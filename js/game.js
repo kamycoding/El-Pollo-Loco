@@ -39,3 +39,10 @@ function endGame() {
     world = null;
   }, 8000);
 }
+
+function init() {
+  canvas = document.querySelector("canvas");
+  keyboardListener = new Keyboard();
+  canvas.focus();
+  document.querySelector("button").blur();
+}
