@@ -21,6 +21,7 @@ class World {
 
   createCharacter() {
     const startX = 100;
+
     this.character = new Character(startX, 0, keyboardListener);
     this.character.y = canvas.height - this.character.height - 40;
     this.character.groundPosition = this.character.y;
@@ -28,13 +29,13 @@ class World {
   }
 
   createStatusBars() {
-    this.statusbars["health"] = new Statusbar("health", 100);
-    this.statusbars["bottle"] = new Statusbar("bottle", 0);
-    this.statusbars["coin"] = new Statusbar("coin", 0);
+    this.statusbars.health = new Statusbar("health", 100);
+    this.statusbars.bottle = new Statusbar("bottle", 0);
+    this.statusbars.coin = new Statusbar("coin", 0);
   }
 
-  setCameraPos(pos) {
-    this.cameraPos = pos;
+  setCameraPos(position) {
+    this.cameraPos = position;
   }
 
   moveBackground(direction) {
@@ -52,70 +53,127 @@ class World {
       this.checkEndbossCollision();
       this.checkCollectables();
       this.checkBottleHitsEndboss();
-    }, 100);
+    }, 40);
   }
 
   checkEnemyCollisions() {
     this.character.getCollisionArea();
 
-    this.level.enemies.forEach((enemy) => {
+    const enemy = this.getCollidingEnemy();
+
+    if (!enemy) return;
+
+    this.handleEnemyCollision(enemy);
+  }
+
+  getCollidingEnemy() {
+    return this.level.enemies.find((enemy) => {
+      if (enemy.isDead) return false;
+
       enemy.getCollisionArea();
 
-      if (this.character.isColliding(enemy)) {
-        if (
-          this.character.isJumping &&
-          this.character.speedY <= 0 &&
-          !enemy.isDead
-        ) {
-          this.smashEnemy(enemy);
-        } else if (
-          !enemy.isDead &&
-          !this.character.isAboveGround() &&
-          !this.character.gotHit
-        ) {
-          this.hitByEnemy(enemy);
-        }
-      }
+      return this.character.isColliding(enemy);
     });
   }
 
+  handleEnemyCollision(enemy) {
+    if (this.isStompCollision(enemy)) {
+      this.smashEnemy(enemy);
+      return;
+    }
+
+    if (this.canTakeEnemyDamage()) {
+      this.hitByEnemy(enemy);
+    }
+  }
+
+  /**
+   * Checks whether the character crosses the enemy's upper edge while falling.
+   *
+   * @param {MovableObject} enemy - Enemy involved in the collision.
+   * @returns {boolean} Whether the collision is a valid stomp.
+   */
+  isStompCollision(enemy) {
+    const characterBottom =
+      this.character.collisionArea.y + this.character.collisionArea.height;
+
+    const previousCharacterBottom = characterBottom + this.character.speedY;
+
+    const enemyTop = enemy.collisionArea.y;
+    const tolerance = 15;
+
+    return (
+      this.character.isJumping &&
+      this.character.speedY <= 0 &&
+      previousCharacterBottom <= enemyTop + tolerance &&
+      characterBottom >= enemyTop
+    );
+  }
+
+  canTakeEnemyDamage() {
+    return (
+      !this.character.isAboveGround() &&
+      !this.character.gotHit &&
+      !this.character.isDead
+    );
+  }
+
   smashEnemy(enemy) {
-    clearInterval(enemy.moveIntervalId);
-    clearInterval(enemy.walkIntervalId);
+    this.stopEnemy(enemy);
+
     enemy.isDead = true;
     enemy.img = enemy.imageCache[enemy.IMAGES_DIE[0]];
 
-    setTimeout(() => {
-      const id = this.level.enemies.findIndex((currentEnemy) => {
-        return currentEnemy.isDead;
-      });
+    this.character.speedY = 10;
 
-      this.level.enemies.splice(id, 1);
+    setTimeout(() => {
+      this.removeEnemy(enemy);
     }, 1500);
+  }
+
+  stopEnemy(enemy) {
+    clearInterval(enemy.moveIntervalId);
+    clearInterval(enemy.walkIntervalId);
+  }
+
+  removeEnemy(enemy) {
+    const enemyIndex = this.level.enemies.indexOf(enemy);
+
+    if (enemyIndex === -1) return;
+
+    this.level.enemies.splice(enemyIndex, 1);
   }
 
   hitByEnemy(enemy) {
     if (enemy instanceof Chicken) {
       this.reduceHealth(this.character, 5, this.statusbars.health);
-    } else if (enemy instanceof Chick) {
-      this.gainHealth(this.character, 5);
-      this.statusbars.health.setValue(this.character.health);
-      clearInterval(enemy.moveIntervalId);
-      clearInterval(enemy.walkIntervalId);
-      enemy.isDead = true;
-
-      const id = this.level.enemies.findIndex((currentEnemy) => {
-        return currentEnemy.isDead;
-      });
-
-      this.level.enemies.splice(id, 1);
+      return;
     }
+
+    if (enemy instanceof Chick) {
+      this.collectHealthFromChick(enemy);
+    }
+  }
+
+  collectHealthFromChick(chick) {
+    this.gainHealth(this.character, 5);
+    this.statusbars.health.setValue(this.character.health);
+
+    this.stopEnemy(chick);
+
+    chick.isDead = true;
+
+    this.removeEnemy(chick);
   }
 
   checkEndbossCollision() {
     this.level.endboss.getCollisionArea();
 
-    if (this.character.isColliding(this.level.endboss)) {
+    if (
+      this.character.isColliding(this.level.endboss) &&
+      !this.character.gotHit &&
+      !this.character.isDead
+    ) {
       this.reduceHealth(this.character, 8, this.statusbars.health);
     }
   }
@@ -126,26 +184,52 @@ class World {
     this.throwables.forEach((bottle) => {
       bottle.getCollisionArea();
 
-      if (
-        bottle.y !== bottle.groundPosition &&
-        this.level.endboss.isColliding(bottle) &&
-        !this.level.endboss.gotHit
-      ) {
-        bottle.smash();
-        this.reduceHealth(this.level.endboss, 20, this.level.endboss.statusbar);
+      if (this.isBottleHittingEndboss(bottle)) {
+        this.damageEndboss(bottle);
       }
     });
   }
 
-  checkCollectables() {
-    this.level.collectables.forEach((item, id) => {
-      if (this.character.isColliding(item)) {
-        if (item.type === "bottle") this.collectBottle();
-        if (item.type === "coin") this.collectCoin();
+  isBottleHittingEndboss(bottle) {
+    return (
+      bottle.y !== bottle.groundPosition &&
+      this.level.endboss.isColliding(bottle) &&
+      !this.level.endboss.gotHit &&
+      !this.level.endboss.isDead
+    );
+  }
 
-        this.level.collectables.splice(id, 1);
-      }
+  damageEndboss(bottle) {
+    bottle.smash();
+
+    this.reduceHealth(this.level.endboss, 20, this.level.endboss.statusbar);
+  }
+
+  checkCollectables() {
+    const itemIndex = this.getCollectableIndex();
+
+    if (itemIndex === -1) return;
+
+    const item = this.level.collectables[itemIndex];
+
+    this.collectItem(item);
+    this.level.collectables.splice(itemIndex, 1);
+  }
+
+  getCollectableIndex() {
+    return this.level.collectables.findIndex((item) => {
+      return this.character.isColliding(item);
     });
+  }
+
+  collectItem(item) {
+    if (item.type === "bottle") {
+      this.collectBottle();
+    }
+
+    if (item.type === "coin") {
+      this.collectCoin();
+    }
   }
 
   collectBottle() {
@@ -164,25 +248,32 @@ class World {
     );
   }
 
-  reduceHealth(obj, amount, statusbar) {
-    obj.health = Math.max(0, obj.health - amount);
-    statusbar.setValue(obj.health);
+  reduceHealth(object, amount, statusbar) {
+    object.health = Math.max(0, object.health - amount);
 
-    if (obj.health <= 0) {
-      this.clearAllIntervals();
-      obj.isDead = true;
-      obj.die();
-    } else {
-      obj.gotHit = true;
-      obj.hurt();
+    statusbar.setValue(object.health);
+
+    if (object.health <= 0) {
+      this.handleObjectDeath(object);
+      return;
     }
+
+    object.gotHit = true;
+    object.hurt();
   }
 
-  gainHealth(obj, amount) {
-    obj.health = Math.min(100, obj.health + amount);
+  handleObjectDeath(object) {
+    this.clearAllIntervals();
+
+    object.isDead = true;
+    object.die();
   }
 
-  gameOver(obj) {
+  gainHealth(object, amount) {
+    object.health = Math.min(100, object.health + amount);
+  }
+
+  gameOver() {
     endGame(this);
   }
 
@@ -193,8 +284,7 @@ class World {
 
   stopEnemiesAndClouds() {
     this.level.enemies.forEach((enemy) => {
-      clearInterval(enemy.moveIntervalId);
-      clearInterval(enemy.walkIntervalId);
+      this.stopEnemy(enemy);
     });
 
     this.level.background.clouds.forEach((cloud) => {
@@ -222,6 +312,7 @@ class World {
 
   drawWorld() {
     this.ctx.translate(this.cameraPos, 0);
+
     this.drawObjects(this.level.background.sky);
     this.drawObjects(this.level.background.clouds);
     this.drawObjects(this.level.background.landscapeLayer);
@@ -230,6 +321,7 @@ class World {
     this.drawObject(this.level.endboss);
     this.drawObjects(this.level.enemies);
     this.drawObjects(this.throwables);
+
     this.ctx.translate(-this.cameraPos, 0);
   }
 
@@ -248,33 +340,46 @@ class World {
     if (this.animationFrameId === null) return;
 
     cancelAnimationFrame(this.animationFrameId);
+
     this.animationFrameId = null;
     this.isRendering = false;
   }
 
   drawObjects(objects) {
-    objects.forEach((obj) => this.drawObject(obj));
+    objects.forEach((object) => {
+      this.drawObject(object);
+    });
   }
 
-  drawObject(obj) {
-    this.mirrorImage(obj);
-    this.ctx.drawImage(obj.img, obj.x, obj.y, obj.width, obj.height);
-    this.resetMirror(obj);
+  drawObject(object) {
+    this.mirrorImage(object);
+
+    this.ctx.drawImage(
+      object.img,
+      object.x,
+      object.y,
+      object.width,
+      object.height,
+    );
+
+    this.resetMirror(object);
   }
 
-  mirrorImage(obj) {
-    if (obj.isFlipped) {
-      this.ctx.save();
-      this.ctx.translate(obj.width, 0);
-      this.ctx.scale(-1, 1);
-      obj.x *= -1;
-    }
+  mirrorImage(object) {
+    if (!object.isFlipped) return;
+
+    this.ctx.save();
+    this.ctx.translate(object.width, 0);
+    this.ctx.scale(-1, 1);
+
+    object.x *= -1;
   }
 
-  resetMirror(obj) {
-    if (obj.isFlipped) {
-      obj.x *= -1;
-      this.ctx.restore();
-    }
+  resetMirror(object) {
+    if (!object.isFlipped) return;
+
+    object.x *= -1;
+
+    this.ctx.restore();
   }
 }
