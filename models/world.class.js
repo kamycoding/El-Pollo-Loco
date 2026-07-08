@@ -81,8 +81,14 @@ class World {
     object.health = Math.min(100, object.health + amount);
   }
 
-  gameOver() {
-    endGame(this);
+  gameOver(object) {
+    endGame(this, this.getGameResult(object));
+  }
+
+  getGameResult(object) {
+    if (object instanceof Endboss) return "win";
+
+    return "lose";
   }
 
   clearAllIntervals() {

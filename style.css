@@ -10,8 +10,89 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#game-container {
+  position: relative;
+  width: 720px;
+  height: 480px;
+  overflow: hidden;
+  background-color: #000;
 }
 
 canvas {
   display: block;
+  width: 720px;
+  height: 480px;
+}
+
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 10;
+}
+
+.game-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
+}
+
+.overlay-card {
+  position: relative;
+  width: 420px;
+  padding: 32px;
+  border-radius: 20px;
+  text-align: center;
+  color: #fff;
+  background: rgba(40, 20, 8, 0.78);
+  border: 2px solid rgba(255, 190, 80, 0.8);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.overlay-card h1 {
+  margin-bottom: 12px;
+  font-size: 42px;
+  color: #ffcc4d;
+}
+
+.overlay-card p {
+  margin-bottom: 24px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.overlay-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+button {
+  min-width: 120px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  background-color: #ffb703;
+  color: #2b1600;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ffd166;
+}
+
+.hidden {
+  display: none;
 }
