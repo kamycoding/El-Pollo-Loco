@@ -4,17 +4,15 @@ let keyboardListener;
 let lastActiveTimestamp = Date.now();
 let intervals = [];
 let isGameRunning = false;
-
-function init() {
-  canvas = document.querySelector("canvas");
-  keyboardListener = new Keyboard();
-}
+let isGameEnding = false;
 
 function startGame() {
+  if (isGameRunning || isGameEnding) return;
+
+  isGameRunning = true;
   createWorld();
   world.draw();
   initLevel1Intervals();
-  isGameRunning = true;
 }
 
 function createWorld() {
@@ -26,17 +24,35 @@ function createWorld() {
 }
 
 function setStopableInterval(fn, time) {
-  intervals.push(setInterval(fn, time));
+  const intervalId = setInterval(fn, time);
+  intervals.push(intervalId);
+}
+
+function clearAllIntervals() {
+  intervals.forEach((intervalId) => clearInterval(intervalId));
+  intervals = [];
 }
 
 function calcRandomNumber(min, max) {
   return Math.round(Math.random() * (max - min)) + min;
 }
 
-function endGame() {
+function endGame(finishedWorld) {
+  if (isGameEnding) return;
+
+  isGameEnding = true;
+
   setTimeout(() => {
-    world.stopEnemiesAndClouds();
-    world = null;
+    clearAllIntervals();
+    finishedWorld.stopEnemiesAndClouds();
+    finishedWorld.stopDrawing();
+
+    if (world === finishedWorld) {
+      world = null;
+    }
+
+    isGameRunning = false;
+    isGameEnding = false;
   }, 8000);
 }
 

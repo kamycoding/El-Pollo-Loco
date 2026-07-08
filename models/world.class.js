@@ -6,6 +6,8 @@ class World {
   statusbars = {};
   throwables = [];
   cameraPos = 0;
+  animationFrameId = null;
+  isRendering = false;
 
   constructor(canvas) {
     this.canvas = canvas;
@@ -36,10 +38,10 @@ class World {
   }
 
   moveBackground(direction) {
-    for (let l = 0; l < 2; l++) {
-      for (let i = 0; i < this.level.sceneParts; i++) {
-        this.level.background.landscapeLayer[l * 2 + i].x +=
-          this.level.parallaxLayers[l] * direction;
+    for (let layer = 0; layer < 2; layer++) {
+      for (let part = 0; part < this.level.sceneParts; part++) {
+        this.level.background.landscapeLayer[layer * 2 + part].x +=
+          this.level.parallaxLayers[layer] * direction;
       }
     }
   }
@@ -55,8 +57,10 @@ class World {
 
   checkEnemyCollisions() {
     this.character.getCollisionArea();
+
     this.level.enemies.forEach((enemy) => {
       enemy.getCollisionArea();
+
       if (this.character.isColliding(enemy)) {
         if (
           this.character.isJumping &&
@@ -80,8 +84,12 @@ class World {
     clearInterval(enemy.walkIntervalId);
     enemy.isDead = true;
     enemy.img = enemy.imageCache[enemy.IMAGES_DIE[0]];
+
     setTimeout(() => {
-      const id = this.level.enemies.findIndex((e) => e.isDead);
+      const id = this.level.enemies.findIndex((currentEnemy) => {
+        return currentEnemy.isDead;
+      });
+
       this.level.enemies.splice(id, 1);
     }, 1500);
   }
@@ -95,13 +103,18 @@ class World {
       clearInterval(enemy.moveIntervalId);
       clearInterval(enemy.walkIntervalId);
       enemy.isDead = true;
-      const id = this.level.enemies.findIndex((e) => e.isDead);
+
+      const id = this.level.enemies.findIndex((currentEnemy) => {
+        return currentEnemy.isDead;
+      });
+
       this.level.enemies.splice(id, 1);
     }
   }
 
   checkEndbossCollision() {
     this.level.endboss.getCollisionArea();
+
     if (this.character.isColliding(this.level.endboss)) {
       this.reduceHealth(this.character, 8, this.statusbars.health);
     }
@@ -109,10 +122,12 @@ class World {
 
   checkBottleHitsEndboss() {
     this.level.endboss.getCollisionArea();
+
     this.throwables.forEach((bottle) => {
       bottle.getCollisionArea();
+
       if (
-        bottle.y != bottle.groundPosition &&
+        bottle.y !== bottle.groundPosition &&
         this.level.endboss.isColliding(bottle) &&
         !this.level.endboss.gotHit
       ) {
@@ -125,8 +140,9 @@ class World {
   checkCollectables() {
     this.level.collectables.forEach((item, id) => {
       if (this.character.isColliding(item)) {
-        if (item.type == "bottle") this.collectBottle();
-        if (item.type == "coin") this.collectCoin();
+        if (item.type === "bottle") this.collectBottle();
+        if (item.type === "coin") this.collectCoin();
+
         this.level.collectables.splice(id, 1);
       }
     });
@@ -134,6 +150,7 @@ class World {
 
   collectBottle() {
     this.character.bottleCount++;
+
     this.statusbars.bottle.setValue(
       (100 / this.level.maxBottles) * this.character.bottleCount,
     );
@@ -141,6 +158,7 @@ class World {
 
   collectCoin() {
     this.character.coinCount++;
+
     this.statusbars.coin.setValue(
       (100 / this.level.maxCoins) * this.character.coinCount,
     );
@@ -149,6 +167,7 @@ class World {
   reduceHealth(obj, amount, statusbar) {
     obj.health = Math.max(0, obj.health - amount);
     statusbar.setValue(obj.health);
+
     if (obj.health <= 0) {
       this.clearAllIntervals();
       obj.isDead = true;
@@ -164,12 +183,11 @@ class World {
   }
 
   gameOver(obj) {
-    isGameRunning = false;
-    endGame();
+    endGame(this);
   }
 
   clearAllIntervals() {
-    intervals.forEach((interval) => clearInterval(interval));
+    intervals.forEach((intervalId) => clearInterval(intervalId));
     intervals = [];
   }
 
@@ -178,12 +196,31 @@ class World {
       clearInterval(enemy.moveIntervalId);
       clearInterval(enemy.walkIntervalId);
     });
+
     this.level.background.clouds.forEach((cloud) => {
       clearInterval(cloud.moveIntervalId);
     });
   }
 
   draw() {
+    if (this.isRendering) return;
+
+    this.isRendering = true;
+    this.renderFrame();
+  }
+
+  renderFrame() {
+    this.clearCanvas();
+    this.drawWorld();
+    this.drawInterface();
+    this.scheduleNextFrame();
+  }
+
+  clearCanvas() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  drawWorld() {
     this.ctx.translate(this.cameraPos, 0);
     this.drawObjects(this.level.background.sky);
     this.drawObjects(this.level.background.clouds);
@@ -194,13 +231,29 @@ class World {
     this.drawObjects(this.level.enemies);
     this.drawObjects(this.throwables);
     this.ctx.translate(-this.cameraPos, 0);
-    this.drawObjects(Object.values(this.statusbars));
-    this.drawObject(this.level.endboss.statusbar);
-    requestAnimationFrame(() => this.draw());
   }
 
-  drawObjects(array) {
-    array.forEach((obj) => this.drawObject(obj));
+  drawInterface() {
+    this.drawObjects(Object.values(this.statusbars));
+    this.drawObject(this.level.endboss.statusbar);
+  }
+
+  scheduleNextFrame() {
+    this.animationFrameId = requestAnimationFrame(() => {
+      this.renderFrame();
+    });
+  }
+
+  stopDrawing() {
+    if (this.animationFrameId === null) return;
+
+    cancelAnimationFrame(this.animationFrameId);
+    this.animationFrameId = null;
+    this.isRendering = false;
+  }
+
+  drawObjects(objects) {
+    objects.forEach((obj) => this.drawObject(obj));
   }
 
   drawObject(obj) {
@@ -214,13 +267,13 @@ class World {
       this.ctx.save();
       this.ctx.translate(obj.width, 0);
       this.ctx.scale(-1, 1);
-      obj.x = obj.x * -1;
+      obj.x *= -1;
     }
   }
 
   resetMirror(obj) {
     if (obj.isFlipped) {
-      obj.x = obj.x * -1;
+      obj.x *= -1;
       this.ctx.restore();
     }
   }
