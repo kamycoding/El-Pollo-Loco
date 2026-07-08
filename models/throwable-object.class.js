@@ -22,6 +22,7 @@ class ThrowableObject extends MovableObject {
 
   throwIntervalId = null;
   splashIntervalId = null;
+  landedAt = null;
 
   constructor(x, y, isFlipped) {
     super(x, y);
@@ -63,6 +64,7 @@ class ThrowableObject extends MovableObject {
     clearInterval(this.throwIntervalId);
 
     this.throwIntervalId = null;
+    this.landedAt = Date.now();
 
     this.loadImage(this.IMAGES_GROUND[Math.round(Math.random())]);
   }
@@ -77,6 +79,7 @@ class ThrowableObject extends MovableObject {
 
     this.currentImage = 0;
     this.isSmashed = true;
+    this.landedAt = null;
 
     clearInterval(this.throwIntervalId);
 

@@ -1,5 +1,6 @@
 class CollisionManager {
   world;
+  groundedBottleLifetime = 3000;
 
   constructor(world) {
     this.world = world;
@@ -19,6 +20,7 @@ class CollisionManager {
     this.checkEndbossCollision();
     this.checkCollectables();
     this.checkBottleCollisions();
+    this.cleanupGroundedBottles();
   }
 
   isWorldReady() {
@@ -215,6 +217,19 @@ class CollisionManager {
     if (bottleIndex === -1) return;
 
     this.world.throwables.splice(bottleIndex, 1);
+  }
+
+  cleanupGroundedBottles() {
+    this.world.throwables = this.world.throwables.filter((bottle) => {
+      return !this.shouldRemoveGroundedBottle(bottle);
+    });
+  }
+
+  shouldRemoveGroundedBottle(bottle) {
+    return (
+      bottle.landedAt &&
+      Date.now() - bottle.landedAt > this.groundedBottleLifetime
+    );
   }
 
   checkCollectables() {
