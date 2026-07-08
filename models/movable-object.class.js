@@ -18,26 +18,37 @@ class MovableObject extends DrawableObject {
     super(x, y);
   }
 
-  isColliding(obj) {
-    const ax = this.getCollisionX(this);
-    const ay = this.collisionArea.y;
-    const bx = this.getCollisionX(obj);
-    const by = obj.collisionArea.y;
+  isColliding(object) {
+    const thisCollisionX = this.getCollisionX(this);
+    const objectCollisionX = this.getCollisionX(object);
+
     return (
-      ax + this.collisionArea.width >= bx &&
-      ax <= bx + obj.collisionArea.width &&
-      ay + this.collisionArea.height >= by &&
-      ay <= by + obj.collisionArea.height
+      thisCollisionX + this.collisionArea.width >= objectCollisionX &&
+      thisCollisionX <= objectCollisionX + object.collisionArea.width &&
+      this.collisionArea.y + this.collisionArea.height >=
+        object.collisionArea.y &&
+      this.collisionArea.y <=
+        object.collisionArea.y + object.collisionArea.height
     );
   }
 
-  getCollisionX(obj) {
-    if (obj.isFlipped) return obj.x + obj.collisionArea.x + obj.x;
-    return obj.collisionArea.x;
+  /**
+   * Returns the horizontal collision position and mirrors its offset
+   * when the object is facing the opposite direction.
+   *
+   * @param {MovableObject} object - Object whose collision position is needed.
+   * @returns {number} Horizontal position of the collision area.
+   */
+  getCollisionX(object) {
+    if (!object.isFlipped) return object.collisionArea.x;
+
+    const offsetX = object.width * object.collisionBasis.offsetX;
+
+    return object.x + object.width - offsetX - object.collisionArea.width;
   }
 
   playAnimation(images) {
-    this.currentImage = this.currentImage % images.length;
+    this.currentImage %= images.length;
     this.img = this.imageCache[images[this.currentImage]];
     this.currentImage++;
   }
@@ -47,13 +58,16 @@ class MovableObject extends DrawableObject {
   }
 
   applyGravity() {
-    let interval = setInterval(() => {
+    const intervalId = setInterval(() => {
       this.y -= this.speedY;
       this.speedY -= this.acceleration;
+
       if (!this.isAboveGround() || this.isSmashed) {
-        clearInterval(interval);
+        clearInterval(intervalId);
         this.speedY = 0;
+
         if (!this.isSmashed) this.y = this.groundPosition;
+
         if (this instanceof Character) {
           setTimeout(() => {
             this.isJumping = false;
@@ -67,10 +81,10 @@ class MovableObject extends DrawableObject {
     this.moveInterval = calcRandomNumber(fast, slow);
   }
 
-  startMoving(objArray, direction) {
+  startMoving(objectArray, direction) {
     this.moveIntervalId = setInterval(() => {
       this.move(direction);
-      this.handleEdge(objArray);
+      this.handleEdge(objectArray);
     }, this.moveInterval);
   }
 
@@ -81,26 +95,30 @@ class MovableObject extends DrawableObject {
   }
 
   move(direction) {
-    this.x = this.x + this.speedX * direction;
+    this.x += this.speedX * direction;
   }
 
-  handleEdge(objArray) {
+  handleEdge(objectArray) {
     if (this.x + this.width < 0) {
-      const id = objArray.findIndex((o) => o === this);
+      const objectIndex = objectArray.findIndex((object) => object === this);
+
       clearInterval(this.moveIntervalId);
       clearInterval(this.walkIntervalId);
-      objArray.splice(id, 1);
+      objectArray.splice(objectIndex, 1);
     }
   }
 
   die() {
     this.currentImage = 0;
-    let interval = setInterval(() => {
+
+    const intervalId = setInterval(() => {
       this.playAnimation(this.IMAGES_DIE);
+
       if (this.currentImage >= this.IMAGES_DIE.length) {
-        clearInterval(interval);
+        clearInterval(intervalId);
       }
     }, 160);
+
     world.gameOver(this);
   }
 }
