@@ -35,7 +35,7 @@ class Endboss extends MovableObject {
     "./img/4_enemie_boss_chicken/5_dead/G25.png",
     "./img/4_enemie_boss_chicken/5_dead/G26.png",
   ];
-  statusbar = new Statusbar("health", 100);
+  statusbar = new Statusbar("endbossHealth", 100);
   status = "alert";
   isAnimPaused = false;
 

@@ -32,7 +32,7 @@ class World {
   }
 
   createStatusBars() {
-    this.statusbars.health = new Statusbar("health", 100);
+    this.statusbars.health = new Statusbar("characterHealth", 100);
     this.statusbars.bottle = new Statusbar("bottle", 0);
     this.statusbars.coin = new Statusbar("coin", 0);
   }

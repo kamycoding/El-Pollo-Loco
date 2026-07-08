@@ -1,6 +1,6 @@
 class Statusbar extends DrawableObject {
   TYPE = {
-    health: {
+    characterHealth: {
       x: 70,
       y: 10,
       images: [
@@ -12,6 +12,20 @@ class Statusbar extends DrawableObject {
         "./img/7_statusbars/1_statusbar/2_statusbar_health/orange/100.png",
       ],
     },
+
+    endbossHealth: {
+      x: 450,
+      y: 10,
+      images: [
+        "./img/7_statusbars/1_statusbar/2_statusbar_health/blue/0.png",
+        "./img/7_statusbars/1_statusbar/2_statusbar_health/blue/20.png",
+        "./img/7_statusbars/1_statusbar/2_statusbar_health/blue/40.png",
+        "./img/7_statusbars/1_statusbar/2_statusbar_health/blue/60.png",
+        "./img/7_statusbars/1_statusbar/2_statusbar_health/blue/80.png",
+        "./img/7_statusbars/1_statusbar/2_statusbar_health/blue/100.png",
+      ],
+    },
+
     bottle: {
       x: 50,
       y: 45,
@@ -24,6 +38,7 @@ class Statusbar extends DrawableObject {
         "./img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/100.png",
       ],
     },
+
     coin: {
       x: 30,
       y: 80,
@@ -40,18 +55,22 @@ class Statusbar extends DrawableObject {
 
   constructor(type, percent) {
     super(0, 0);
+
     this.type = type;
     this.aspectRatio = 595 / 158;
     this.width = 200;
     this.height = this.width / this.aspectRatio;
     this.x = this.TYPE[type].x;
     this.y = this.TYPE[type].y;
+
     this.loadImageCache(this.TYPE[type].images);
     this.setValue(percent);
   }
 
   setValue(percent) {
-    this.currentImage = Math.floor((percent * 5) / 100);
+    const safePercent = Math.max(0, Math.min(100, percent));
+
+    this.currentImage = Math.floor((safePercent * 5) / 100);
     this.img = this.imageCache[this.TYPE[this.type].images[this.currentImage]];
   }
 }
