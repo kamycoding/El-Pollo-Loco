@@ -170,12 +170,18 @@ class Character extends MovableObject {
   }
 
   startJumpAnimation() {
-    let interval = setInterval(() => {
-      this.playAnimation(this.IMAGES_JUMP);
+    const jumpIntervalId = setInterval(() => {
+      if (!this.gotHit) {
+        this.playAnimation(this.IMAGES_JUMP);
+      }
+
       if (!this.isAboveGround()) {
-        clearInterval(interval);
+        clearInterval(jumpIntervalId);
         this.speedY = 0;
-        this.reset();
+
+        if (!this.gotHit) {
+          this.reset();
+        }
       }
     }, 90);
   }
@@ -224,19 +230,25 @@ class Character extends MovableObject {
 
   hurt() {
     this.currentImage = 0;
-    let interval = setInterval(() => {
+
+    const hurtIntervalId = setInterval(() => {
       this.playAnimation(this.IMAGES_HURT);
-      if (
-        this.currentImage >= this.IMAGES_HURT.length ||
-        this.isAboveGround()
-      ) {
-        clearInterval(interval);
-        setTimeout(() => {
-          this.gotHit = false;
-          this.reset();
-        }, 200);
+
+      if (this.currentImage >= this.IMAGES_HURT.length) {
+        clearInterval(hurtIntervalId);
+        this.finishHurtAnimation();
       }
-    }, 90);
+    }, 120);
+  }
+
+  finishHurtAnimation() {
+    setTimeout(() => {
+      this.gotHit = false;
+
+      if (!this.isDead) {
+        this.reset();
+      }
+    }, 250);
   }
 
   reset() {

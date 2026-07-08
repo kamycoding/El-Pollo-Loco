@@ -1,6 +1,8 @@
 class CollisionManager {
   world;
   groundedBottleLifetime = 3000;
+  characterDamageCooldown = 1000;
+  lastCharacterDamageAt = 0;
 
   constructor(world) {
     this.world = world;
@@ -84,9 +86,30 @@ class CollisionManager {
   }
 
   canTakeEnemyDamage() {
-    const character = this.world.character;
+    return !this.world.character.isAboveGround() && this.canDamageCharacter();
+  }
 
-    return !character.isAboveGround() && !character.gotHit && !character.isDead;
+  canDamageCharacter() {
+    const character = this.world.character;
+    const now = Date.now();
+
+    return (
+      !character.gotHit &&
+      !character.isDead &&
+      now - this.lastCharacterDamageAt >= this.characterDamageCooldown
+    );
+  }
+
+  damageCharacter(amount) {
+    if (!this.canDamageCharacter()) return;
+
+    this.lastCharacterDamageAt = Date.now();
+
+    this.world.reduceHealth(
+      this.world.character,
+      amount,
+      this.world.statusbars.health,
+    );
   }
 
   smashEnemy(enemy) {
@@ -107,12 +130,7 @@ class CollisionManager {
 
   hitByEnemy(enemy) {
     if (enemy instanceof Chicken) {
-      this.world.reduceHealth(
-        this.world.character,
-        5,
-        this.world.statusbars.health,
-      );
-
+      this.damageCharacter(5);
       return;
     }
 
@@ -139,12 +157,8 @@ class CollisionManager {
 
     endboss.getCollisionArea();
 
-    if (
-      character.isColliding(endboss) &&
-      !character.gotHit &&
-      !character.isDead
-    ) {
-      this.world.reduceHealth(character, 8, this.world.statusbars.health);
+    if (character.isColliding(endboss)) {
+      this.damageCharacter(8);
     }
   }
 
