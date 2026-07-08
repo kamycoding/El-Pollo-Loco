@@ -18,7 +18,7 @@ class CollisionManager {
     this.checkEnemyCollisions();
     this.checkEndbossCollision();
     this.checkCollectables();
-    this.checkBottleHitsEndboss();
+    this.checkBottleCollisions();
   }
 
   isWorldReady() {
@@ -70,7 +70,6 @@ class CollisionManager {
       character.collisionArea.y + character.collisionArea.height;
 
     const previousCharacterBottom = characterBottom + character.speedY;
-
     const enemyTop = enemy.collisionArea.y;
     const tolerance = 15;
 
@@ -89,12 +88,15 @@ class CollisionManager {
   }
 
   smashEnemy(enemy) {
+    this.defeatEnemy(enemy);
+    this.world.character.speedY = 10;
+  }
+
+  defeatEnemy(enemy) {
     this.world.stopEnemy(enemy);
 
     enemy.isDead = true;
     enemy.img = enemy.imageCache[enemy.IMAGES_DIE[0]];
-
-    this.world.character.speedY = 10;
 
     setTimeout(() => {
       this.world.removeEnemy(enemy);
@@ -144,33 +146,75 @@ class CollisionManager {
     }
   }
 
-  checkBottleHitsEndboss() {
+  checkBottleCollisions() {
+    this.world.throwables.forEach((bottle) => {
+      if (!this.canBottleHit(bottle)) return;
+
+      bottle.getCollisionArea();
+
+      if (this.handleBottleEnemyCollision(bottle)) return;
+
+      this.handleBottleEndbossCollision(bottle);
+    });
+  }
+
+  canBottleHit(bottle) {
+    return !bottle.isSmashed && bottle.y < bottle.groundPosition;
+  }
+
+  handleBottleEnemyCollision(bottle) {
+    const enemy = this.getBottleHitEnemy(bottle);
+
+    if (!enemy) return false;
+
+    this.defeatEnemy(enemy);
+    this.smashBottle(bottle);
+
+    return true;
+  }
+
+  getBottleHitEnemy(bottle) {
+    return this.world.level.enemies.find((enemy) => {
+      if (!this.canBottleHitEnemy(enemy)) return false;
+
+      enemy.getCollisionArea();
+
+      return enemy.isColliding(bottle);
+    });
+  }
+
+  canBottleHitEnemy(enemy) {
+    return enemy instanceof Chicken && !enemy.isDead;
+  }
+
+  handleBottleEndbossCollision(bottle) {
     const endboss = this.world.level.endboss;
 
     endboss.getCollisionArea();
 
-    this.world.throwables.forEach((bottle) => {
-      bottle.getCollisionArea();
+    if (!this.isBottleHittingEndboss(bottle, endboss)) return;
 
-      if (this.isBottleHittingEndboss(bottle, endboss)) {
-        this.damageEndboss(bottle, endboss);
-      }
-    });
+    this.smashBottle(bottle);
+
+    this.world.reduceHealth(endboss, 20, endboss.statusbar);
   }
 
   isBottleHittingEndboss(bottle, endboss) {
-    return (
-      bottle.y !== bottle.groundPosition &&
-      endboss.isColliding(bottle) &&
-      !endboss.gotHit &&
-      !endboss.isDead
-    );
+    return !endboss.isDead && !endboss.gotHit && endboss.isColliding(bottle);
   }
 
-  damageEndboss(bottle, endboss) {
-    bottle.smash();
+  smashBottle(bottle) {
+    bottle.smash(() => {
+      this.removeThrowable(bottle);
+    });
+  }
 
-    this.world.reduceHealth(endboss, 20, endboss.statusbar);
+  removeThrowable(bottle) {
+    const bottleIndex = this.world.throwables.indexOf(bottle);
+
+    if (bottleIndex === -1) return;
+
+    this.world.throwables.splice(bottleIndex, 1);
   }
 
   checkCollectables() {
