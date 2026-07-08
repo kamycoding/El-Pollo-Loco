@@ -3,6 +3,7 @@ class World {
   ctx;
   level;
   character;
+  collisionManager;
   statusbars = {};
   throwables = [];
   cameraPos = 0;
@@ -12,7 +13,7 @@ class World {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-    this.checkCollisions();
+    this.collisionManager = new CollisionManager(this);
   }
 
   setLevel(level) {
@@ -23,7 +24,9 @@ class World {
     const startX = 100;
 
     this.character = new Character(startX, 0, keyboardListener);
-    this.character.y = canvas.height - this.character.height - 40;
+
+    this.character.y = this.canvas.height - this.character.height - 40;
+
     this.character.groundPosition = this.character.y;
     this.character.applyGravity();
   }
@@ -40,217 +43,22 @@ class World {
 
   moveBackground(direction) {
     for (let layer = 0; layer < 2; layer++) {
-      for (let part = 0; part < this.level.sceneParts; part++) {
-        this.level.background.landscapeLayer[layer * 2 + part].x +=
-          this.level.parallaxLayers[layer] * direction;
-      }
+      this.moveBackgroundLayer(layer, direction);
     }
   }
 
-  checkCollisions() {
-    setStopableInterval(() => {
-      this.checkEnemyCollisions();
-      this.checkEndbossCollision();
-      this.checkCollectables();
-      this.checkBottleHitsEndboss();
-    }, 40);
-  }
+  moveBackgroundLayer(layer, direction) {
+    for (let part = 0; part < this.level.sceneParts; part++) {
+      const backgroundIndex = layer * 2 + part;
+      const layerSpeed = this.level.parallaxLayers[layer];
 
-  checkEnemyCollisions() {
-    this.character.getCollisionArea();
-
-    const enemy = this.getCollidingEnemy();
-
-    if (!enemy) return;
-
-    this.handleEnemyCollision(enemy);
-  }
-
-  getCollidingEnemy() {
-    return this.level.enemies.find((enemy) => {
-      if (enemy.isDead) return false;
-
-      enemy.getCollisionArea();
-
-      return this.character.isColliding(enemy);
-    });
-  }
-
-  handleEnemyCollision(enemy) {
-    if (this.isStompCollision(enemy)) {
-      this.smashEnemy(enemy);
-      return;
+      this.level.background.landscapeLayer[backgroundIndex].x +=
+        layerSpeed * direction;
     }
-
-    if (this.canTakeEnemyDamage()) {
-      this.hitByEnemy(enemy);
-    }
-  }
-
-  /**
-   * Checks whether the character crosses the enemy's upper edge while falling.
-   *
-   * @param {MovableObject} enemy - Enemy involved in the collision.
-   * @returns {boolean} Whether the collision is a valid stomp.
-   */
-  isStompCollision(enemy) {
-    const characterBottom =
-      this.character.collisionArea.y + this.character.collisionArea.height;
-
-    const previousCharacterBottom = characterBottom + this.character.speedY;
-
-    const enemyTop = enemy.collisionArea.y;
-    const tolerance = 15;
-
-    return (
-      this.character.isJumping &&
-      this.character.speedY <= 0 &&
-      previousCharacterBottom <= enemyTop + tolerance &&
-      characterBottom >= enemyTop
-    );
-  }
-
-  canTakeEnemyDamage() {
-    return (
-      !this.character.isAboveGround() &&
-      !this.character.gotHit &&
-      !this.character.isDead
-    );
-  }
-
-  smashEnemy(enemy) {
-    this.stopEnemy(enemy);
-
-    enemy.isDead = true;
-    enemy.img = enemy.imageCache[enemy.IMAGES_DIE[0]];
-
-    this.character.speedY = 10;
-
-    setTimeout(() => {
-      this.removeEnemy(enemy);
-    }, 1500);
-  }
-
-  stopEnemy(enemy) {
-    clearInterval(enemy.moveIntervalId);
-    clearInterval(enemy.walkIntervalId);
-  }
-
-  removeEnemy(enemy) {
-    const enemyIndex = this.level.enemies.indexOf(enemy);
-
-    if (enemyIndex === -1) return;
-
-    this.level.enemies.splice(enemyIndex, 1);
-  }
-
-  hitByEnemy(enemy) {
-    if (enemy instanceof Chicken) {
-      this.reduceHealth(this.character, 5, this.statusbars.health);
-      return;
-    }
-
-    if (enemy instanceof Chick) {
-      this.collectHealthFromChick(enemy);
-    }
-  }
-
-  collectHealthFromChick(chick) {
-    this.gainHealth(this.character, 5);
-    this.statusbars.health.setValue(this.character.health);
-
-    this.stopEnemy(chick);
-
-    chick.isDead = true;
-
-    this.removeEnemy(chick);
-  }
-
-  checkEndbossCollision() {
-    this.level.endboss.getCollisionArea();
-
-    if (
-      this.character.isColliding(this.level.endboss) &&
-      !this.character.gotHit &&
-      !this.character.isDead
-    ) {
-      this.reduceHealth(this.character, 8, this.statusbars.health);
-    }
-  }
-
-  checkBottleHitsEndboss() {
-    this.level.endboss.getCollisionArea();
-
-    this.throwables.forEach((bottle) => {
-      bottle.getCollisionArea();
-
-      if (this.isBottleHittingEndboss(bottle)) {
-        this.damageEndboss(bottle);
-      }
-    });
-  }
-
-  isBottleHittingEndboss(bottle) {
-    return (
-      bottle.y !== bottle.groundPosition &&
-      this.level.endboss.isColliding(bottle) &&
-      !this.level.endboss.gotHit &&
-      !this.level.endboss.isDead
-    );
-  }
-
-  damageEndboss(bottle) {
-    bottle.smash();
-
-    this.reduceHealth(this.level.endboss, 20, this.level.endboss.statusbar);
-  }
-
-  checkCollectables() {
-    const itemIndex = this.getCollectableIndex();
-
-    if (itemIndex === -1) return;
-
-    const item = this.level.collectables[itemIndex];
-
-    this.collectItem(item);
-    this.level.collectables.splice(itemIndex, 1);
-  }
-
-  getCollectableIndex() {
-    return this.level.collectables.findIndex((item) => {
-      return this.character.isColliding(item);
-    });
-  }
-
-  collectItem(item) {
-    if (item.type === "bottle") {
-      this.collectBottle();
-    }
-
-    if (item.type === "coin") {
-      this.collectCoin();
-    }
-  }
-
-  collectBottle() {
-    this.character.bottleCount++;
-
-    this.statusbars.bottle.setValue(
-      (100 / this.level.maxBottles) * this.character.bottleCount,
-    );
-  }
-
-  collectCoin() {
-    this.character.coinCount++;
-
-    this.statusbars.coin.setValue(
-      (100 / this.level.maxCoins) * this.character.coinCount,
-    );
   }
 
   reduceHealth(object, amount, statusbar) {
     object.health = Math.max(0, object.health - amount);
-
     statusbar.setValue(object.health);
 
     if (object.health <= 0) {
@@ -278,8 +86,24 @@ class World {
   }
 
   clearAllIntervals() {
-    intervals.forEach((intervalId) => clearInterval(intervalId));
+    intervals.forEach((intervalId) => {
+      clearInterval(intervalId);
+    });
+
     intervals = [];
+  }
+
+  stopEnemy(enemy) {
+    clearInterval(enemy.moveIntervalId);
+    clearInterval(enemy.walkIntervalId);
+  }
+
+  removeEnemy(enemy) {
+    const enemyIndex = this.level.enemies.indexOf(enemy);
+
+    if (enemyIndex === -1) return;
+
+    this.level.enemies.splice(enemyIndex, 1);
   }
 
   stopEnemiesAndClouds() {
