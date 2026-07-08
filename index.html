@@ -7,19 +7,42 @@
     <link rel="stylesheet" href="style.css" />
   </head>
 
-  <body>
+  <body onload="showStartScreen()">
     <div id="game-container">
-      <canvas id="canvas" width="720" height="480"></canvas>
+      <canvas id="canvas" width="720" height="480" tabindex="0"></canvas>
 
-      <button
-        onclick="
-          init();
-          startGame();
-        "
-        onkeydown="event.preventDefault()"
-      >
-        Start
-      </button>
+      <div id="game-overlay" class="game-overlay">
+        <div class="overlay-card">
+          <h1 id="overlay-title">El Pollo Loco</h1>
+          <p id="overlay-message">
+            Collect bottles, defeat chickens and beat the final boss.
+          </p>
+
+          <div class="overlay-actions">
+            <button id="start-button" type="button" onclick="startGame()">
+              Start
+            </button>
+
+            <button
+              id="restart-button"
+              class="hidden"
+              type="button"
+              onclick="restartGame()"
+            >
+              Restart
+            </button>
+
+            <button
+              id="home-button"
+              class="hidden"
+              type="button"
+              onclick="goToHomeScreen()"
+            >
+              Home
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="models/drawable-object.class.js"></script>
