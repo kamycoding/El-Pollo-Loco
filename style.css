@@ -74,6 +74,7 @@ canvas {
 .overlay-actions {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 12px;
 }
 

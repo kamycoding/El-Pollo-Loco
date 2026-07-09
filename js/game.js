@@ -17,6 +17,8 @@ let overlayMessage;
 let startButton;
 let restartButton;
 let homeButton;
+let audioManager;
+let soundButton;
 
 function startGame() {
   if (isGameRunning || isGameEnding) return;
@@ -24,6 +26,7 @@ function startGame() {
   init();
   hideGameOverlay();
   blurActiveElement();
+  audioManager.playBackgroundMusic();
 
   isGameRunning = true;
   createWorld();
@@ -74,6 +77,8 @@ function finishGame(finishedWorld, result) {
 
   isGameRunning = false;
   isGameEnding = false;
+  audioManager.stopBackgroundMusic();
+  playEndSound(result);
   showEndScreen(result);
 }
 
@@ -168,12 +173,6 @@ function blurActiveElement() {
   }
 }
 
-function init() {
-  cacheDomElements();
-  keyboardListener = new Keyboard();
-  canvas.focus();
-}
-
 function cacheDomElements() {
   canvas = document.getElementById("canvas");
   gameOverlay = document.getElementById("game-overlay");
@@ -182,10 +181,45 @@ function cacheDomElements() {
   startButton = document.getElementById("start-button");
   restartButton = document.getElementById("restart-button");
   homeButton = document.getElementById("home-button");
+  soundButton = document.getElementById("sound-button");
 }
 
 function setOverlayBackground(screen) {
   const imagePath = OVERLAY_BACKGROUNDS[screen];
 
   gameOverlay.style.backgroundImage = `url("${imagePath}")`;
+}
+
+function createAudioManager() {
+  if (audioManager) return;
+
+  audioManager = new AudioManager();
+  updateSoundButton();
+}
+
+function toggleSound() {
+  audioManager.toggleMute();
+  updateSoundButton();
+}
+
+function updateSoundButton() {
+  if (!soundButton || !audioManager) return;
+
+  soundButton.textContent = audioManager.isMuted ? "Sound: Off" : "Sound: On";
+}
+
+function playEndSound(result) {
+  if (result === "win") {
+    audioManager.playWinSound();
+    return;
+  }
+
+  audioManager.playGameOverSound();
+}
+
+function init() {
+  cacheDomElements();
+  createAudioManager();
+  keyboardListener = new Keyboard();
+  canvas.focus();
 }
