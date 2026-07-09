@@ -19,6 +19,11 @@ let startButton;
 let restartButton;
 let homeButton;
 let soundButton;
+let soundIcon;
+let controlsButton;
+let controlsPanel;
+let fullscreenButton;
+let fullscreenIcon;
 
 function startGame() {
   if (isGameRunning || isGameEnding) return;
@@ -128,9 +133,10 @@ function showStartScreen() {
     "El Pollo Loco",
     "Collect bottles, defeat chickens and beat the final boss.",
   );
-  showStartButton();
+  showStartMenu();
   showGameOverlay();
   updateSoundButton();
+  updateFullscreenButton();
 }
 
 function showEndScreen(result) {
@@ -145,17 +151,19 @@ function showEndScreen(result) {
 function showWinScreen() {
   setOverlayBackground("win");
   setOverlayContent("You won!", "The endboss is defeated. Nice job.");
-  showEndButtons();
+  showEndMenu();
   showGameOverlay();
   updateSoundButton();
+  updateFullscreenButton();
 }
 
 function showLoseScreen() {
   setOverlayBackground("lose");
   setOverlayContent("Game over", "Pepe lost all health. Try again.");
-  showEndButtons();
+  showEndMenu();
   showGameOverlay();
   updateSoundButton();
+  updateFullscreenButton();
 }
 
 function setOverlayContent(title, message) {
@@ -163,18 +171,20 @@ function setOverlayContent(title, message) {
   overlayMessage.textContent = message;
 }
 
-function showStartButton() {
+function showStartMenu() {
   startButton.classList.remove("hidden");
   restartButton.classList.add("hidden");
   homeButton.classList.add("hidden");
-  soundButton.classList.remove("hidden");
+  controlsButton.classList.remove("hidden");
+  controlsPanel.classList.remove("hidden");
 }
 
-function showEndButtons() {
+function showEndMenu() {
   startButton.classList.add("hidden");
   restartButton.classList.remove("hidden");
   homeButton.classList.remove("hidden");
-  soundButton.classList.remove("hidden");
+  controlsButton.classList.add("hidden");
+  controlsPanel.classList.add("hidden");
 }
 
 function showGameOverlay() {
@@ -198,9 +208,34 @@ function toggleSound() {
 }
 
 function updateSoundButton() {
-  if (!soundButton || !audioManager) return;
+  if (!soundIcon || !audioManager) return;
 
-  soundButton.textContent = audioManager.isMuted ? "Sound: Off" : "Sound: On";
+  soundIcon.src = audioManager.isMuted
+    ? "symbols/music_off.png"
+    : "symbols/music_on.png";
+}
+
+function toggleControls() {
+  controlsPanel.classList.toggle("hidden");
+}
+
+function toggleFullscreen() {
+  const gameContainer = document.getElementById("game-container");
+
+  if (!document.fullscreenElement) {
+    gameContainer.requestFullscreen();
+    return;
+  }
+
+  document.exitFullscreen();
+}
+
+function updateFullscreenButton() {
+  if (!fullscreenIcon) return;
+
+  fullscreenIcon.src = document.fullscreenElement
+    ? "symbols/exit-fullscreen.png"
+    : "symbols/enter-fullscreen.png";
 }
 
 function blurActiveElement() {
@@ -214,6 +249,7 @@ function init() {
   createAudioManager();
   createKeyboardListener();
   resetKeyboard();
+  addFullscreenListener();
   canvas.focus();
 }
 
@@ -236,6 +272,11 @@ function resetKeyboard() {
   keyboardListener.resetKeys();
 }
 
+function addFullscreenListener() {
+  document.removeEventListener("fullscreenchange", updateFullscreenButton);
+  document.addEventListener("fullscreenchange", updateFullscreenButton);
+}
+
 function cacheDomElements() {
   canvas = document.getElementById("canvas");
   gameOverlay = document.getElementById("game-overlay");
@@ -245,4 +286,9 @@ function cacheDomElements() {
   restartButton = document.getElementById("restart-button");
   homeButton = document.getElementById("home-button");
   soundButton = document.getElementById("sound-button");
+  soundIcon = document.getElementById("sound-icon");
+  controlsButton = document.getElementById("controls-button");
+  controlsPanel = document.getElementById("controls-panel");
+  fullscreenButton = document.getElementById("fullscreen-button");
+  fullscreenIcon = document.getElementById("fullscreen-icon");
 }
