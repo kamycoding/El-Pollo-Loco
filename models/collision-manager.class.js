@@ -132,7 +132,7 @@ class CollisionManager {
 
   hitByEnemy(enemy) {
     if (enemy instanceof Chicken) {
-      this.damageCharacter(5);
+      this.damageCharacter(10);
       return;
     }
 
@@ -162,7 +162,7 @@ class CollisionManager {
     endboss.getCollisionArea();
 
     if (character.isColliding(endboss)) {
-      this.damageCharacter(8);
+      this.damageCharacter(20);
     }
   }
 

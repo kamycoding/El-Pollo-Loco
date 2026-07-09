@@ -56,6 +56,8 @@ class Statusbar extends DrawableObject {
   constructor(type, percent) {
     super(0, 0);
 
+    this.validateType(type);
+
     this.type = type;
     this.aspectRatio = 595 / 158;
     this.width = 200;
@@ -67,10 +69,25 @@ class Statusbar extends DrawableObject {
     this.setValue(percent);
   }
 
-  setValue(percent) {
-    const safePercent = Math.max(0, Math.min(100, percent));
+  validateType(type) {
+    if (this.TYPE[type]) return;
 
-    this.currentImage = Math.floor((safePercent * 5) / 100);
-    this.img = this.imageCache[this.TYPE[this.type].images[this.currentImage]];
+    throw new Error(`Unknown statusbar type: ${type}`);
+  }
+
+  setValue(percent) {
+    const safePercent = this.getSafePercent(percent);
+    const imageIndex = this.getImageIndex(safePercent);
+
+    this.currentImage = imageIndex;
+    this.img = this.imageCache[this.TYPE[this.type].images[imageIndex]];
+  }
+
+  getSafePercent(percent) {
+    return Math.max(0, Math.min(100, percent));
+  }
+
+  getImageIndex(percent) {
+    return Math.floor((percent * 5) / 100);
   }
 }
