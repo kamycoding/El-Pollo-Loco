@@ -1,6 +1,7 @@
 class AudioManager {
   sounds = {};
   isMuted = false;
+  isUnlocked = false;
   storageKey = "elPolloLocoMuted";
 
   constructor() {
@@ -23,6 +24,33 @@ class AudioManager {
     );
 
     this.sounds.win = this.createAudio("./audio/win_1.mp3", false, 0.7);
+    this.sounds.jump = this.createAudio("./audio/jump_2.mp3", false, 0.55);
+
+    this.sounds.bottleSmash = this.createAudio(
+      "./audio/bottle-smash_2.mp3",
+      false,
+      0.65,
+    );
+
+    this.sounds.collectBottle = this.createAudio(
+      "./audio/collect-bottle.wav",
+      false,
+      0.65,
+    );
+
+    this.sounds.collectCoin = this.createAudio(
+      "./audio/collect-coin_1.mp3",
+      false,
+      0.65,
+    );
+
+    this.sounds.bonusHealth = this.createAudio(
+      "./audio/get-bonus-hp.mp3",
+      false,
+      0.65,
+    );
+
+    this.sounds.hurt = this.createAudio("./audio/got_hurt_1.mp3", false, 0.65);
   }
 
   createAudio(src, loop, volume) {
@@ -30,6 +58,8 @@ class AudioManager {
 
     audio.loop = loop;
     audio.volume = volume;
+    audio.preload = "auto";
+    audio.load();
 
     return audio;
   }
@@ -54,16 +84,56 @@ class AudioManager {
     });
   }
 
-  playBackgroundMusic() {
-    if (this.isMuted) return;
+  unlockAudio() {
+    if (this.isUnlocked) return;
 
-    this.sounds.background.currentTime = 0;
-    this.sounds.background.play();
+    Object.entries(this.sounds).forEach(([name, sound]) => {
+      if (name === "background") return;
+
+      this.prepareSound(sound);
+    });
+
+    this.isUnlocked = true;
+  }
+
+  prepareSound(sound) {
+    const volume = sound.volume;
+
+    sound.muted = true;
+    sound.volume = 0;
+
+    sound
+      .play()
+      .then(() => {
+        sound.pause();
+        sound.currentTime = 0;
+        sound.volume = volume;
+        sound.muted = this.isMuted;
+      })
+      .catch(() => {
+        sound.volume = volume;
+        sound.muted = this.isMuted;
+      });
+  }
+
+  playBackgroundMusic() {
+    const background = this.sounds.background;
+
+    if (this.isMuted || !background) return;
+
+    background.pause();
+    background.currentTime = 0;
+    background.muted = false;
+    background.play().catch(() => {});
   }
 
   stopBackgroundMusic() {
-    this.sounds.background.pause();
-    this.sounds.background.currentTime = 0;
+    const background = this.sounds.background;
+
+    if (!background) return;
+
+    background.pause();
+    background.currentTime = 0;
   }
 
   playGameOverSound() {
@@ -74,10 +144,37 @@ class AudioManager {
     this.playEffect("win");
   }
 
-  playEffect(name) {
-    if (this.isMuted || !this.sounds[name]) return;
+  playJumpSound() {
+    this.playEffect("jump");
+  }
 
-    this.sounds[name].currentTime = 0;
-    this.sounds[name].play();
+  playBottleSmashSound() {
+    this.playEffect("bottleSmash");
+  }
+
+  playCollectBottleSound() {
+    this.playEffect("collectBottle");
+  }
+
+  playCollectCoinSound() {
+    this.playEffect("collectCoin");
+  }
+
+  playBonusHealthSound() {
+    this.playEffect("bonusHealth");
+  }
+
+  playHurtSound() {
+    this.playEffect("hurt");
+  }
+
+  playEffect(name) {
+    const sound = this.sounds[name];
+
+    if (this.isMuted || !sound) return;
+
+    sound.pause();
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
   }
 }

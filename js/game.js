@@ -7,6 +7,7 @@ const OVERLAY_BACKGROUNDS = {
 let canvas;
 let world;
 let keyboardListener;
+let audioManager;
 let lastActiveTimestamp = Date.now();
 let intervals = [];
 let isGameRunning = false;
@@ -17,7 +18,6 @@ let overlayMessage;
 let startButton;
 let restartButton;
 let homeButton;
-let audioManager;
 let soundButton;
 
 function startGame() {
@@ -26,6 +26,7 @@ function startGame() {
   init();
   hideGameOverlay();
   blurActiveElement();
+  audioManager.unlockAudio();
   audioManager.playBackgroundMusic();
 
   isGameRunning = true;
@@ -77,9 +78,19 @@ function finishGame(finishedWorld, result) {
 
   isGameRunning = false;
   isGameEnding = false;
+
   audioManager.stopBackgroundMusic();
   playEndSound(result);
   showEndScreen(result);
+}
+
+function playEndSound(result) {
+  if (result === "win") {
+    audioManager.playWinSound();
+    return;
+  }
+
+  audioManager.playGameOverSound();
 }
 
 function restartGame() {
@@ -101,6 +112,10 @@ function resetCurrentGame() {
     world = null;
   }
 
+  if (audioManager) {
+    audioManager.stopBackgroundMusic();
+  }
+
   isGameRunning = false;
   isGameEnding = false;
 }
@@ -117,6 +132,7 @@ function showStartScreen() {
   );
   showStartButton();
   showGameOverlay();
+  updateSoundButton();
 }
 
 function showEndScreen(result) {
@@ -133,6 +149,7 @@ function showWinScreen() {
   setOverlayContent("You won!", "The endboss is defeated. Nice job.");
   showEndButtons();
   showGameOverlay();
+  updateSoundButton();
 }
 
 function showLoseScreen() {
@@ -140,6 +157,7 @@ function showLoseScreen() {
   setOverlayContent("Game over", "Pepe lost all health. Try again.");
   showEndButtons();
   showGameOverlay();
+  updateSoundButton();
 }
 
 function setOverlayContent(title, message) {
@@ -151,12 +169,14 @@ function showStartButton() {
   startButton.classList.remove("hidden");
   restartButton.classList.add("hidden");
   homeButton.classList.add("hidden");
+  soundButton.classList.remove("hidden");
 }
 
 function showEndButtons() {
   startButton.classList.add("hidden");
   restartButton.classList.remove("hidden");
   homeButton.classList.remove("hidden");
+  soundButton.classList.remove("hidden");
 }
 
 function showGameOverlay() {
@@ -167,34 +187,10 @@ function hideGameOverlay() {
   gameOverlay.classList.add("hidden");
 }
 
-function blurActiveElement() {
-  if (document.activeElement) {
-    document.activeElement.blur();
-  }
-}
-
-function cacheDomElements() {
-  canvas = document.getElementById("canvas");
-  gameOverlay = document.getElementById("game-overlay");
-  overlayTitle = document.getElementById("overlay-title");
-  overlayMessage = document.getElementById("overlay-message");
-  startButton = document.getElementById("start-button");
-  restartButton = document.getElementById("restart-button");
-  homeButton = document.getElementById("home-button");
-  soundButton = document.getElementById("sound-button");
-}
-
 function setOverlayBackground(screen) {
   const imagePath = OVERLAY_BACKGROUNDS[screen];
 
   gameOverlay.style.backgroundImage = `url("${imagePath}")`;
-}
-
-function createAudioManager() {
-  if (audioManager) return;
-
-  audioManager = new AudioManager();
-  updateSoundButton();
 }
 
 function toggleSound() {
@@ -208,13 +204,10 @@ function updateSoundButton() {
   soundButton.textContent = audioManager.isMuted ? "Sound: Off" : "Sound: On";
 }
 
-function playEndSound(result) {
-  if (result === "win") {
-    audioManager.playWinSound();
-    return;
+function blurActiveElement() {
+  if (document.activeElement) {
+    document.activeElement.blur();
   }
-
-  audioManager.playGameOverSound();
 }
 
 function init() {
@@ -222,4 +215,22 @@ function init() {
   createAudioManager();
   keyboardListener = new Keyboard();
   canvas.focus();
+}
+
+function createAudioManager() {
+  if (audioManager) return;
+
+  audioManager = new AudioManager();
+  updateSoundButton();
+}
+
+function cacheDomElements() {
+  canvas = document.getElementById("canvas");
+  gameOverlay = document.getElementById("game-overlay");
+  overlayTitle = document.getElementById("overlay-title");
+  overlayMessage = document.getElementById("overlay-message");
+  startButton = document.getElementById("start-button");
+  restartButton = document.getElementById("restart-button");
+  homeButton = document.getElementById("home-button");
+  soundButton = document.getElementById("sound-button");
 }

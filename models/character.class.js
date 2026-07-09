@@ -158,15 +158,17 @@ class Character extends MovableObject {
         !this.isAboveGround() &&
         !this.isJumping
       ) {
+        audioManager.playJumpSound();
         this.isJumping = true;
         this.currentImage = 2;
         this.startJumpAnimation();
         this.speedY = 50;
+
         setTimeout(() => {
           this.applyGravity();
         }, 100);
       }
-    }, 50);
+    }, 20);
   }
 
   startJumpAnimation() {
