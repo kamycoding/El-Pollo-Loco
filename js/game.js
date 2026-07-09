@@ -105,6 +105,7 @@ function goToHomeScreen() {
 
 function resetCurrentGame() {
   clearAllIntervals();
+  resetKeyboard();
 
   if (world) {
     world.stopEnemiesAndClouds();
@@ -121,10 +122,7 @@ function resetCurrentGame() {
 }
 
 function showStartScreen() {
-  if (!canvas) {
-    init();
-  }
-
+  init();
   setOverlayBackground("start");
   setOverlayContent(
     "El Pollo Loco",
@@ -194,6 +192,7 @@ function setOverlayBackground(screen) {
 }
 
 function toggleSound() {
+  createAudioManager();
   audioManager.toggleMute();
   updateSoundButton();
 }
@@ -213,7 +212,8 @@ function blurActiveElement() {
 function init() {
   cacheDomElements();
   createAudioManager();
-  keyboardListener = new Keyboard();
+  createKeyboardListener();
+  resetKeyboard();
   canvas.focus();
 }
 
@@ -222,6 +222,18 @@ function createAudioManager() {
 
   audioManager = new AudioManager();
   updateSoundButton();
+}
+
+function createKeyboardListener() {
+  if (keyboardListener) return;
+
+  keyboardListener = new Keyboard();
+}
+
+function resetKeyboard() {
+  if (!keyboardListener) return;
+
+  keyboardListener.resetKeys();
 }
 
 function cacheDomElements() {

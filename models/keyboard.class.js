@@ -7,52 +7,46 @@ class Keyboard {
   };
 
   constructor() {
-    this.handleKeyDown();
-    this.handleKeyUp();
+    this.addListeners();
   }
 
-  handleKeyDown() {
-    document.addEventListener("keydown", (e) => {
-      switch (e.code) {
-        case this.KEYS.LEFT.code:
-          this.KEYS.LEFT.status = true;
-          break;
-        case this.KEYS.RIGHT.code:
-          this.KEYS.RIGHT.status = true;
-          break;
-        case this.KEYS.JUMP.code:
-          this.KEYS.JUMP.status = true;
-          break;
-        case this.KEYS.THROW.code:
-          this.KEYS.THROW.status = true;
-          break;
-      }
+  addListeners() {
+    document.addEventListener("keydown", this.handleKeyDown);
+    document.addEventListener("keyup", this.handleKeyUp);
+  }
+
+  handleKeyDown = (event) => {
+    this.handleKeyChange(event, true);
+  };
+
+  handleKeyUp = (event) => {
+    this.handleKeyChange(event, false);
+  };
+
+  handleKeyChange(event, status) {
+    const key = this.getKeyByCode(event.code);
+
+    if (!key) return;
+
+    event.preventDefault();
+    key.status = status;
+  }
+
+  getKeyByCode(code) {
+    return Object.values(this.KEYS).find((key) => {
+      return key.code === code;
     });
   }
 
-  handleKeyUp() {
-    document.addEventListener("keyup", (e) => {
-      switch (e.code) {
-        case this.KEYS.LEFT.code:
-          this.KEYS.LEFT.status = false;
-          break;
-        case this.KEYS.RIGHT.code:
-          this.KEYS.RIGHT.status = false;
-          break;
-        case this.KEYS.JUMP.code:
-          this.KEYS.JUMP.status = false;
-          break;
-        case this.KEYS.THROW.code:
-          this.KEYS.THROW.status = false;
-          break;
-      }
+  resetKeys() {
+    Object.values(this.KEYS).forEach((key) => {
+      key.status = false;
     });
   }
 
   isAnyKeyPressed() {
-    for (let key in this.KEYS) {
-      if (this.KEYS[key].status) return true;
-    }
-    return false;
+    return Object.values(this.KEYS).some((key) => {
+      return key.status;
+    });
   }
 }
