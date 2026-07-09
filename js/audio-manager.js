@@ -50,7 +50,13 @@ class AudioManager {
       0.65,
     );
 
-    this.sounds.hurt = this.createAudio("./audio/got_hurt_1.mp3", false, 0.65);
+    this.sounds.hurt = this.createAudio("./audio/got-hurt_1.mp3", false, 0.65);
+
+    this.sounds.enemyDefeat = this.createAudio(
+      "./audio/chicken-single-alarm-call.wav",
+      false,
+      0.55,
+    );
   }
 
   createAudio(src, loop, volume) {
@@ -166,6 +172,10 @@ class AudioManager {
 
   playHurtSound() {
     this.playEffect("hurt");
+  }
+
+  playEnemyDefeatSound() {
+    this.playEffect("enemyDefeat");
   }
 
   playEffect(name) {

@@ -104,6 +104,7 @@ class CollisionManager {
     if (!this.canDamageCharacter()) return;
 
     this.lastCharacterDamageAt = Date.now();
+    audioManager.playHurtSound();
 
     this.world.reduceHealth(
       this.world.character,
@@ -113,6 +114,7 @@ class CollisionManager {
   }
 
   smashEnemy(enemy) {
+    audioManager.playEnemyDefeatSound();
     this.defeatEnemy(enemy);
     this.world.character.speedY = 10;
   }
@@ -141,6 +143,8 @@ class CollisionManager {
 
   collectHealthFromChick(chick) {
     const character = this.world.character;
+
+    audioManager.playBonusHealthSound();
 
     this.world.gainHealth(character, 5);
     this.world.statusbars.health.setValue(character.health);
@@ -183,6 +187,7 @@ class CollisionManager {
 
     if (!enemy) return false;
 
+    audioManager.playEnemyDefeatSound();
     this.defeatEnemy(enemy);
     this.smashBottle(bottle);
 
@@ -277,6 +282,8 @@ class CollisionManager {
     const character = this.world.character;
     const maxBottles = this.world.level.maxBottles;
 
+    audioManager.playCollectBottleSound();
+
     character.bottleCount++;
 
     this.world.statusbars.bottle.setValue(
@@ -287,6 +294,8 @@ class CollisionManager {
   collectCoin() {
     const character = this.world.character;
     const maxCoins = this.world.level.maxCoins;
+
+    audioManager.playCollectCoinSound();
 
     character.coinCount++;
 
