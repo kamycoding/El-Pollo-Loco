@@ -77,6 +77,8 @@ class ThrowableObject extends MovableObject {
   smash(onFinished) {
     if (this.isSmashed) return;
 
+    audioManager.playBottleSmashSound();
+
     this.currentImage = 0;
     this.isSmashed = true;
     this.landedAt = null;

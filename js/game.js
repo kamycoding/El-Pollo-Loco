@@ -12,6 +12,7 @@ let lastActiveTimestamp = Date.now();
 let intervals = [];
 let isGameRunning = false;
 let isGameEnding = false;
+let isTouchContextMenuDisabled = false;
 let gameOverlay;
 let overlayTitle;
 let overlayMessage;
@@ -238,6 +239,19 @@ function updateFullscreenButton() {
     : "symbols/enter-fullscreen.png";
 }
 
+function setTouchKey(keyName, status, event) {
+  if (event) {
+    event.preventDefault();
+  }
+
+  createKeyboardListener();
+
+  if (!keyboardListener.KEYS[keyName]) return;
+
+  keyboardListener.KEYS[keyName].status = status;
+  lastActiveTimestamp = Date.now();
+}
+
 function blurActiveElement() {
   if (document.activeElement) {
     document.activeElement.blur();
@@ -250,6 +264,7 @@ function init() {
   createKeyboardListener();
   resetKeyboard();
   addFullscreenListener();
+  disableTouchContextMenu();
   canvas.focus();
 }
 
@@ -275,6 +290,20 @@ function resetKeyboard() {
 function addFullscreenListener() {
   document.removeEventListener("fullscreenchange", updateFullscreenButton);
   document.addEventListener("fullscreenchange", updateFullscreenButton);
+}
+
+function disableTouchContextMenu() {
+  if (isTouchContextMenuDisabled) return;
+
+  const touchControls = document.getElementById("touch-controls");
+
+  if (!touchControls) return;
+
+  touchControls.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+  });
+
+  isTouchContextMenuDisabled = true;
 }
 
 function cacheDomElements() {
