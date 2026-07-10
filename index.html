@@ -27,14 +27,29 @@
     <meta name="apple-mobile-web-app-title" content="El Pollo Loco" />
 
     <link rel="manifest" href="./favicon/site.webmanifest" />
+
     <link rel="stylesheet" href="./style.css" />
+
     <link rel="stylesheet" href="./css/menu.css" />
+
     <link rel="stylesheet" href="./css/responsive.css" />
   </head>
 
   <body onload="showStartScreen()">
     <div id="game-container">
       <canvas id="canvas" width="720" height="480" tabindex="0"></canvas>
+
+      <button
+        id="game-sound-button"
+        class="game-sound-button hidden"
+        type="button"
+        aria-label="Turn sound off"
+        aria-pressed="false"
+        title="Turn sound off"
+        onclick="toggleSound()"
+      >
+        <img id="game-sound-icon" src="symbols/music_on.png" alt="" />
+      </button>
 
       <div id="game-overlay" class="game-overlay">
         <div class="menu-layer">

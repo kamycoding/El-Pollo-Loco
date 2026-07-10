@@ -13,6 +13,7 @@ function startGame() {
 
   init();
   hideGameOverlay();
+  showGameSoundButton();
   blurActiveElement();
   prepareGameAudio();
 
@@ -70,6 +71,7 @@ function endGame(finishedWorld, result) {
 function finishGame(finishedWorld, result) {
   stopFinishedWorld(finishedWorld);
   resetGameState(finishedWorld);
+  hideGameSoundButton();
   audioManager.stopBackgroundMusic();
   playEndSound(result);
   showEndScreen(result);
@@ -113,6 +115,7 @@ function goToHomeScreen() {
 function resetCurrentGame() {
   clearAllIntervals();
   resetKeyboard();
+  hideGameSoundButton();
   stopCurrentWorld();
   stopCurrentAudio();
 
@@ -198,6 +201,5 @@ function setTouchKey(keyName, status, event) {
   if (!keyboardListener.KEYS[keyName]) return;
 
   keyboardListener.KEYS[keyName].status = status;
-
   lastActiveTimestamp = Date.now();
 }

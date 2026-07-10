@@ -10,8 +10,9 @@ let overlayMessage;
 let startButton;
 let restartButton;
 let homeButton;
-let soundButton;
-let soundIcon;
+let gameSoundButton;
+let soundButtons = [];
+let soundIcons = [];
 let controlsButton;
 let controlsPanel;
 let fullscreenButton;
@@ -19,6 +20,7 @@ let fullscreenIcon;
 
 function showStartScreen() {
   init();
+  hideGameSoundButton();
   setOverlayBackground("start");
 
   setOverlayContent(
@@ -32,6 +34,8 @@ function showStartScreen() {
 }
 
 function showEndScreen(result) {
+  hideGameSoundButton();
+
   if (result === "win") {
     showWinScreen();
     return;
@@ -94,6 +98,18 @@ function hideGameOverlay() {
   gameOverlay.classList.add("hidden");
 }
 
+function showGameSoundButton() {
+  if (!gameSoundButton) return;
+
+  gameSoundButton.classList.remove("hidden");
+}
+
+function hideGameSoundButton() {
+  if (!gameSoundButton) return;
+
+  gameSoundButton.classList.add("hidden");
+}
+
 function setOverlayBackground(screen) {
   const imagePath = OVERLAY_BACKGROUNDS[screen];
 
@@ -102,9 +118,7 @@ function setOverlayBackground(screen) {
 
 function toggleSound() {
   createAudioManager();
-
   audioManager.toggleMute();
-
   updateSoundButton();
   updateBackgroundMusic();
 }
@@ -121,25 +135,40 @@ function updateBackgroundMusic() {
 }
 
 function updateSoundButton() {
-  if (!soundIcon || !audioManager) return;
+  if (!audioManager) return;
 
-  soundIcon.src = audioManager.isMuted
-    ? "symbols/music_off.png"
-    : "symbols/music_on.png";
+  const iconPath = getSoundIconPath();
 
-  updateSoundButtonLabel();
+  soundIcons.forEach((icon) => {
+    icon.src = iconPath;
+  });
+
+  updateSoundButtonLabels();
 }
 
-function updateSoundButtonLabel() {
-  if (!soundButton) return;
+function getSoundIconPath() {
+  return audioManager.isMuted
+    ? "symbols/music_off.png"
+    : "symbols/music_on.png";
+}
 
-  const label = audioManager.isMuted ? "Turn sound on" : "Turn sound off";
+function updateSoundButtonLabels() {
+  const label = getSoundButtonLabel();
 
-  soundButton.setAttribute("aria-label", label);
+  soundButtons.forEach((button) => {
+    updateSoundButtonAccessibility(button, label);
+  });
+}
 
-  soundButton.setAttribute("aria-pressed", String(audioManager.isMuted));
+function getSoundButtonLabel() {
+  return audioManager.isMuted ? "Turn sound on" : "Turn sound off";
+}
 
-  soundButton.title = label;
+function updateSoundButtonAccessibility(button, label) {
+  button.setAttribute("aria-label", label);
+  button.setAttribute("aria-pressed", String(audioManager.isMuted));
+
+  button.title = label;
 }
 
 function toggleControls() {
@@ -179,7 +208,6 @@ function updateFullscreenButtonLabel() {
     : "Enter fullscreen";
 
   fullscreenButton.setAttribute("aria-label", label);
-
   fullscreenButton.title = label;
 }
 
@@ -193,6 +221,7 @@ function cacheDomElements() {
   cacheGameElements();
   cacheOverlayElements();
   cacheActionButtons();
+  cacheSoundControls();
   cacheInterfaceButtons();
 }
 
@@ -218,11 +247,27 @@ function cacheActionButtons() {
   homeButton = document.getElementById("home-button");
 }
 
+function cacheSoundControls() {
+  gameSoundButton = document.getElementById("game-sound-button");
+
+  soundButtons = getSoundButtons();
+  soundIcons = getSoundIcons();
+}
+
+function getSoundButtons() {
+  return [document.getElementById("sound-button"), gameSoundButton].filter(
+    Boolean,
+  );
+}
+
+function getSoundIcons() {
+  return [
+    document.getElementById("sound-icon"),
+    document.getElementById("game-sound-icon"),
+  ].filter(Boolean);
+}
+
 function cacheInterfaceButtons() {
-  soundButton = document.getElementById("sound-button");
-
-  soundIcon = document.getElementById("sound-icon");
-
   controlsButton = document.getElementById("controls-button");
 
   fullscreenButton = document.getElementById("fullscreen-button");
