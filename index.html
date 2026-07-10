@@ -56,7 +56,7 @@
               onclick="toggleSound()"
             >
               <img id="sound-icon" src="symbols/music_on.png" alt="" />
-              <span id="sound-label">Sound</span>
+              <span>Sound</span>
             </button>
 
             <button
@@ -108,6 +108,64 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div id="touch-controls" class="touch-controls">
+        <div class="touch-group touch-left">
+          <button
+            class="touch-button"
+            type="button"
+            data-icon="‹"
+            aria-label="Move left"
+            onpointerdown="setTouchKey('LEFT', true, event)"
+            onpointerup="setTouchKey('LEFT', false, event)"
+            onpointerleave="setTouchKey('LEFT', false, event)"
+            onpointercancel="setTouchKey('LEFT', false, event)"
+          ></button>
+
+          <button
+            class="touch-button"
+            type="button"
+            data-icon="›"
+            aria-label="Move right"
+            onpointerdown="setTouchKey('RIGHT', true, event)"
+            onpointerup="setTouchKey('RIGHT', false, event)"
+            onpointerleave="setTouchKey('RIGHT', false, event)"
+            onpointercancel="setTouchKey('RIGHT', false, event)"
+          ></button>
+        </div>
+
+        <div class="touch-group touch-right">
+          <button
+            class="touch-button"
+            type="button"
+            data-icon="▲"
+            aria-label="Jump"
+            onpointerdown="setTouchKey('JUMP', true, event)"
+            onpointerup="setTouchKey('JUMP', false, event)"
+            onpointerleave="setTouchKey('JUMP', false, event)"
+            onpointercancel="setTouchKey('JUMP', false, event)"
+          ></button>
+
+          <button
+            class="touch-button throw-button"
+            type="button"
+            data-icon="D"
+            aria-label="Throw bottle"
+            onpointerdown="setTouchKey('THROW', true, event)"
+            onpointerup="setTouchKey('THROW', false, event)"
+            onpointerleave="setTouchKey('THROW', false, event)"
+            onpointercancel="setTouchKey('THROW', false, event)"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <div id="rotate-message" class="rotate-message">
+      <div class="rotate-card">
+        <div class="rotate-icon">↻</div>
+        <h2>Rotate to landscape</h2>
+        <p>Please turn your phone horizontally to play.</p>
       </div>
     </div>
 
