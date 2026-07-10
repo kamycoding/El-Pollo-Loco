@@ -14,7 +14,8 @@ let gameSoundButton;
 let soundButtons = [];
 let soundIcons = [];
 let controlsButton;
-let controlsPanel;
+let controlsDialog;
+let controlsCloseButton;
 let fullscreenButton;
 let fullscreenIcon;
 
@@ -35,6 +36,7 @@ function showStartScreen() {
 
 function showEndScreen(result) {
   hideGameSoundButton();
+  closeControlsDialog(false);
 
   if (result === "win") {
     showWinScreen();
@@ -79,7 +81,7 @@ function showStartMenu() {
   restartButton.classList.add("hidden");
   homeButton.classList.add("hidden");
   controlsButton.classList.remove("hidden");
-  controlsPanel.classList.remove("hidden");
+  closeControlsDialog(false);
 }
 
 function showEndMenu() {
@@ -87,7 +89,7 @@ function showEndMenu() {
   restartButton.classList.remove("hidden");
   homeButton.classList.remove("hidden");
   controlsButton.classList.add("hidden");
-  controlsPanel.classList.add("hidden");
+  closeControlsDialog(false);
 }
 
 function showGameOverlay() {
@@ -171,8 +173,49 @@ function updateSoundButtonAccessibility(button, label) {
   button.title = label;
 }
 
-function toggleControls() {
-  controlsPanel.classList.toggle("hidden");
+function toggleControlsDialog() {
+  if (controlsDialog.classList.contains("hidden")) {
+    openControlsDialog();
+    return;
+  }
+
+  closeControlsDialog();
+}
+
+function openControlsDialog() {
+  controlsDialog.classList.remove("hidden");
+  controlsButton.setAttribute("aria-expanded", "true");
+
+  controlsCloseButton.focus();
+}
+
+function closeControlsDialog(restoreFocus = true) {
+  if (!controlsDialog) return;
+
+  controlsDialog.classList.add("hidden");
+
+  if (controlsButton) {
+    controlsButton.setAttribute("aria-expanded", "false");
+  }
+
+  if (restoreFocus && controlsButton) {
+    controlsButton.focus();
+  }
+}
+
+function handleControlsBackdropClick(event) {
+  if (event.target !== event.currentTarget) {
+    return;
+  }
+
+  closeControlsDialog();
+}
+
+function handleControlsDialogKeydown(event) {
+  if (event.key !== "Escape") return;
+
+  event.preventDefault();
+  closeControlsDialog();
 }
 
 function toggleFullscreen() {
@@ -208,6 +251,7 @@ function updateFullscreenButtonLabel() {
     : "Enter fullscreen";
 
   fullscreenButton.setAttribute("aria-label", label);
+
   fullscreenButton.title = label;
 }
 
@@ -236,7 +280,9 @@ function cacheOverlayElements() {
 
   overlayMessage = document.getElementById("overlay-message");
 
-  controlsPanel = document.getElementById("controls-panel");
+  controlsDialog = document.getElementById("controls-dialog");
+
+  controlsCloseButton = document.getElementById("controls-close-button");
 }
 
 function cacheActionButtons() {

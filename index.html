@@ -32,6 +32,8 @@
 
     <link rel="stylesheet" href="./css/menu.css" />
 
+    <link rel="stylesheet" href="./css/dialog.css" />
+
     <link rel="stylesheet" href="./css/responsive.css" />
   </head>
 
@@ -108,8 +110,10 @@
               class="round-button"
               type="button"
               aria-label="Show controls"
+              aria-controls="controls-dialog"
+              aria-expanded="false"
               title="Show controls"
-              onclick="toggleControls()"
+              onclick="toggleControlsDialog()"
             >
               <img src="symbols/help_open.png" alt="" />
 
@@ -133,32 +137,73 @@
               <span>Fullscreen</span>
             </button>
           </div>
+        </div>
 
-          <div id="controls-panel" class="controls-panel">
-            <div class="control-group">
-              <strong>Move</strong>
+        <div
+          id="controls-dialog"
+          class="controls-dialog hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="controls-dialog-title"
+          tabindex="-1"
+          onclick="handleControlsBackdropClick(event)"
+          onkeydown="handleControlsDialogKeydown(event)"
+        >
+          <div class="controls-card">
+            <button
+              id="controls-close-button"
+              class="controls-close-button"
+              type="button"
+              aria-label="Close controls"
+              title="Close controls"
+              onclick="closeControlsDialog()"
+            >
+              ×
+            </button>
 
-              <div class="key-row">
-                <span class="key">←</span>
-                <span class="key">→</span>
+            <h2 id="controls-dialog-title">Controls</h2>
+
+            <p class="controls-description">
+              Use the keyboard or touch buttons to help Pepe defeat the
+              chickens.
+            </p>
+
+            <div class="controls-content">
+              <div class="control-group">
+                <strong>Move</strong>
+
+                <div class="key-row">
+                  <span class="key">←</span>
+                  <span class="key">→</span>
+                </div>
+
+                <p>Walk left or right</p>
+              </div>
+
+              <div class="control-group">
+                <strong>Jump</strong>
+
+                <div class="key-row">
+                  <span class="key wide-key"> Space </span>
+                </div>
+
+                <p>Jump on enemies</p>
+              </div>
+
+              <div class="control-group">
+                <strong>Throw</strong>
+
+                <div class="key-row">
+                  <span class="key">D</span>
+                </div>
+
+                <p>Throw a bottle</p>
               </div>
             </div>
 
-            <div class="control-group">
-              <strong>Jump</strong>
-
-              <div class="key-row">
-                <span class="key wide-key"> Space </span>
-              </div>
-            </div>
-
-            <div class="control-group">
-              <strong>Throw</strong>
-
-              <div class="key-row">
-                <span class="key">D</span>
-              </div>
-            </div>
+            <p class="controls-hint">
+              Collect bottles before fighting the endboss.
+            </p>
           </div>
         </div>
       </div>
