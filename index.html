@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>El Pollo Loco</title>
 
     <link
@@ -25,8 +27,9 @@
     <meta name="apple-mobile-web-app-title" content="El Pollo Loco" />
 
     <link rel="manifest" href="./favicon/site.webmanifest" />
-
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./css/menu.css" />
+    <link rel="stylesheet" href="./css/responsive.css" />
   </head>
 
   <body onload="showStartScreen()">
@@ -75,9 +78,13 @@
               id="sound-button"
               class="round-button"
               type="button"
+              aria-label="Turn sound off"
+              aria-pressed="false"
+              title="Turn sound off"
               onclick="toggleSound()"
             >
               <img id="sound-icon" src="symbols/music_on.png" alt="" />
+
               <span>Sound</span>
             </button>
 
@@ -85,9 +92,12 @@
               id="controls-button"
               class="round-button"
               type="button"
+              aria-label="Show controls"
+              title="Show controls"
               onclick="toggleControls()"
             >
               <img src="symbols/help_open.png" alt="" />
+
               <span>Controls</span>
             </button>
 
@@ -95,6 +105,8 @@
               id="fullscreen-button"
               class="round-button"
               type="button"
+              aria-label="Enter fullscreen"
+              title="Enter fullscreen"
               onclick="toggleFullscreen()"
             >
               <img
@@ -102,6 +114,7 @@
                 src="symbols/enter-fullscreen.png"
                 alt=""
               />
+
               <span>Fullscreen</span>
             </button>
           </div>
@@ -109,6 +122,7 @@
           <div id="controls-panel" class="controls-panel">
             <div class="control-group">
               <strong>Move</strong>
+
               <div class="key-row">
                 <span class="key">←</span>
                 <span class="key">→</span>
@@ -117,13 +131,15 @@
 
             <div class="control-group">
               <strong>Jump</strong>
+
               <div class="key-row">
-                <span class="key wide-key">Space</span>
+                <span class="key wide-key"> Space </span>
               </div>
             </div>
 
             <div class="control-group">
               <strong>Throw</strong>
+
               <div class="key-row">
                 <span class="key">D</span>
               </div>
@@ -186,7 +202,9 @@
     <div id="rotate-message" class="rotate-message">
       <div class="rotate-card">
         <div class="rotate-icon">↻</div>
+
         <h2>Rotate to landscape</h2>
+
         <p>Please turn your phone horizontally to play.</p>
       </div>
     </div>
@@ -209,5 +227,6 @@
     <script src="levels/level1.js"></script>
     <script src="js/audio-manager.js"></script>
     <script src="js/game.js"></script>
+    <script src="js/game-ui.js"></script>
   </body>
 </html>

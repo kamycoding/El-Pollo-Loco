@@ -1,0 +1,215 @@
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.game-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 205, 90, 0.08),
+    rgba(0, 0, 0, 0.2)
+  );
+}
+
+.menu-layer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 24px 0 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.game-title {
+  font-family: GameFont, GameText, Arial, sans-serif;
+  font-size: 76px;
+  line-height: 0.9;
+  letter-spacing: 2px;
+  color: #ffca3a;
+  text-transform: uppercase;
+  text-shadow:
+    4px 4px 0 #7a2600,
+    7px 7px 0 #3f1700,
+    0 0 14px rgba(255, 238, 120, 0.9);
+}
+
+.game-subtitle {
+  max-width: 520px;
+  margin-top: 6px;
+  color: #fff4c2;
+  font-size: 18px;
+  text-shadow: 2px 2px 0 #4d2500;
+}
+
+.main-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.menu-button {
+  min-width: 230px;
+  height: 64px;
+  border: 4px solid #8a3900;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffe174 0%, #ffad16 52%, #dc6f00 100%);
+  color: #fff8d6;
+  font-family: GameFont, GameText, Arial, sans-serif;
+  font-size: 40px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 3px 3px 0 #7a2600;
+  box-shadow:
+    inset 0 5px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -6px 0 rgba(118, 48, 0, 0.35),
+    0 7px 0 #5c2400,
+    0 12px 18px rgba(0, 0, 0, 0.35);
+}
+
+.menu-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.menu-button:active {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -4px 0 rgba(118, 48, 0, 0.35),
+    0 3px 0 #5c2400;
+}
+
+.round-actions {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+}
+
+.round-button {
+  position: relative;
+  width: 82px;
+  min-width: 82px;
+  height: 82px;
+  border: 4px solid #873600;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #ffe27a 0%, #ffaf18 55%, #d96d00 100%);
+  box-shadow:
+    inset 0 5px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -5px 0 rgba(117, 47, 0, 0.35),
+    0 6px 0 #5d2500,
+    0 10px 15px rgba(0, 0, 0, 0.28);
+}
+
+.round-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.round-button:active {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -4px 0 rgba(117, 47, 0, 0.35),
+    0 2px 0 #5d2500;
+}
+
+.round-button img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.round-button span {
+  position: absolute;
+  top: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4b2100;
+  font-size: 15px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow:
+    1px 1px 0 #ffd987,
+    0 1px 0 #ffd987;
+}
+
+.controls-panel {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: 460px;
+  min-height: 72px;
+  padding: 12px 24px;
+  border: 3px solid #7e3a00;
+  border-radius: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 226, 143, 0.9),
+    rgba(237, 174, 78, 0.9)
+  );
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.35),
+    0 6px 0 rgba(89, 39, 0, 0.8),
+    0 12px 18px rgba(0, 0, 0, 0.25);
+}
+
+.control-group {
+  min-width: 110px;
+  color: #4b2100;
+  text-transform: uppercase;
+}
+
+.control-group strong {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.key-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.key {
+  min-width: 42px;
+  height: 34px;
+  padding: 4px 10px;
+  border: 3px solid #7a3900;
+  border-radius: 9px;
+  background: #fff2c6;
+  color: #4b2100;
+  font-size: 20px;
+  line-height: 22px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    0 3px 0 #8b4a0a;
+}
+
+.wide-key {
+  min-width: 92px;
+}

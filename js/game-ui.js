@@ -1,0 +1,231 @@
+const OVERLAY_BACKGROUNDS = {
+  start: "./img/ui/start-screen-bg.png",
+  lose: "./img/ui/game-over-bg.png",
+  win: "./img/ui/win-screen-bg.png",
+};
+
+let gameOverlay;
+let overlayTitle;
+let overlayMessage;
+let startButton;
+let restartButton;
+let homeButton;
+let soundButton;
+let soundIcon;
+let controlsButton;
+let controlsPanel;
+let fullscreenButton;
+let fullscreenIcon;
+
+function showStartScreen() {
+  init();
+  setOverlayBackground("start");
+
+  setOverlayContent(
+    "El Pollo Loco",
+    "Collect bottles, defeat chickens and beat the final boss.",
+  );
+
+  showStartMenu();
+  showGameOverlay();
+  updateInterfaceButtons();
+}
+
+function showEndScreen(result) {
+  if (result === "win") {
+    showWinScreen();
+    return;
+  }
+
+  showLoseScreen();
+}
+
+function showWinScreen() {
+  setOverlayBackground("win");
+
+  setOverlayContent("You won!", "The endboss is defeated. Nice job.");
+
+  showEndMenu();
+  showGameOverlay();
+  updateInterfaceButtons();
+}
+
+function showLoseScreen() {
+  setOverlayBackground("lose");
+
+  setOverlayContent("Game over", "Pepe lost all health. Try again.");
+
+  showEndMenu();
+  showGameOverlay();
+  updateInterfaceButtons();
+}
+
+function updateInterfaceButtons() {
+  updateSoundButton();
+  updateFullscreenButton();
+}
+
+function setOverlayContent(title, message) {
+  overlayTitle.textContent = title;
+  overlayMessage.textContent = message;
+}
+
+function showStartMenu() {
+  startButton.classList.remove("hidden");
+  restartButton.classList.add("hidden");
+  homeButton.classList.add("hidden");
+  controlsButton.classList.remove("hidden");
+  controlsPanel.classList.remove("hidden");
+}
+
+function showEndMenu() {
+  startButton.classList.add("hidden");
+  restartButton.classList.remove("hidden");
+  homeButton.classList.remove("hidden");
+  controlsButton.classList.add("hidden");
+  controlsPanel.classList.add("hidden");
+}
+
+function showGameOverlay() {
+  gameOverlay.classList.remove("hidden");
+}
+
+function hideGameOverlay() {
+  gameOverlay.classList.add("hidden");
+}
+
+function setOverlayBackground(screen) {
+  const imagePath = OVERLAY_BACKGROUNDS[screen];
+
+  gameOverlay.style.backgroundImage = `url("${imagePath}")`;
+}
+
+function toggleSound() {
+  createAudioManager();
+
+  audioManager.toggleMute();
+
+  updateSoundButton();
+  updateBackgroundMusic();
+}
+
+function updateBackgroundMusic() {
+  if (!isGameRunning) return;
+
+  if (audioManager.isMuted) {
+    audioManager.pauseBackgroundMusic();
+    return;
+  }
+
+  audioManager.resumeBackgroundMusic();
+}
+
+function updateSoundButton() {
+  if (!soundIcon || !audioManager) return;
+
+  soundIcon.src = audioManager.isMuted
+    ? "symbols/music_off.png"
+    : "symbols/music_on.png";
+
+  updateSoundButtonLabel();
+}
+
+function updateSoundButtonLabel() {
+  if (!soundButton) return;
+
+  const label = audioManager.isMuted ? "Turn sound on" : "Turn sound off";
+
+  soundButton.setAttribute("aria-label", label);
+
+  soundButton.setAttribute("aria-pressed", String(audioManager.isMuted));
+
+  soundButton.title = label;
+}
+
+function toggleControls() {
+  controlsPanel.classList.toggle("hidden");
+}
+
+function toggleFullscreen() {
+  const gameContainer = document.getElementById("game-container");
+
+  if (!document.fullscreenElement) {
+    requestGameFullscreen(gameContainer);
+    return;
+  }
+
+  document.exitFullscreen();
+}
+
+function requestGameFullscreen(gameContainer) {
+  gameContainer.requestFullscreen().catch(() => {});
+}
+
+function updateFullscreenButton() {
+  if (!fullscreenIcon) return;
+
+  fullscreenIcon.src = document.fullscreenElement
+    ? "symbols/exit-fullscreen.png"
+    : "symbols/enter-fullscreen.png";
+
+  updateFullscreenButtonLabel();
+}
+
+function updateFullscreenButtonLabel() {
+  if (!fullscreenButton) return;
+
+  const label = document.fullscreenElement
+    ? "Exit fullscreen"
+    : "Enter fullscreen";
+
+  fullscreenButton.setAttribute("aria-label", label);
+
+  fullscreenButton.title = label;
+}
+
+function blurActiveElement() {
+  if (!document.activeElement) return;
+
+  document.activeElement.blur();
+}
+
+function cacheDomElements() {
+  cacheGameElements();
+  cacheOverlayElements();
+  cacheActionButtons();
+  cacheInterfaceButtons();
+}
+
+function cacheGameElements() {
+  canvas = document.getElementById("canvas");
+
+  gameOverlay = document.getElementById("game-overlay");
+}
+
+function cacheOverlayElements() {
+  overlayTitle = document.getElementById("overlay-title");
+
+  overlayMessage = document.getElementById("overlay-message");
+
+  controlsPanel = document.getElementById("controls-panel");
+}
+
+function cacheActionButtons() {
+  startButton = document.getElementById("start-button");
+
+  restartButton = document.getElementById("restart-button");
+
+  homeButton = document.getElementById("home-button");
+}
+
+function cacheInterfaceButtons() {
+  soundButton = document.getElementById("sound-button");
+
+  soundIcon = document.getElementById("sound-icon");
+
+  controlsButton = document.getElementById("controls-button");
+
+  fullscreenButton = document.getElementById("fullscreen-button");
+
+  fullscreenIcon = document.getElementById("fullscreen-icon");
+}
