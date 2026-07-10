@@ -28,12 +28,15 @@ class World {
     this.character.y = this.canvas.height - this.character.height - 40;
 
     this.character.groundPosition = this.character.y;
+
     this.character.applyGravity();
   }
 
   createStatusBars() {
     this.statusbars.health = new Statusbar("characterHealth", 100);
+
     this.statusbars.bottle = new Statusbar("bottle", 0);
+
     this.statusbars.coin = new Statusbar("coin", 0);
   }
 
@@ -50,6 +53,7 @@ class World {
   moveBackgroundLayer(layer, direction) {
     for (let part = 0; part < this.level.sceneParts; part++) {
       const backgroundIndex = layer * 2 + part;
+
       const layerSpeed = this.level.parallaxLayers[layer];
 
       this.level.background.landscapeLayer[backgroundIndex].x +=
@@ -59,6 +63,7 @@ class World {
 
   reduceHealth(object, amount, statusbar) {
     object.health = Math.max(0, object.health - amount);
+
     statusbar.setValue(object.health);
 
     if (object.health <= 0) {
@@ -86,7 +91,9 @@ class World {
   }
 
   getGameResult(object) {
-    if (object instanceof Endboss) return "win";
+    if (object instanceof Endboss) {
+      return "win";
+    }
 
     return "lose";
   }
@@ -144,9 +151,13 @@ class World {
     this.ctx.translate(this.cameraPos, 0);
 
     this.drawObjects(this.level.background.sky);
+
     this.drawObjects(this.level.background.clouds);
+
     this.drawObjects(this.level.background.landscapeLayer);
+
     this.drawObjects(this.level.collectables);
+
     this.drawObject(this.character);
     this.drawObject(this.level.endboss);
     this.drawObjects(this.level.enemies);
@@ -157,6 +168,7 @@ class World {
 
   drawInterface() {
     this.drawObjects(Object.values(this.statusbars));
+
     this.drawObject(this.level.endboss.statusbar);
   }
 
@@ -167,7 +179,9 @@ class World {
   }
 
   stopDrawing() {
-    if (this.animationFrameId === null) return;
+    if (this.animationFrameId === null) {
+      return;
+    }
 
     cancelAnimationFrame(this.animationFrameId);
 
@@ -183,15 +197,7 @@ class World {
 
   drawObject(object) {
     this.mirrorImage(object);
-
-    this.ctx.drawImage(
-      object.img,
-      object.x,
-      object.y,
-      object.width,
-      object.height,
-    );
-
+    object.draw(this.ctx);
     this.resetMirror(object);
   }
 
@@ -200,6 +206,7 @@ class World {
 
     this.ctx.save();
     this.ctx.translate(object.width, 0);
+
     this.ctx.scale(-1, 1);
 
     object.x *= -1;

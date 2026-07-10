@@ -40,7 +40,9 @@ class MovableObject extends DrawableObject {
    * @returns {number} Horizontal position of the collision area.
    */
   getCollisionX(object) {
-    if (!object.isFlipped) return object.collisionArea.x;
+    if (!object.isFlipped) {
+      return object.collisionArea.x;
+    }
 
     const offsetX = object.width * object.collisionBasis.offsetX;
 
@@ -54,7 +56,7 @@ class MovableObject extends DrawableObject {
   }
 
   isAboveGround() {
-    return this.y - this.speedY < this.groundPosition;
+    return this.y < this.groundPosition;
   }
 
   applyGravity() {
@@ -66,7 +68,9 @@ class MovableObject extends DrawableObject {
         clearInterval(intervalId);
         this.speedY = 0;
 
-        if (!this.isSmashed) this.y = this.groundPosition;
+        if (!this.isSmashed) {
+          this.y = this.groundPosition;
+        }
 
         if (this instanceof Character) {
           setTimeout(() => {
@@ -104,6 +108,7 @@ class MovableObject extends DrawableObject {
 
       clearInterval(this.moveIntervalId);
       clearInterval(this.walkIntervalId);
+
       objectArray.splice(objectIndex, 1);
     }
   }

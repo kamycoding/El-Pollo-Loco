@@ -43,7 +43,7 @@ class CollisionManager {
 
   getCollidingEnemy() {
     return this.world.level.enemies.find((enemy) => {
-      if (enemy.isDead) return false;
+      if (!this.isActiveRegularEnemy(enemy)) return false;
 
       enemy.getCollisionArea();
 
@@ -57,32 +57,59 @@ class CollisionManager {
       return;
     }
 
-    if (this.canTakeEnemyDamage()) {
-      this.hitByEnemy(enemy);
-    }
+    this.damageByEnemy(enemy);
   }
 
-  /**
-   * Checks whether the character crosses the enemy's upper edge while falling.
-   *
-   * @param {MovableObject} enemy - Enemy involved in the collision.
-   * @returns {boolean} Whether the collision is a valid stomp.
-   */
   isStompCollision(enemy) {
     const character = this.world.character;
     const characterBottom =
       character.collisionArea.y + character.collisionArea.height;
 
-    const previousCharacterBottom = characterBottom + character.speedY;
     const enemyTop = enemy.collisionArea.y;
-    const tolerance = 15;
+    const stompRange = this.getStompRange(enemy);
 
     return (
       character.isJumping &&
       character.speedY <= 0 &&
-      previousCharacterBottom <= enemyTop + tolerance &&
-      characterBottom >= enemyTop
+      characterBottom >= enemyTop - 5 &&
+      characterBottom <= enemyTop + stompRange &&
+      this.hasHorizontalOverlap(character, enemy)
     );
+  }
+
+  getStompRange(enemy) {
+    if (enemy instanceof Chick) return 45;
+
+    return 32;
+  }
+
+  hasHorizontalOverlap(character, enemy) {
+    const characterLeft = character.getCollisionX(character);
+    const enemyLeft = enemy.getCollisionX(enemy);
+
+    const characterRight = characterLeft + character.collisionArea.width;
+
+    const enemyRight = enemyLeft + enemy.collisionArea.width;
+
+    const tolerance = 8;
+
+    return (
+      characterRight > enemyLeft + tolerance &&
+      characterLeft < enemyRight - tolerance
+    );
+  }
+
+  damageByEnemy(enemy) {
+    if (!this.canTakeEnemyDamage()) return;
+
+    this.damageCharacter(this.getEnemyDamage(enemy));
+  }
+
+  getEnemyDamage(enemy) {
+    if (enemy instanceof Chick) return 5;
+    if (enemy instanceof Chicken) return 10;
+
+    return 0;
   }
 
   canTakeEnemyDamage() {
@@ -101,9 +128,10 @@ class CollisionManager {
   }
 
   damageCharacter(amount) {
-    if (!this.canDamageCharacter()) return;
+    if (!amount || !this.canDamageCharacter()) return;
 
     this.lastCharacterDamageAt = Date.now();
+
     audioManager.playHurtSound();
 
     this.world.reduceHealth(
@@ -115,44 +143,45 @@ class CollisionManager {
 
   smashEnemy(enemy) {
     audioManager.playEnemyDefeatSound();
+
     this.defeatEnemy(enemy);
-    this.world.character.speedY = 10;
+    this.world.character.speedY = 14;
   }
 
   defeatEnemy(enemy) {
     this.world.stopEnemy(enemy);
 
     enemy.isDead = true;
-    enemy.img = enemy.imageCache[enemy.IMAGES_DIE[0]];
 
+    this.setEnemyDeathImage(enemy);
+    this.removeDefeatedEnemy(enemy);
+  }
+
+  setEnemyDeathImage(enemy) {
+    if (!this.hasDeathImage(enemy)) return;
+
+    enemy.img = enemy.imageCache[enemy.IMAGES_DIE[0]];
+  }
+
+  hasDeathImage(enemy) {
+    return (
+      enemy.IMAGES_DIE &&
+      enemy.IMAGES_DIE.length > 0 &&
+      enemy.imageCache &&
+      enemy.imageCache[enemy.IMAGES_DIE[0]]
+    );
+  }
+
+  removeDefeatedEnemy(enemy) {
     setTimeout(() => {
       this.world.removeEnemy(enemy);
-    }, 1500);
+    }, this.getEnemyRemoveDelay(enemy));
   }
 
-  hitByEnemy(enemy) {
-    if (enemy instanceof Chicken) {
-      this.damageCharacter(10);
-      return;
-    }
+  getEnemyRemoveDelay(enemy) {
+    if (enemy instanceof Chick) return 600;
 
-    if (enemy instanceof Chick) {
-      this.collectHealthFromChick(enemy);
-    }
-  }
-
-  collectHealthFromChick(chick) {
-    const character = this.world.character;
-
-    audioManager.playBonusHealthSound();
-
-    this.world.gainHealth(character, 5);
-    this.world.statusbars.health.setValue(character.health);
-    this.world.stopEnemy(chick);
-
-    chick.isDead = true;
-
-    this.world.removeEnemy(chick);
+    return 1200;
   }
 
   checkEndbossCollision() {
@@ -179,7 +208,11 @@ class CollisionManager {
   }
 
   canBottleHit(bottle) {
-    return !bottle.isSmashed && bottle.y < bottle.groundPosition;
+    return !bottle.isSmashed && !this.isOldGroundedBottle(bottle);
+  }
+
+  isOldGroundedBottle(bottle) {
+    return bottle.landedAt && Date.now() - bottle.landedAt > 200;
   }
 
   handleBottleEnemyCollision(bottle) {
@@ -187,7 +220,6 @@ class CollisionManager {
 
     if (!enemy) return false;
 
-    audioManager.playEnemyDefeatSound();
     this.defeatEnemy(enemy);
     this.smashBottle(bottle);
 
@@ -196,16 +228,24 @@ class CollisionManager {
 
   getBottleHitEnemy(bottle) {
     return this.world.level.enemies.find((enemy) => {
-      if (!this.canBottleHitEnemy(enemy)) return false;
+      if (!this.isActiveRegularEnemy(enemy)) return false;
 
       enemy.getCollisionArea();
 
-      return enemy.isColliding(bottle);
+      return this.isBottleCollidingWithEnemy(bottle, enemy);
     });
   }
 
-  canBottleHitEnemy(enemy) {
-    return enemy instanceof Chicken && !enemy.isDead;
+  isBottleCollidingWithEnemy(bottle, enemy) {
+    return bottle.isColliding(enemy) || enemy.isColliding(bottle);
+  }
+
+  isActiveRegularEnemy(enemy) {
+    return this.isRegularEnemy(enemy) && !enemy.isDead;
+  }
+
+  isRegularEnemy(enemy) {
+    return enemy instanceof Chicken || enemy instanceof Chick;
   }
 
   handleBottleEndbossCollision(bottle) {
@@ -213,7 +253,9 @@ class CollisionManager {
 
     endboss.getCollisionArea();
 
-    if (!this.isBottleHittingEndboss(bottle, endboss)) return;
+    if (!this.isBottleHittingEndboss(bottle, endboss)) {
+      return;
+    }
 
     this.smashBottle(bottle);
 
@@ -259,6 +301,7 @@ class CollisionManager {
     const item = this.world.level.collectables[itemIndex];
 
     this.collectItem(item);
+
     this.world.level.collectables.splice(itemIndex, 1);
   }
 

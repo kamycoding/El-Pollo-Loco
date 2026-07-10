@@ -11,6 +11,7 @@ class Character extends MovableObject {
     "./img/2_character_pepe/1_idle/idle/I-9.png",
     "./img/2_character_pepe/1_idle/idle/I-10.png",
   ];
+
   IMAGES_SNOOZE = [
     "./img/2_character_pepe/1_idle/long_idle/I-11.png",
     "./img/2_character_pepe/1_idle/long_idle/I-12.png",
@@ -23,6 +24,7 @@ class Character extends MovableObject {
     "./img/2_character_pepe/1_idle/long_idle/I-19.png",
     "./img/2_character_pepe/1_idle/long_idle/I-20.png",
   ];
+
   IMAGES_WALK = [
     "./img/2_character_pepe/2_walk/W-21.png",
     "./img/2_character_pepe/2_walk/W-22.png",
@@ -31,6 +33,7 @@ class Character extends MovableObject {
     "./img/2_character_pepe/2_walk/W-25.png",
     "./img/2_character_pepe/2_walk/W-26.png",
   ];
+
   IMAGES_JUMP = [
     "./img/2_character_pepe/3_jump/J-31.png",
     "./img/2_character_pepe/3_jump/J-32.png",
@@ -42,11 +45,13 @@ class Character extends MovableObject {
     "./img/2_character_pepe/3_jump/J-38.png",
     "./img/2_character_pepe/3_jump/J-39.png",
   ];
+
   IMAGES_HURT = [
     "./img/2_character_pepe/4_hurt/H-41.png",
     "./img/2_character_pepe/4_hurt/H-42.png",
     "./img/2_character_pepe/4_hurt/H-43.png",
   ];
+
   IMAGES_DIE = [
     "./img/2_character_pepe/5_dead/D-51.png",
     "./img/2_character_pepe/5_dead/D-52.png",
@@ -56,6 +61,7 @@ class Character extends MovableObject {
     "./img/2_character_pepe/5_dead/D-56.png",
     "./img/2_character_pepe/5_dead/D-57.png",
   ];
+
   keyboard;
   startX = 0;
   hasThrownBottle = false;
@@ -64,6 +70,7 @@ class Character extends MovableObject {
 
   constructor(x, y, keyboard) {
     super(x, y).loadImage(this.IMAGES_WAIT[0]);
+
     this.keyboard = keyboard;
     this.aspectRatio = 0.5083;
     this.width = 220;
@@ -71,7 +78,9 @@ class Character extends MovableObject {
     this.startX = x;
     this.speedX = 12;
     this.health = 100;
+
     this.setCollisionBasis(0.15, 0.45, 0.55, 0.55);
+
     this.loadImages(
       this.IMAGES_WAIT,
       this.IMAGES_SNOOZE,
@@ -80,6 +89,7 @@ class Character extends MovableObject {
       this.IMAGES_HURT,
       this.IMAGES_DIE,
     );
+
     this.initIntervals();
   }
 
@@ -98,11 +108,13 @@ class Character extends MovableObject {
           world.level.sceneParts -
         this.startX -
         this.width;
+
       const maxCamX =
         world.level.background.landscapeLayer[0].width *
           world.level.sceneParts -
         this.startX -
         canvas.width;
+
       if (this.keyboard.KEYS.RIGHT.status) {
         this.moveRight(maxX, maxCamX);
       } else if (this.keyboard.KEYS.LEFT.status) {
@@ -113,7 +125,11 @@ class Character extends MovableObject {
 
   moveRight(maxX, maxCamX) {
     this.isFlipped = false;
-    if (this.x <= maxX) this.move(1);
+
+    if (this.x <= maxX) {
+      this.move(1);
+    }
+
     if (this.x <= maxCamX) {
       world.setCameraPos(-this.x + this.startX);
       world.moveBackground(1);
@@ -122,8 +138,10 @@ class Character extends MovableObject {
 
   moveLeft(maxCamX) {
     this.isFlipped = true;
+
     if (this.x > this.startX) {
       this.move(-1);
+
       if (this.x <= maxCamX) {
         world.setCameraPos(-this.x + this.startX);
         world.moveBackground(-1);
@@ -133,11 +151,10 @@ class Character extends MovableObject {
 
   animateWalk() {
     setStopableInterval(() => {
-      if (
-        (this.keyboard.KEYS.RIGHT.status || this.keyboard.KEYS.LEFT.status) &&
-        !this.isAboveGround() &&
-        !this.gotHit
-      ) {
+      const isMoving =
+        this.keyboard.KEYS.RIGHT.status || this.keyboard.KEYS.LEFT.status;
+
+      if (isMoving && !this.isAboveGround() && !this.gotHit) {
         this.isWalking = true;
         this.playAnimation(this.IMAGES_WALK);
       } else if (this.isWalking) {
@@ -153,22 +170,23 @@ class Character extends MovableObject {
 
   animateJump() {
     setStopableInterval(() => {
-      if (
-        this.keyboard.KEYS.JUMP.status &&
-        !this.isAboveGround() &&
-        !this.isJumping
-      ) {
-        audioManager.playJumpSound();
-        this.isJumping = true;
-        this.currentImage = 2;
-        this.startJumpAnimation();
-        this.speedY = 50;
+      if (!this.canJump()) return;
 
-        setTimeout(() => {
-          this.applyGravity();
-        }, 100);
-      }
+      audioManager.playJumpSound();
+
+      this.isJumping = true;
+      this.currentImage = 2;
+      this.speedY = 50;
+
+      this.applyGravity();
+      this.startJumpAnimation();
     }, 20);
+  }
+
+  canJump() {
+    return (
+      this.keyboard.KEYS.JUMP.status && !this.isAboveGround() && !this.isJumping
+    );
   }
 
   startJumpAnimation() {
@@ -191,7 +209,8 @@ class Character extends MovableObject {
   animateIdle() {
     setStopableInterval(() => {
       if (!this.keyboard.isAnyKeyPressed() && !this.gotHit) {
-        let now = Date.now();
+        const now = Date.now();
+
         if (
           now - lastActiveTimestamp > 4000 &&
           now - lastActiveTimestamp <= 8000
@@ -206,27 +225,35 @@ class Character extends MovableObject {
 
   handleThrow() {
     setStopableInterval(() => {
-      if (
-        this.keyboard.KEYS.THROW.status &&
-        !this.hasThrownBottle &&
-        this.bottleCount > 0
-      ) {
-        this.hasThrownBottle = true;
-        this.bottleCount--;
-        world.statusbars.bottle.setValue(
-          (100 / world.level.maxBottles) * this.bottleCount,
-        );
-        this.throwBottle();
-        setTimeout(() => {
-          this.hasThrownBottle = false;
-        }, 500);
-      }
+      if (!this.canThrowBottle()) return;
+
+      this.hasThrownBottle = true;
+      this.bottleCount--;
+
+      world.statusbars.bottle.setValue(
+        (100 / world.level.maxBottles) * this.bottleCount,
+      );
+
+      this.throwBottle();
+
+      setTimeout(() => {
+        this.hasThrownBottle = false;
+      }, 500);
     }, 50);
+  }
+
+  canThrowBottle() {
+    return (
+      this.keyboard.KEYS.THROW.status &&
+      !this.hasThrownBottle &&
+      this.bottleCount > 0
+    );
   }
 
   throwBottle() {
     const startX = this.x + this.width / 2;
     const startY = this.y + this.height / 3;
+
     world.throwables.push(new ThrowableObject(startX, startY, this.isFlipped));
   }
 
