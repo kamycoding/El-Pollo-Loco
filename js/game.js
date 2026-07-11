@@ -40,8 +40,8 @@ function createWorld() {
   world.createStatusBars();
 }
 
-function setStopableInterval(fn, time) {
-  const intervalId = setInterval(fn, time);
+function setStoppableInterval(callback, delay) {
+  const intervalId = setInterval(callback, delay);
 
   intervals.push(intervalId);
 }

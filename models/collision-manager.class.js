@@ -10,7 +10,7 @@ class CollisionManager {
   }
 
   start() {
-    setStopableInterval(() => {
+    setStoppableInterval(() => {
       this.checkAllCollisions();
     }, 40);
   }

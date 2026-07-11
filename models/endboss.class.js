@@ -79,7 +79,7 @@ class Endboss extends MovableObject {
   }
 
   animateAlert() {
-    setStopableInterval(() => {
+    setStoppableInterval(() => {
       this.activateWhenCharacterIsNear();
 
       if (this.canAnimateAlert()) {
@@ -154,7 +154,7 @@ class Endboss extends MovableObject {
   animateFight() {
     let sequenceCount = 0;
 
-    setStopableInterval(() => {
+    setStoppableInterval(() => {
       sequenceCount = this.handleFightAnimation(sequenceCount);
     }, 130);
   }

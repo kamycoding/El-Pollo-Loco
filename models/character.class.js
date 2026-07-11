@@ -104,7 +104,7 @@ class Character extends MovableObject {
   }
 
   handleMovement() {
-    setStopableInterval(() => {
+    setStoppableInterval(() => {
       const maxX =
         world.level.background.landscapeLayer[0].width *
           world.level.sceneParts -
@@ -152,7 +152,7 @@ class Character extends MovableObject {
   }
 
   animateWalk() {
-    setStopableInterval(() => {
+    setStoppableInterval(() => {
       const isMoving =
         this.keyboard.KEYS.RIGHT.status || this.keyboard.KEYS.LEFT.status;
 
@@ -171,7 +171,7 @@ class Character extends MovableObject {
   }
 
   animateJump() {
-    setStopableInterval(() => {
+    setStoppableInterval(() => {
       if (!this.canJump()) return;
 
       audioManager.playJumpSound();
@@ -209,7 +209,7 @@ class Character extends MovableObject {
   }
 
   animateIdle() {
-    setStopableInterval(() => {
+    setStoppableInterval(() => {
       if (!this.canAnimateIdle()) return;
 
       this.playIdleAnimation();
@@ -239,7 +239,7 @@ class Character extends MovableObject {
   }
 
   handleThrow() {
-    setStopableInterval(() => {
+    setStoppableInterval(() => {
       if (!this.canThrowBottle()) return;
 
       this.hasThrownBottle = true;
