@@ -24,6 +24,7 @@ class AudioManager {
     );
 
     this.sounds.win = this.createAudio("./audio/win_1.mp3", false, 0.7);
+
     this.sounds.jump = this.createAudio("./audio/jump_2.mp3", false, 0.55);
 
     this.sounds.bottleSmash = this.createAudio(
@@ -80,6 +81,7 @@ class AudioManager {
 
   toggleMute() {
     this.isMuted = !this.isMuted;
+
     this.saveMuteState();
     this.applyMuteState();
   }
@@ -94,9 +96,9 @@ class AudioManager {
     if (this.isUnlocked) return;
 
     Object.entries(this.sounds).forEach(([name, sound]) => {
-      if (name === "background") return;
-
-      this.prepareSound(sound);
+      if (name !== "background") {
+        this.prepareSound(sound);
+      }
     });
 
     this.isUnlocked = true;
@@ -111,15 +113,23 @@ class AudioManager {
     sound
       .play()
       .then(() => {
-        sound.pause();
-        sound.currentTime = 0;
-        sound.volume = volume;
-        sound.muted = this.isMuted;
+        this.finishSoundPreparation(sound, volume);
       })
       .catch(() => {
-        sound.volume = volume;
-        sound.muted = this.isMuted;
+        this.restorePreparedSound(sound, volume);
       });
+  }
+
+  finishSoundPreparation(sound, volume) {
+    sound.pause();
+    sound.currentTime = 0;
+
+    this.restorePreparedSound(sound, volume);
+  }
+
+  restorePreparedSound(sound, volume) {
+    sound.volume = volume;
+    sound.muted = this.isMuted;
   }
 
   playBackgroundMusic() {
@@ -129,8 +139,26 @@ class AudioManager {
 
     background.pause();
     background.currentTime = 0;
-    background.muted = false;
+
     background.play().catch(() => {});
+  }
+
+  resumeBackgroundMusic() {
+    const background = this.sounds.background;
+
+    if (this.isMuted || !background || !background.paused) {
+      return;
+    }
+
+    background.play().catch(() => {});
+  }
+
+  pauseBackgroundMusic() {
+    const background = this.sounds.background;
+
+    if (background) {
+      background.pause();
+    }
   }
 
   stopBackgroundMusic() {
@@ -140,6 +168,13 @@ class AudioManager {
 
     background.pause();
     background.currentTime = 0;
+  }
+
+  stopAllSounds() {
+    Object.values(this.sounds).forEach((sound) => {
+      sound.pause();
+      sound.currentTime = 0;
+    });
   }
 
   playGameOverSound() {
@@ -185,6 +220,7 @@ class AudioManager {
 
     sound.pause();
     sound.currentTime = 0;
+
     sound.play().catch(() => {});
   }
 }
