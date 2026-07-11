@@ -58,13 +58,15 @@ class Statusbar extends DrawableObject {
   };
 
   value = 100;
+  maxValue = 100;
+  currentCount = 0;
 
-  constructor(type, percent) {
+  constructor(type, percent, maxValue = 100) {
     super(0, 0);
 
     this.validateType(type);
-
     this.type = type;
+    this.maxValue = Math.max(1, maxValue);
     this.aspectRatio = 595 / 158;
     this.width = 200;
     this.height = this.width / this.aspectRatio;
@@ -83,11 +85,21 @@ class Statusbar extends DrawableObject {
 
   setValue(percent) {
     const safePercent = this.getSafePercent(percent);
+
     const imageIndex = this.getImageIndex(safePercent);
 
     this.value = safePercent;
     this.currentImage = imageIndex;
+
     this.img = this.imageCache[this.TYPE[this.type].images[imageIndex]];
+
+    this.updateCurrentCount();
+  }
+
+  updateCurrentCount() {
+    if (!this.isCounterBar()) return;
+
+    this.currentCount = Math.round((this.value / 100) * this.maxValue);
   }
 
   getSafePercent(percent) {
@@ -103,13 +115,26 @@ class Statusbar extends DrawableObject {
 
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
 
+    this.drawStatusValue(ctx);
+  }
+
+  drawStatusValue(ctx) {
     if (this.isHealthbar()) {
       this.drawExactHealthValue(ctx);
+      return;
+    }
+
+    if (this.isCounterBar()) {
+      this.drawCounterText(ctx);
     }
   }
 
   isHealthbar() {
     return this.type === "characterHealth" || this.type === "endbossHealth";
+  }
+
+  isCounterBar() {
+    return this.type === "bottle" || this.type === "coin";
   }
 
   drawExactHealthValue(ctx) {
@@ -122,14 +147,19 @@ class Statusbar extends DrawableObject {
 
     ctx.save();
     ctx.fillStyle = "rgba(45, 20, 0, 0.7)";
+
     ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
 
     ctx.fillStyle = this.TYPE[this.type].color;
+
     ctx.fillRect(bar.x, bar.y, bar.width * (this.value / 100), bar.height);
 
     ctx.strokeStyle = "rgba(255, 245, 190, 0.85)";
+
     ctx.lineWidth = 1;
+
     ctx.strokeRect(bar.x, bar.y, bar.width, bar.height);
+
     ctx.restore();
   }
 
@@ -143,20 +173,29 @@ class Statusbar extends DrawableObject {
   }
 
   drawHealthText(ctx) {
+    const text = `${Math.round(this.value)}%`;
+
+    this.drawOutlinedText(ctx, text, this.x + this.width - 42, this.y + 24, 13);
+  }
+
+  drawCounterText(ctx) {
+    const text = `${this.currentCount}/${this.maxValue}`;
+
+    this.drawOutlinedText(ctx, text, this.x + this.width - 40, this.y + 24, 15);
+  }
+
+  drawOutlinedText(ctx, text, x, y, fontSize) {
     ctx.save();
-    ctx.font = "bold 13px Arial";
+    ctx.font = `bold ${fontSize}px Arial`;
+
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.lineWidth = 3;
     ctx.strokeStyle = "rgba(70, 25, 0, 0.9)";
+
     ctx.fillStyle = "#fff6c7";
-
-    const text = `${Math.round(this.value)}%`;
-    const textX = this.x + this.width - 42;
-    const textY = this.y + 24;
-
-    ctx.strokeText(text, textX, textY);
-    ctx.fillText(text, textX, textY);
+    ctx.strokeText(text, x, y);
+    ctx.fillText(text, x, y);
     ctx.restore();
   }
 }

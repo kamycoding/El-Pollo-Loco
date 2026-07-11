@@ -11,6 +11,7 @@ class CollectableObject extends DrawableObject {
         heightRatio: 0.4,
       },
     },
+
     coin: {
       img: "./img/8_coin/coin_2.png",
       width: 130,
@@ -24,17 +25,67 @@ class CollectableObject extends DrawableObject {
     },
   };
 
+  baseWidth = 0;
+  baseHeight = 0;
+  pulseAmount = 0.045;
+  pulseSpeed = 0.004;
+  pulsePhase = 0;
+
   constructor(x, y, type) {
     super(x, y).loadImage(this.TYPE[type].img);
+
+    this.type = type;
+    this.setDimensions(type);
+    this.setCollectableCollision(type);
+
+    this.pulsePhase = x * 0.01;
+    this.getCollisionArea();
+  }
+
+  setDimensions(type) {
     this.width = this.TYPE[type].width;
     this.height = this.TYPE[type].height;
-    this.type = type;
+    this.baseWidth = this.width;
+    this.baseHeight = this.height;
+  }
+
+  setCollectableCollision(type) {
+    const collision = this.TYPE[type].collision;
+
     this.setCollisionBasis(
-      this.TYPE[type].collision.offsetX,
-      this.TYPE[type].collision.offsetY,
-      this.TYPE[type].collision.widthRatio,
-      this.TYPE[type].collision.heightRatio,
+      collision.offsetX,
+      collision.offsetY,
+      collision.widthRatio,
+      collision.heightRatio,
     );
-    this.getCollisionArea();
+  }
+
+  draw(ctx) {
+    if (!this.img) return;
+
+    if (this.type !== "coin") {
+      super.draw(ctx);
+      return;
+    }
+
+    this.drawPulsingCoin(ctx);
+  }
+
+  drawPulsingCoin(ctx) {
+    const scale = this.getPulseScale();
+    const width = this.baseWidth * scale;
+    const height = this.baseHeight * scale;
+
+    const x = this.x + (this.baseWidth - width) / 2;
+
+    const y = this.y + (this.baseHeight - height) / 2;
+
+    ctx.drawImage(this.img, x, y, width, height);
+  }
+
+  getPulseScale() {
+    const animationTime = performance.now() * this.pulseSpeed;
+
+    return 1 + Math.sin(animationTime + this.pulsePhase) * this.pulseAmount;
   }
 }

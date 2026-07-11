@@ -13,6 +13,7 @@ class World {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
+
     this.collisionManager = new CollisionManager(this);
   }
 
@@ -35,9 +36,9 @@ class World {
   createStatusBars() {
     this.statusbars.health = new Statusbar("characterHealth", 100);
 
-    this.statusbars.bottle = new Statusbar("bottle", 0);
+    this.statusbars.bottle = new Statusbar("bottle", 0, this.level.maxBottles);
 
-    this.statusbars.coin = new Statusbar("coin", 0);
+    this.statusbars.coin = new Statusbar("coin", 0, this.level.maxCoins);
   }
 
   setCameraPos(position) {
@@ -108,6 +109,7 @@ class World {
 
   stopEnemy(enemy) {
     clearInterval(enemy.moveIntervalId);
+
     clearInterval(enemy.walkIntervalId);
   }
 
@@ -159,8 +161,11 @@ class World {
     this.drawObjects(this.level.collectables);
 
     this.drawObject(this.character);
+
     this.drawObject(this.level.endboss);
+
     this.drawObjects(this.level.enemies);
+
     this.drawObjects(this.throwables);
 
     this.ctx.translate(-this.cameraPos, 0);
@@ -205,10 +210,10 @@ class World {
     if (!object.isFlipped) return;
 
     this.ctx.save();
+
     this.ctx.translate(object.width, 0);
 
     this.ctx.scale(-1, 1);
-
     object.x *= -1;
   }
 
@@ -216,7 +221,6 @@ class World {
     if (!object.isFlipped) return;
 
     object.x *= -1;
-
     this.ctx.restore();
   }
 }
