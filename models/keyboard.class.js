@@ -1,9 +1,24 @@
 class Keyboard {
   KEYS = {
-    LEFT: { code: "ArrowLeft", status: false },
-    RIGHT: { code: "ArrowRight", status: false },
-    JUMP: { code: "Space", status: false },
-    THROW: { code: "KeyD", status: false },
+    LEFT: {
+      code: "ArrowLeft",
+      status: false,
+    },
+
+    RIGHT: {
+      code: "ArrowRight",
+      status: false,
+    },
+
+    JUMP: {
+      code: "Space",
+      status: false,
+    },
+
+    THROW: {
+      code: "KeyD",
+      status: false,
+    },
   };
 
   constructor() {
@@ -12,6 +27,7 @@ class Keyboard {
 
   addListeners() {
     document.addEventListener("keydown", this.handleKeyDown);
+
     document.addEventListener("keyup", this.handleKeyUp);
   }
 
@@ -30,6 +46,14 @@ class Keyboard {
 
     event.preventDefault();
     key.status = status;
+
+    if (status) {
+      this.updateActivityTimer();
+    }
+  }
+
+  updateActivityTimer() {
+    lastActiveTimestamp = Date.now();
   }
 
   getKeyByCode(code) {

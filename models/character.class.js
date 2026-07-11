@@ -67,6 +67,7 @@ class Character extends MovableObject {
   hasThrownBottle = false;
   bottleCount = 0;
   coinCount = 0;
+  sleepDelay = 5000;
 
   constructor(x, y, keyboard) {
     super(x, y).loadImage(this.IMAGES_WAIT[0]);
@@ -90,6 +91,7 @@ class Character extends MovableObject {
       this.IMAGES_DIE,
     );
 
+    this.resetActivityTimer();
     this.initIntervals();
   }
 
@@ -208,19 +210,32 @@ class Character extends MovableObject {
 
   animateIdle() {
     setStopableInterval(() => {
-      if (!this.keyboard.isAnyKeyPressed() && !this.gotHit) {
-        const now = Date.now();
+      if (!this.canAnimateIdle()) return;
 
-        if (
-          now - lastActiveTimestamp > 4000 &&
-          now - lastActiveTimestamp <= 8000
-        ) {
-          this.playAnimation(this.IMAGES_WAIT);
-        } else if (now - lastActiveTimestamp > 8000) {
-          this.playAnimation(this.IMAGES_SNOOZE);
-        }
-      }
+      this.playIdleAnimation();
     }, 180);
+  }
+
+  canAnimateIdle() {
+    return (
+      !this.keyboard.isAnyKeyPressed() &&
+      !this.isAboveGround() &&
+      !this.isWalking &&
+      !this.isJumping &&
+      !this.hasThrownBottle &&
+      !this.gotHit &&
+      !this.isDead
+    );
+  }
+
+  playIdleAnimation() {
+    const images = this.shouldSleep() ? this.IMAGES_SNOOZE : this.IMAGES_WAIT;
+
+    this.playAnimation(images);
+  }
+
+  shouldSleep() {
+    return Date.now() - lastActiveTimestamp >= this.sleepDelay;
   }
 
   handleThrow() {
@@ -229,6 +244,7 @@ class Character extends MovableObject {
 
       this.hasThrownBottle = true;
       this.bottleCount--;
+      this.resetActivityTimer();
 
       world.statusbars.bottle.setValue(
         (100 / world.level.maxBottles) * this.bottleCount,
@@ -283,6 +299,10 @@ class Character extends MovableObject {
   reset() {
     this.currentImage = 0;
     this.loadImage(this.IMAGES_WAIT[0]);
+    this.resetActivityTimer();
+  }
+
+  resetActivityTimer() {
     lastActiveTimestamp = Date.now();
   }
 }
