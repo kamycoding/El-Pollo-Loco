@@ -173,7 +173,7 @@ class CollisionManager {
   }
 
   removeDefeatedEnemy(enemy) {
-    setTimeout(() => {
+    setStoppableTimeout(() => {
       this.world.removeEnemy(enemy);
     }, this.getEnemyRemoveDelay(enemy));
   }

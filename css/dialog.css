@@ -198,3 +198,113 @@
     font-size: 12px;
   }
 }
+
+.pause-dialog {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(37, 16, 3, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.pause-card {
+  width: min(420px, 100%);
+  padding: 30px;
+  border: 4px solid #7e3a00;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffe6a1 0%, #efb758 100%);
+  color: #4b2100;
+  text-align: center;
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -5px 0 rgba(117, 47, 0, 0.24),
+    0 8px 0 #572200,
+    0 18px 36px rgba(0, 0, 0, 0.45);
+}
+
+.pause-card h2 {
+  color: #9a3600;
+  font-family: GameFont, GameText, Arial, sans-serif;
+  font-size: 52px;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 #ffdb7a;
+}
+
+.pause-card p {
+  margin-top: 10px;
+  font-size: 17px;
+}
+
+.pause-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pause-action-button {
+  width: 100%;
+  min-height: 54px;
+  border: 3px solid #7e3a00;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffe174 0%, #ffad16 55%, #dc6f00 100%);
+  color: #fff8d6;
+  font-family: GameFont, GameText, Arial, sans-serif;
+  font-size: 30px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 #7a2600;
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.4),
+    0 4px 0 #5c2400;
+}
+
+.pause-action-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.pause-action-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #5c2400;
+}
+
+.pause-action-button:focus-visible {
+  outline: 4px solid #ffffff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) and (min-aspect-ratio: 1 / 1) {
+  .pause-dialog {
+    padding: 12px;
+  }
+
+  .pause-card {
+    width: min(350px, 90%);
+    padding: 20px;
+  }
+
+  .pause-card h2 {
+    font-size: 38px;
+  }
+
+  .pause-card p {
+    font-size: 14px;
+  }
+
+  .pause-actions {
+    margin-top: 16px;
+    gap: 10px;
+  }
+
+  .pause-action-button {
+    min-height: 44px;
+    font-size: 24px;
+  }
+}

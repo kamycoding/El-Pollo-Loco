@@ -42,6 +42,19 @@
       <canvas id="canvas" width="720" height="480" tabindex="0"></canvas>
 
       <button
+        id="game-menu-button"
+        class="game-menu-button hidden"
+        type="button"
+        aria-label="Pause game"
+        aria-controls="pause-dialog"
+        aria-expanded="false"
+        title="Pause game"
+        onclick="pauseGame()"
+      >
+        <img src="./img/symbol/pause.svg" alt="" />
+      </button>
+
+      <button
         id="game-sound-button"
         class="game-sound-button hidden"
         type="button"
@@ -50,7 +63,7 @@
         title="Turn sound off"
         onclick="toggleSound()"
       >
-        <img id="game-sound-icon" src="symbols/music_on.png" alt="" />
+        <img id="game-sound-icon" src="./img/symbol/volume-on.svg" alt="" />
       </button>
 
       <div id="game-overlay" class="game-overlay">
@@ -100,7 +113,7 @@
               title="Turn sound off"
               onclick="toggleSound()"
             >
-              <img id="sound-icon" src="symbols/music_on.png" alt="" />
+              <img id="sound-icon" src="./img/symbol/volume-on.svg" alt="" />
 
               <span>Sound</span>
             </button>
@@ -206,6 +219,49 @@
             <p class="controls-hint">
               Collect bottles before fighting the endboss.
             </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="pause-dialog"
+        class="pause-dialog hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pause-dialog-title"
+        tabindex="-1"
+        onkeydown="handlePauseDialogKeydown(event)"
+      >
+        <div class="pause-card">
+          <h2 id="pause-dialog-title">Paused</h2>
+
+          <p>The game is paused.</p>
+
+          <div class="pause-actions">
+            <button
+              id="resume-button"
+              class="pause-action-button"
+              type="button"
+              onclick="resumeGame()"
+            >
+              Resume
+            </button>
+
+            <button
+              class="pause-action-button"
+              type="button"
+              onclick="restartGame()"
+            >
+              Restart
+            </button>
+
+            <button
+              class="pause-action-button"
+              type="button"
+              onclick="goToHomeScreen()"
+            >
+              Home
+            </button>
           </div>
         </div>
       </div>

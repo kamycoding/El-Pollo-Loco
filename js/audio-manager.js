@@ -1,3 +1,43 @@
+const AUDIO_CONFIG = {
+  background: {
+    src: "./audio/background-music_3.mp3",
+    loop: true,
+    volume: 0.35,
+  },
+  gameOver: {
+    src: "./audio/game-over_4.mp3",
+    volume: 0.7,
+  },
+  win: {
+    src: "./audio/win_1.mp3",
+    volume: 0.7,
+  },
+  jump: {
+    src: "./audio/jump_2.mp3",
+    volume: 0.55,
+  },
+  bottleSmash: {
+    src: "./audio/bottle-smash_2.mp3",
+    volume: 0.65,
+  },
+  collectBottle: {
+    src: "./audio/collect-bottle.wav",
+    volume: 0.65,
+  },
+  collectCoin: {
+    src: "./audio/collect-coin_1.mp3",
+    volume: 0.65,
+  },
+  hurt: {
+    src: "./audio/got-hurt_1.mp3",
+    volume: 0.65,
+  },
+  enemyDefeat: {
+    src: "./audio/chicken-single-alarm-call.wav",
+    volume: 0.55,
+  },
+};
+
 class AudioManager {
   sounds = {};
   isMuted = false;
@@ -11,56 +51,12 @@ class AudioManager {
   }
 
   createSounds() {
-    this.sounds.background = this.createAudio(
-      "./audio/background-music_3.mp3",
-      true,
-      0.35,
-    );
-
-    this.sounds.gameOver = this.createAudio(
-      "./audio/game-over_4.mp3",
-      false,
-      0.7,
-    );
-
-    this.sounds.win = this.createAudio("./audio/win_1.mp3", false, 0.7);
-
-    this.sounds.jump = this.createAudio("./audio/jump_2.mp3", false, 0.55);
-
-    this.sounds.bottleSmash = this.createAudio(
-      "./audio/bottle-smash_2.mp3",
-      false,
-      0.65,
-    );
-
-    this.sounds.collectBottle = this.createAudio(
-      "./audio/collect-bottle.wav",
-      false,
-      0.65,
-    );
-
-    this.sounds.collectCoin = this.createAudio(
-      "./audio/collect-coin_1.mp3",
-      false,
-      0.65,
-    );
-
-    this.sounds.bonusHealth = this.createAudio(
-      "./audio/get-bonus-hp.mp3",
-      false,
-      0.65,
-    );
-
-    this.sounds.hurt = this.createAudio("./audio/got-hurt_1.mp3", false, 0.65);
-
-    this.sounds.enemyDefeat = this.createAudio(
-      "./audio/chicken-single-alarm-call.wav",
-      false,
-      0.55,
-    );
+    Object.entries(AUDIO_CONFIG).forEach(([name, config]) => {
+      this.sounds[name] = this.createAudio(config);
+    });
   }
 
-  createAudio(src, loop, volume) {
+  createAudio({ src, loop = false, volume = 1 }) {
     const audio = new Audio(src);
 
     audio.loop = loop;
@@ -96,9 +92,7 @@ class AudioManager {
     if (this.isUnlocked) return;
 
     Object.entries(this.sounds).forEach(([name, sound]) => {
-      if (name !== "background") {
-        this.prepareSound(sound);
-      }
+      if (name !== "background") this.prepareSound(sound);
     });
 
     this.isUnlocked = true;
@@ -107,17 +101,17 @@ class AudioManager {
   prepareSound(sound) {
     const volume = sound.volume;
 
-    sound.muted = true;
-    sound.volume = 0;
+    this.muteForPreparation(sound);
 
     sound
       .play()
-      .then(() => {
-        this.finishSoundPreparation(sound, volume);
-      })
-      .catch(() => {
-        this.restorePreparedSound(sound, volume);
-      });
+      .then(() => this.finishSoundPreparation(sound, volume))
+      .catch(() => this.restorePreparedSound(sound, volume));
+  }
+
+  muteForPreparation(sound) {
+    sound.muted = true;
+    sound.volume = 0;
   }
 
   finishSoundPreparation(sound, volume) {
@@ -139,16 +133,13 @@ class AudioManager {
 
     background.pause();
     background.currentTime = 0;
-
     background.play().catch(() => {});
   }
 
   resumeBackgroundMusic() {
     const background = this.sounds.background;
 
-    if (this.isMuted || !background || !background.paused) {
-      return;
-    }
+    if (this.isMuted || !background || !background.paused) return;
 
     background.play().catch(() => {});
   }
@@ -156,9 +147,7 @@ class AudioManager {
   pauseBackgroundMusic() {
     const background = this.sounds.background;
 
-    if (background) {
-      background.pause();
-    }
+    if (background) background.pause();
   }
 
   stopBackgroundMusic() {
@@ -168,6 +157,12 @@ class AudioManager {
 
     background.pause();
     background.currentTime = 0;
+  }
+
+  pauseAllSounds() {
+    Object.values(this.sounds).forEach((sound) => {
+      sound.pause();
+    });
   }
 
   stopAllSounds() {
@@ -201,10 +196,6 @@ class AudioManager {
     this.playEffect("collectCoin");
   }
 
-  playBonusHealthSound() {
-    this.playEffect("bonusHealth");
-  }
-
   playHurtSound() {
     this.playEffect("hurt");
   }
@@ -220,7 +211,6 @@ class AudioManager {
 
     sound.pause();
     sound.currentTime = 0;
-
     sound.play().catch(() => {});
   }
 }

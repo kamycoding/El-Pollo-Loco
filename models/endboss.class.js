@@ -135,7 +135,7 @@ class Endboss extends MovableObject {
   pauseAlertAnimation() {
     this.isAnimPaused = true;
 
-    setTimeout(
+    setStoppableTimeout(
       () => {
         this.resumeAlertAnimation();
       },
@@ -204,7 +204,7 @@ class Endboss extends MovableObject {
   }
 
   startHurtAnimation() {
-    const intervalId = setInterval(() => {
+    const intervalId = setStoppableInterval(() => {
       this.playAnimation(this.IMAGES_HURT);
 
       if (this.currentImage >= this.IMAGES_HURT.length) {
@@ -214,9 +214,9 @@ class Endboss extends MovableObject {
   }
 
   finishHurtAnimation(intervalId) {
-    clearInterval(intervalId);
+    clearStoppableInterval(intervalId);
 
-    setTimeout(() => {
+    setStoppableTimeout(() => {
       this.resumeFight();
     }, 200);
   }

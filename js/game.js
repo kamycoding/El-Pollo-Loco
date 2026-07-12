@@ -4,24 +4,33 @@ let keyboardListener;
 let audioManager;
 let lastActiveTimestamp = Date.now();
 let intervals = [];
+let timeouts = [];
+let gameEndTimeoutId = null;
 let isGameRunning = false;
 let isGameEnding = false;
+let isGamePaused = false;
+let pauseStartedAt = null;
 let isTouchContextMenuDisabled = false;
 
 function startGame() {
   if (isGameRunning || isGameEnding) return;
 
-  init();
-  hideGameOverlay();
-  showGameSoundButton();
-  blurActiveElement();
-  prepareGameAudio();
-
-  isGameRunning = true;
-
+  initializeGameSession();
   createWorld();
   world.draw();
   initLevel1Intervals();
+}
+
+function initializeGameSession() {
+  init();
+  hideGameOverlay();
+  closePauseMenu(false);
+  showGameSoundButton();
+  showGameMenuButton();
+  blurActiveElement();
+  prepareGameAudio();
+  isGameRunning = true;
+  isGamePaused = false;
 }
 
 function prepareGameAudio() {
@@ -32,65 +41,169 @@ function prepareGameAudio() {
 
 function createWorld() {
   world = new World(canvas);
-
   createLevel1();
-
   world.setLevel(level1);
   world.createCharacter();
   world.createStatusBars();
 }
 
 function setStoppableInterval(callback, delay) {
-  const intervalId = setInterval(callback, delay);
+  const intervalId = setInterval(() => {
+    if (!isGamePaused) callback();
+  }, delay);
 
   intervals.push(intervalId);
+  return intervalId;
+}
+
+function clearStoppableInterval(intervalId) {
+  clearInterval(intervalId);
+  intervals = intervals.filter((id) => id !== intervalId);
+}
+
+function setStoppableTimeout(callback, delay) {
+  const timeout = { id: null, callback };
+
+  timeout.id = setTimeout(() => runStoppableTimeout(timeout), delay);
+  timeouts.push(timeout);
+
+  return timeout;
+}
+
+function runStoppableTimeout(timeout) {
+  if (isGamePaused) {
+    timeout.id = setTimeout(() => runStoppableTimeout(timeout), 50);
+    return;
+  }
+
+  removeTimeout(timeout);
+  timeout.callback();
+}
+
+function clearStoppableTimeout(timeout) {
+  if (!timeout) return;
+
+  clearTimeout(timeout.id);
+  removeTimeout(timeout);
+}
+
+function removeTimeout(timeout) {
+  timeouts = timeouts.filter((item) => item !== timeout);
 }
 
 function clearAllIntervals() {
-  intervals.forEach((intervalId) => {
-    clearInterval(intervalId);
-  });
-
+  intervals.forEach((intervalId) => clearInterval(intervalId));
   intervals = [];
+}
+
+function clearAllTimeouts() {
+  timeouts.forEach((timeout) => clearTimeout(timeout.id));
+  timeouts = [];
+}
+
+function clearAllTimers() {
+  clearAllIntervals();
+  clearAllTimeouts();
 }
 
 function calcRandomNumber(min, max) {
   return Math.round(Math.random() * (max - min)) + min;
 }
 
+function pauseGame() {
+  if (!canPauseGame()) return;
+
+  isGamePaused = true;
+  pauseStartedAt = Date.now();
+  resetKeyboard();
+  world.stopDrawing();
+  audioManager.pauseAllSounds();
+  showPauseMenu();
+}
+
+function canPauseGame() {
+  return isGameRunning && !isGameEnding && !isGamePaused && Boolean(world);
+}
+
+function resumeGame() {
+  if (!isGamePaused || !world) return;
+
+  preservePausedTimestamps();
+  isGamePaused = false;
+  pauseStartedAt = null;
+  closePauseMenu(false);
+  showGameMenuButton();
+  world.draw();
+  resumeGameAudio();
+  canvas.focus();
+}
+
+function preservePausedTimestamps() {
+  const pauseDuration = Date.now() - pauseStartedAt;
+
+  lastActiveTimestamp = Date.now();
+  shiftCollisionTimestamp(pauseDuration);
+  shiftBottleTimestamps(pauseDuration);
+}
+
+function shiftCollisionTimestamp(pauseDuration) {
+  const collisionManager = world?.collisionManager;
+
+  if (!collisionManager?.lastCharacterDamageAt) return;
+
+  collisionManager.lastCharacterDamageAt += pauseDuration;
+}
+
+function shiftBottleTimestamps(pauseDuration) {
+  world.throwables.forEach((bottle) => {
+    if (bottle.landedAt) bottle.landedAt += pauseDuration;
+  });
+}
+
+function resumeGameAudio() {
+  if (audioManager.isMuted) return;
+
+  audioManager.resumeBackgroundMusic();
+}
+
 function endGame(finishedWorld, result) {
   if (isGameEnding) return;
 
   isGameEnding = true;
+  hideGameMenuButton();
 
-  setTimeout(() => {
+  gameEndTimeoutId = setStoppableTimeout(() => {
     finishGame(finishedWorld, result);
   }, 2500);
 }
 
 function finishGame(finishedWorld, result) {
+  gameEndTimeoutId = null;
+
+  if (world !== finishedWorld) return;
+
   stopFinishedWorld(finishedWorld);
   resetGameState(finishedWorld);
   hideGameSoundButton();
+  hideGameMenuButton();
   audioManager.stopBackgroundMusic();
   playEndSound(result);
   showEndScreen(result);
 }
 
 function stopFinishedWorld(finishedWorld) {
-  clearAllIntervals();
-
+  clearAllTimers();
   finishedWorld.stopEnemiesAndClouds();
   finishedWorld.stopDrawing();
 }
 
 function resetGameState(finishedWorld) {
-  if (world === finishedWorld) {
-    world = null;
-  }
+  if (world === finishedWorld) world = null;
 
   isGameRunning = false;
   isGameEnding = false;
+  isGamePaused = false;
+  pauseStartedAt = null;
 }
 
 function playEndSound(result) {
@@ -113,14 +226,29 @@ function goToHomeScreen() {
 }
 
 function resetCurrentGame() {
-  clearAllIntervals();
+  clearPendingGameEnd();
+  clearAllTimers();
   resetKeyboard();
+  closePauseMenu(false);
   hideGameSoundButton();
+  hideGameMenuButton();
   stopCurrentWorld();
   stopCurrentAudio();
+  resetSessionFlags();
+}
 
+function resetSessionFlags() {
   isGameRunning = false;
   isGameEnding = false;
+  isGamePaused = false;
+  pauseStartedAt = null;
+}
+
+function clearPendingGameEnd() {
+  if (gameEndTimeoutId === null) return;
+
+  clearStoppableTimeout(gameEndTimeoutId);
+  gameEndTimeoutId = null;
 }
 
 function stopCurrentWorld() {
@@ -128,7 +256,6 @@ function stopCurrentWorld() {
 
   world.stopEnemiesAndClouds();
   world.stopDrawing();
-
   world = null;
 }
 
@@ -145,7 +272,6 @@ function init() {
   resetKeyboard();
   addFullscreenListener();
   disableTouchContextMenu();
-
   canvas.focus();
 }
 
@@ -153,7 +279,6 @@ function createAudioManager() {
   if (audioManager) return;
 
   audioManager = new AudioManager();
-
   updateSoundButton();
 }
 
@@ -171,7 +296,6 @@ function resetKeyboard() {
 
 function addFullscreenListener() {
   document.removeEventListener("fullscreenchange", updateFullscreenButton);
-
   document.addEventListener("fullscreenchange", updateFullscreenButton);
 }
 
@@ -183,7 +307,6 @@ function disableTouchContextMenu() {
   if (!touchControls) return;
 
   touchControls.addEventListener("contextmenu", preventContextMenu);
-
   isTouchContextMenuDisabled = true;
 }
 
@@ -192,9 +315,7 @@ function preventContextMenu(event) {
 }
 
 function setTouchKey(keyName, status, event) {
-  if (event) {
-    event.preventDefault();
-  }
+  if (event) event.preventDefault();
 
   createKeyboardListener();
 

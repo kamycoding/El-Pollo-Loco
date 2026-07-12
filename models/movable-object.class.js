@@ -10,8 +10,10 @@ class MovableObject extends DrawableObject {
   gotHit = false;
   isDead = false;
   isSmashed = false;
-  moveIntervalId = 0;
-  walkIntervalId = 0;
+  moveIntervalId = null;
+  walkIntervalId = null;
+  gravityIntervalId = null;
+  deathIntervalId = null;
   moveInterval;
 
   constructor(x, y) {
@@ -19,12 +21,12 @@ class MovableObject extends DrawableObject {
   }
 
   isColliding(object) {
-    const thisCollisionX = this.getCollisionX(this);
-    const objectCollisionX = this.getCollisionX(object);
+    const thisX = this.getCollisionX(this);
+    const objectX = this.getCollisionX(object);
 
     return (
-      thisCollisionX + this.collisionArea.width >= objectCollisionX &&
-      thisCollisionX <= objectCollisionX + object.collisionArea.width &&
+      thisX + this.collisionArea.width >= objectX &&
+      thisX <= objectX + object.collisionArea.width &&
       this.collisionArea.y + this.collisionArea.height >=
         object.collisionArea.y &&
       this.collisionArea.y <=
@@ -40,9 +42,7 @@ class MovableObject extends DrawableObject {
    * @returns {number} Horizontal position of the collision area.
    */
   getCollisionX(object) {
-    if (!object.isFlipped) {
-      return object.collisionArea.x;
-    }
+    if (!object.isFlipped) return object.collisionArea.x;
 
     const offsetX = object.width * object.collisionBasis.offsetX;
 
@@ -60,25 +60,41 @@ class MovableObject extends DrawableObject {
   }
 
   applyGravity() {
-    const intervalId = setInterval(() => {
-      this.y -= this.speedY;
-      this.speedY -= this.acceleration;
+    if (this.gravityIntervalId !== null) return;
 
-      if (!this.isAboveGround() || this.isSmashed) {
-        clearInterval(intervalId);
-        this.speedY = 0;
-
-        if (!this.isSmashed) {
-          this.y = this.groundPosition;
-        }
-
-        if (this instanceof Character) {
-          setTimeout(() => {
-            this.isJumping = false;
-          }, 200);
-        }
-      }
+    this.gravityIntervalId = setStoppableInterval(() => {
+      this.updateGravity();
     }, 40);
+  }
+
+  updateGravity() {
+    this.y -= this.speedY;
+    this.speedY -= this.acceleration;
+
+    if (this.isAboveGround() && !this.isSmashed) return;
+
+    this.finishGravity();
+  }
+
+  finishGravity() {
+    this.stopGravity();
+
+    if (!this.isSmashed) this.y = this.groundPosition;
+    if (this instanceof Character) this.releaseJumpState();
+  }
+
+  stopGravity() {
+    if (this.gravityIntervalId === null) return;
+
+    clearStoppableInterval(this.gravityIntervalId);
+    this.gravityIntervalId = null;
+    this.speedY = 0;
+  }
+
+  releaseJumpState() {
+    setStoppableTimeout(() => {
+      this.isJumping = false;
+    }, 200);
   }
 
   setMoveInterval(fast, slow) {
@@ -86,14 +102,14 @@ class MovableObject extends DrawableObject {
   }
 
   startMoving(objectArray, direction) {
-    this.moveIntervalId = setInterval(() => {
+    this.moveIntervalId = setStoppableInterval(() => {
       this.move(direction);
       this.handleEdge(objectArray);
     }, this.moveInterval);
   }
 
   walk(frequency, images) {
-    this.walkIntervalId = setInterval(() => {
+    this.walkIntervalId = setStoppableInterval(() => {
       this.playAnimation(images);
     }, frequency);
   }
@@ -103,27 +119,40 @@ class MovableObject extends DrawableObject {
   }
 
   handleEdge(objectArray) {
-    if (this.x + this.width < 0) {
-      const objectIndex = objectArray.findIndex((object) => object === this);
+    if (this.x + this.width >= 0) return;
 
-      clearInterval(this.moveIntervalId);
-      clearInterval(this.walkIntervalId);
+    this.stopMovementIntervals();
+    this.removeFromArray(objectArray);
+  }
 
-      objectArray.splice(objectIndex, 1);
-    }
+  stopMovementIntervals() {
+    clearStoppableInterval(this.moveIntervalId);
+    clearStoppableInterval(this.walkIntervalId);
+    this.moveIntervalId = null;
+    this.walkIntervalId = null;
+  }
+
+  removeFromArray(objectArray) {
+    const objectIndex = objectArray.indexOf(this);
+
+    if (objectIndex !== -1) objectArray.splice(objectIndex, 1);
   }
 
   die() {
     this.currentImage = 0;
-
-    const intervalId = setInterval(() => {
-      this.playAnimation(this.IMAGES_DIE);
-
-      if (this.currentImage >= this.IMAGES_DIE.length) {
-        clearInterval(intervalId);
-      }
+    this.deathIntervalId = setStoppableInterval(() => {
+      this.animateDeath();
     }, 160);
 
     world.gameOver(this);
+  }
+
+  animateDeath() {
+    this.playAnimation(this.IMAGES_DIE);
+
+    if (this.currentImage < this.IMAGES_DIE.length) return;
+
+    clearStoppableInterval(this.deathIntervalId);
+    this.deathIntervalId = null;
   }
 }

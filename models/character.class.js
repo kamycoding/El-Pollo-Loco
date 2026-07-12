@@ -68,20 +68,29 @@ class Character extends MovableObject {
   bottleCount = 0;
   coinCount = 0;
   sleepDelay = 5000;
+  jumpIntervalId = null;
+  hurtIntervalId = null;
 
   constructor(x, y, keyboard) {
     super(x, y).loadImage(this.IMAGES_WAIT[0]);
-
     this.keyboard = keyboard;
+    this.configureCharacter(x);
+    this.loadCharacterImages();
+    this.resetActivityTimer();
+    this.initIntervals();
+  }
+
+  configureCharacter(x) {
     this.aspectRatio = 0.5083;
     this.width = 220;
     this.height = this.width / this.aspectRatio;
     this.startX = x;
     this.speedX = 12;
     this.health = 100;
-
     this.setCollisionBasis(0.15, 0.45, 0.55, 0.55);
+  }
 
+  loadCharacterImages() {
     this.loadImages(
       this.IMAGES_WAIT,
       this.IMAGES_SNOOZE,
@@ -90,9 +99,6 @@ class Character extends MovableObject {
       this.IMAGES_HURT,
       this.IMAGES_DIE,
     );
-
-    this.resetActivityTimer();
-    this.initIntervals();
   }
 
   initIntervals() {
@@ -105,32 +111,35 @@ class Character extends MovableObject {
 
   handleMovement() {
     setStoppableInterval(() => {
-      const maxX =
-        world.level.background.landscapeLayer[0].width *
-          world.level.sceneParts -
-        this.startX -
-        this.width;
-
-      const maxCamX =
-        world.level.background.landscapeLayer[0].width *
-          world.level.sceneParts -
-        this.startX -
-        canvas.width;
-
-      if (this.keyboard.KEYS.RIGHT.status) {
-        this.moveRight(maxX, maxCamX);
-      } else if (this.keyboard.KEYS.LEFT.status) {
-        this.moveLeft(maxCamX);
-      }
+      this.updateMovement();
     }, 55);
+  }
+
+  updateMovement() {
+    const { maxX, maxCamX } = this.getMovementLimits();
+
+    if (this.keyboard.KEYS.RIGHT.status) {
+      this.moveRight(maxX, maxCamX);
+      return;
+    }
+
+    if (this.keyboard.KEYS.LEFT.status) this.moveLeft(maxCamX);
+  }
+
+  getMovementLimits() {
+    const backgroundWidth = world.level.background.landscapeLayer[0].width;
+    const levelWidth = backgroundWidth * world.level.sceneParts;
+
+    return {
+      maxX: levelWidth - this.startX - this.width,
+      maxCamX: levelWidth - this.startX - canvas.width,
+    };
   }
 
   moveRight(maxX, maxCamX) {
     this.isFlipped = false;
 
-    if (this.x <= maxX) {
-      this.move(1);
-    }
+    if (this.x <= maxX) this.move(1);
 
     if (this.x <= maxCamX) {
       world.setCameraPos(-this.x + this.startX);
@@ -141,20 +150,19 @@ class Character extends MovableObject {
   moveLeft(maxCamX) {
     this.isFlipped = true;
 
-    if (this.x > this.startX) {
-      this.move(-1);
+    if (this.x <= this.startX) return;
 
-      if (this.x <= maxCamX) {
-        world.setCameraPos(-this.x + this.startX);
-        world.moveBackground(-1);
-      }
+    this.move(-1);
+
+    if (this.x <= maxCamX) {
+      world.setCameraPos(-this.x + this.startX);
+      world.moveBackground(-1);
     }
   }
 
   animateWalk() {
     setStoppableInterval(() => {
-      const isMoving =
-        this.keyboard.KEYS.RIGHT.status || this.keyboard.KEYS.LEFT.status;
+      const isMoving = this.isMovementKeyPressed();
 
       if (isMoving && !this.isAboveGround() && !this.gotHit) {
         this.isWalking = true;
@@ -165,6 +173,10 @@ class Character extends MovableObject {
     }, 100);
   }
 
+  isMovementKeyPressed() {
+    return this.keyboard.KEYS.RIGHT.status || this.keyboard.KEYS.LEFT.status;
+  }
+
   stopWalk() {
     this.isWalking = false;
     this.reset();
@@ -172,17 +184,23 @@ class Character extends MovableObject {
 
   animateJump() {
     setStoppableInterval(() => {
-      if (!this.canJump()) return;
-
-      audioManager.playJumpSound();
-
-      this.isJumping = true;
-      this.currentImage = 2;
-      this.speedY = 50;
-
-      this.applyGravity();
-      this.startJumpAnimation();
+      this.tryJump();
     }, 20);
+  }
+
+  tryJump() {
+    if (!this.canJump()) return;
+
+    audioManager.playJumpSound();
+    this.startJumpState();
+    this.applyGravity();
+    this.startJumpAnimation();
+  }
+
+  startJumpState() {
+    this.isJumping = true;
+    this.currentImage = 2;
+    this.speedY = 50;
   }
 
   canJump() {
@@ -192,27 +210,29 @@ class Character extends MovableObject {
   }
 
   startJumpAnimation() {
-    const jumpIntervalId = setInterval(() => {
-      if (!this.gotHit) {
-        this.playAnimation(this.IMAGES_JUMP);
-      }
-
-      if (!this.isAboveGround()) {
-        clearInterval(jumpIntervalId);
-        this.speedY = 0;
-
-        if (!this.gotHit) {
-          this.reset();
-        }
-      }
+    this.jumpIntervalId = setStoppableInterval(() => {
+      this.updateJumpAnimation();
     }, 90);
+  }
+
+  updateJumpAnimation() {
+    if (!this.gotHit) this.playAnimation(this.IMAGES_JUMP);
+    if (this.isAboveGround()) return;
+
+    this.finishJumpAnimation();
+  }
+
+  finishJumpAnimation() {
+    clearStoppableInterval(this.jumpIntervalId);
+    this.jumpIntervalId = null;
+    this.speedY = 0;
+
+    if (!this.gotHit) this.reset();
   }
 
   animateIdle() {
     setStoppableInterval(() => {
-      if (!this.canAnimateIdle()) return;
-
-      this.playIdleAnimation();
+      if (this.canAnimateIdle()) this.playIdleAnimation();
     }, 180);
   }
 
@@ -240,22 +260,31 @@ class Character extends MovableObject {
 
   handleThrow() {
     setStoppableInterval(() => {
-      if (!this.canThrowBottle()) return;
-
-      this.hasThrownBottle = true;
-      this.bottleCount--;
-      this.resetActivityTimer();
-
-      world.statusbars.bottle.setValue(
-        (100 / world.level.maxBottles) * this.bottleCount,
-      );
-
-      this.throwBottle();
-
-      setTimeout(() => {
-        this.hasThrownBottle = false;
-      }, 500);
+      this.tryThrowBottle();
     }, 50);
+  }
+
+  tryThrowBottle() {
+    if (!this.canThrowBottle()) return;
+
+    this.hasThrownBottle = true;
+    this.bottleCount--;
+    this.resetActivityTimer();
+    this.updateBottleStatus();
+    this.throwBottle();
+    this.scheduleThrowReset();
+  }
+
+  updateBottleStatus() {
+    const percent = (100 / world.level.maxBottles) * this.bottleCount;
+
+    world.statusbars.bottle.setValue(percent);
+  }
+
+  scheduleThrowReset() {
+    setStoppableTimeout(() => {
+      this.hasThrownBottle = false;
+    }, 500);
   }
 
   canThrowBottle() {
@@ -275,24 +304,26 @@ class Character extends MovableObject {
 
   hurt() {
     this.currentImage = 0;
-
-    const hurtIntervalId = setInterval(() => {
-      this.playAnimation(this.IMAGES_HURT);
-
-      if (this.currentImage >= this.IMAGES_HURT.length) {
-        clearInterval(hurtIntervalId);
-        this.finishHurtAnimation();
-      }
+    this.hurtIntervalId = setStoppableInterval(() => {
+      this.updateHurtAnimation();
     }, 120);
   }
 
+  updateHurtAnimation() {
+    this.playAnimation(this.IMAGES_HURT);
+
+    if (this.currentImage < this.IMAGES_HURT.length) return;
+
+    clearStoppableInterval(this.hurtIntervalId);
+    this.hurtIntervalId = null;
+    this.finishHurtAnimation();
+  }
+
   finishHurtAnimation() {
-    setTimeout(() => {
+    setStoppableTimeout(() => {
       this.gotHit = false;
 
-      if (!this.isDead) {
-        this.reset();
-      }
+      if (!this.isDead) this.reset();
     }, 250);
   }
 
