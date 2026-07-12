@@ -73,7 +73,7 @@ class World {
   }
 
   handleObjectDeath(object) {
-    clearAllIntervals();
+    clearAllTimers();
     object.isDead = true;
     object.die();
   }

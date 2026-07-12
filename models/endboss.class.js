@@ -188,14 +188,19 @@ class Endboss extends MovableObject {
 
     const nextSequenceCount = sequenceCount + 1;
 
-    if (nextSequenceCount >= this.IMAGES_WALK.length * 5) {
-      this.currentImage = 0;
-      this.status = "attack";
+    if (!this.shouldStartAttack(nextSequenceCount)) return nextSequenceCount;
 
-      return 0;
-    }
+    this.startAttack();
+    return 0;
+  }
 
-    return nextSequenceCount;
+  shouldStartAttack(sequenceCount) {
+    return sequenceCount >= this.IMAGES_WALK.length * 5;
+  }
+
+  startAttack() {
+    this.currentImage = 0;
+    this.status = "attack";
   }
 
   hurt() {

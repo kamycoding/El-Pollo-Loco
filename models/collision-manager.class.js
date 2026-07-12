@@ -62,19 +62,28 @@ class CollisionManager {
 
   isStompCollision(enemy) {
     const character = this.world.character;
-    const characterBottom =
-      character.collisionArea.y + character.collisionArea.height;
-
+    const characterBottom = this.getCollisionBottom(character);
     const enemyTop = enemy.collisionArea.y;
-    const stompRange = this.getStompRange(enemy);
 
     return (
-      character.isJumping &&
-      character.speedY <= 0 &&
-      characterBottom >= enemyTop - 5 &&
-      characterBottom <= enemyTop + stompRange &&
+      this.isFalling(character) &&
+      this.isWithinStompRange(characterBottom, enemyTop, enemy) &&
       this.hasHorizontalOverlap(character, enemy)
     );
+  }
+
+  getCollisionBottom(object) {
+    return object.collisionArea.y + object.collisionArea.height;
+  }
+
+  isFalling(character) {
+    return character.isJumping && character.speedY <= 0;
+  }
+
+  isWithinStompRange(characterBottom, enemyTop, enemy) {
+    const stompRange = this.getStompRange(enemy);
+
+    return characterBottom >= enemyTop - 5 && characterBottom <= enemyTop + stompRange;
   }
 
   getStompRange(enemy) {
@@ -84,18 +93,25 @@ class CollisionManager {
   }
 
   hasHorizontalOverlap(character, enemy) {
-    const characterLeft = character.getCollisionX(character);
-    const enemyLeft = enemy.getCollisionX(enemy);
+    const characterEdges = this.getHorizontalEdges(character);
+    const enemyEdges = this.getHorizontalEdges(enemy);
 
-    const characterRight = characterLeft + character.collisionArea.width;
+    return this.overlapsWithTolerance(characterEdges, enemyEdges, 8);
+  }
 
-    const enemyRight = enemyLeft + enemy.collisionArea.width;
+  getHorizontalEdges(object) {
+    const left = object.getCollisionX(object);
 
-    const tolerance = 8;
+    return {
+      left,
+      right: left + object.collisionArea.width,
+    };
+  }
 
+  overlapsWithTolerance(first, second, tolerance) {
     return (
-      characterRight > enemyLeft + tolerance &&
-      characterLeft < enemyRight - tolerance
+      first.right > second.left + tolerance &&
+      first.left < second.right - tolerance
     );
   }
 
@@ -131,9 +147,7 @@ class CollisionManager {
     if (!amount || !this.canDamageCharacter()) return;
 
     this.lastCharacterDamageAt = Date.now();
-
     audioManager.playHurtSound();
-
     this.world.reduceHealth(
       this.world.character,
       amount,
@@ -143,16 +157,13 @@ class CollisionManager {
 
   smashEnemy(enemy) {
     audioManager.playEnemyDefeatSound();
-
     this.defeatEnemy(enemy);
     this.world.character.speedY = 14;
   }
 
   defeatEnemy(enemy) {
     this.world.stopEnemy(enemy);
-
     enemy.isDead = true;
-
     this.setEnemyDeathImage(enemy);
     this.removeDefeatedEnemy(enemy);
   }
@@ -188,11 +199,10 @@ class CollisionManager {
     const endboss = this.world.level.endboss;
     const character = this.world.character;
 
+    character.getCollisionArea();
     endboss.getCollisionArea();
 
-    if (character.isColliding(endboss)) {
-      this.damageCharacter(20);
-    }
+    if (character.isColliding(endboss)) this.damageCharacter(20);
   }
 
   checkBottleCollisions() {
@@ -212,7 +222,7 @@ class CollisionManager {
   }
 
   isOldGroundedBottle(bottle) {
-    return bottle.landedAt && Date.now() - bottle.landedAt > 200;
+    return Boolean(bottle.landedAt && Date.now() - bottle.landedAt > 200);
   }
 
   handleBottleEnemyCollision(bottle) {
@@ -220,6 +230,7 @@ class CollisionManager {
 
     if (!enemy) return false;
 
+    audioManager.playEnemyDefeatSound();
     this.defeatEnemy(enemy);
     this.smashBottle(bottle);
 
@@ -253,12 +264,9 @@ class CollisionManager {
 
     endboss.getCollisionArea();
 
-    if (!this.isBottleHittingEndboss(bottle, endboss)) {
-      return;
-    }
+    if (!this.isBottleHittingEndboss(bottle, endboss)) return;
 
     this.smashBottle(bottle);
-
     this.world.reduceHealth(endboss, 20, endboss.statusbar);
   }
 
@@ -287,9 +295,9 @@ class CollisionManager {
   }
 
   shouldRemoveGroundedBottle(bottle) {
-    return (
+    return Boolean(
       bottle.landedAt &&
-      Date.now() - bottle.landedAt > this.groundedBottleLifetime
+        Date.now() - bottle.landedAt > this.groundedBottleLifetime,
     );
   }
 
@@ -301,24 +309,23 @@ class CollisionManager {
     const item = this.world.level.collectables[itemIndex];
 
     this.collectItem(item);
-
     this.world.level.collectables.splice(itemIndex, 1);
   }
 
   getCollectableIndex() {
+    const character = this.world.character;
+
+    character.getCollisionArea();
+
     return this.world.level.collectables.findIndex((item) => {
-      return this.world.character.isColliding(item);
+      item.getCollisionArea();
+      return character.isColliding(item);
     });
   }
 
   collectItem(item) {
-    if (item.type === "bottle") {
-      this.collectBottle();
-    }
-
-    if (item.type === "coin") {
-      this.collectCoin();
-    }
+    if (item.type === "bottle") this.collectBottle();
+    if (item.type === "coin") this.collectCoin();
   }
 
   collectBottle() {
@@ -326,12 +333,8 @@ class CollisionManager {
     const maxBottles = this.world.level.maxBottles;
 
     audioManager.playCollectBottleSound();
-
-    character.bottleCount++;
-
-    this.world.statusbars.bottle.setValue(
-      (100 / maxBottles) * character.bottleCount,
-    );
+    character.bottleCount = Math.min(maxBottles, character.bottleCount + 1);
+    this.updateCounterStatus("bottle", character.bottleCount, maxBottles);
   }
 
   collectCoin() {
@@ -339,9 +342,11 @@ class CollisionManager {
     const maxCoins = this.world.level.maxCoins;
 
     audioManager.playCollectCoinSound();
+    character.coinCount = Math.min(maxCoins, character.coinCount + 1);
+    this.updateCounterStatus("coin", character.coinCount, maxCoins);
+  }
 
-    character.coinCount++;
-
-    this.world.statusbars.coin.setValue((100 / maxCoins) * character.coinCount);
+  updateCounterStatus(type, count, maxValue) {
+    this.world.statusbars[type].setValue((100 / maxValue) * count);
   }
 }

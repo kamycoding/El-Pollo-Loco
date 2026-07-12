@@ -138,8 +138,7 @@ class Character extends MovableObject {
 
   moveRight(maxX, maxCamX) {
     this.isFlipped = false;
-
-    if (this.x <= maxX) this.move(1);
+    this.x = Math.min(maxX, this.x + this.speedX);
 
     if (this.x <= maxCamX) {
       world.setCameraPos(-this.x + this.startX);
@@ -152,7 +151,7 @@ class Character extends MovableObject {
 
     if (this.x <= this.startX) return;
 
-    this.move(-1);
+    this.x = Math.max(this.startX, this.x - this.speedX);
 
     if (this.x <= maxCamX) {
       world.setCameraPos(-this.x + this.startX);
@@ -291,6 +290,8 @@ class Character extends MovableObject {
     return (
       this.keyboard.KEYS.THROW.status &&
       !this.hasThrownBottle &&
+      !this.gotHit &&
+      !this.isDead &&
       this.bottleCount > 0
     );
   }

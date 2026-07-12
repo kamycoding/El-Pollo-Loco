@@ -63,8 +63,13 @@ class Statusbar extends DrawableObject {
 
   constructor(type, percent, maxValue = 100) {
     super(0, 0);
-
     this.validateType(type);
+    this.configureStatusbar(type, maxValue);
+    this.loadImageCache(this.TYPE[type].images);
+    this.setValue(percent);
+  }
+
+  configureStatusbar(type, maxValue) {
     this.type = type;
     this.maxValue = Math.max(1, maxValue);
     this.aspectRatio = 595 / 158;
@@ -72,9 +77,6 @@ class Statusbar extends DrawableObject {
     this.height = this.width / this.aspectRatio;
     this.x = this.TYPE[type].x;
     this.y = this.TYPE[type].y;
-
-    this.loadImageCache(this.TYPE[type].images);
-    this.setValue(percent);
   }
 
   validateType(type) {
@@ -146,21 +148,26 @@ class Statusbar extends DrawableObject {
     const bar = this.getHealthFillPosition();
 
     ctx.save();
-    ctx.fillStyle = "rgba(45, 20, 0, 0.7)";
-
-    ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
-
-    ctx.fillStyle = this.TYPE[this.type].color;
-
-    ctx.fillRect(bar.x, bar.y, bar.width * (this.value / 100), bar.height);
-
-    ctx.strokeStyle = "rgba(255, 245, 190, 0.85)";
-
-    ctx.lineWidth = 1;
-
-    ctx.strokeRect(bar.x, bar.y, bar.width, bar.height);
-
+    this.drawHealthBackground(ctx, bar);
+    this.drawHealthProgress(ctx, bar);
+    this.drawHealthBorder(ctx, bar);
     ctx.restore();
+  }
+
+  drawHealthBackground(ctx, bar) {
+    ctx.fillStyle = "rgba(45, 20, 0, 0.7)";
+    ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
+  }
+
+  drawHealthProgress(ctx, bar) {
+    ctx.fillStyle = this.TYPE[this.type].color;
+    ctx.fillRect(bar.x, bar.y, bar.width * (this.value / 100), bar.height);
+  }
+
+  drawHealthBorder(ctx, bar) {
+    ctx.strokeStyle = "rgba(255, 245, 190, 0.85)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(bar.x, bar.y, bar.width, bar.height);
   }
 
   getHealthFillPosition() {

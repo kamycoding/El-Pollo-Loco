@@ -100,18 +100,20 @@ class Level {
 
   getCollectableLayout() {
     const total = this.maxBottles + this.maxCoins;
-
     const startPosition = canvas.width * 0.6;
-
-    const endPosition = this.getLevelEndPosition() - canvas.width * 0.7;
-
-    const distance = (endPosition - startPosition) / total;
+    const distance = this.getCollectableDistance(total, startPosition);
 
     return {
       total,
       distance,
       currentPosition: startPosition - distance,
     };
+  }
+
+  getCollectableDistance(total, startPosition) {
+    const endPosition = this.getLevelEndPosition() - canvas.width * 0.7;
+
+    return (endPosition - startPosition) / Math.max(1, total);
   }
 
   addCollectables(types, remaining, layout) {
@@ -122,18 +124,22 @@ class Level {
 
   addCollectable(types, remaining, layout) {
     const typeIndex = this.getObjectType(remaining);
-
     const position = this.getCollectablePosition(
       layout.currentPosition,
       layout.distance,
     );
 
-    this.collectables.push(
-      new CollectableObject(position.x, position.y, types[typeIndex]),
-    );
+    this.pushCollectable(position, types[typeIndex]);
+    this.updateCollectableLayout(remaining, layout, typeIndex, position.x);
+  }
 
+  pushCollectable(position, type) {
+    this.collectables.push(new CollectableObject(position.x, position.y, type));
+  }
+
+  updateCollectableLayout(remaining, layout, typeIndex, positionX) {
     remaining[typeIndex]--;
-    layout.currentPosition = position.x;
+    layout.currentPosition = positionX;
   }
 
   getObjectType(remaining) {

@@ -57,33 +57,69 @@ function setStoppableInterval(callback, delay) {
 }
 
 function clearStoppableInterval(intervalId) {
+  if (intervalId === null || intervalId === undefined) return;
+
   clearInterval(intervalId);
   intervals = intervals.filter((id) => id !== intervalId);
 }
 
 function setStoppableTimeout(callback, delay) {
-  const timeout = { id: null, callback };
+  const timeout = createTimeoutRecord(callback, delay);
 
-  timeout.id = setTimeout(() => runStoppableTimeout(timeout), delay);
   timeouts.push(timeout);
+  scheduleTimeout(timeout);
 
   return timeout;
 }
 
-function runStoppableTimeout(timeout) {
-  if (isGamePaused) {
-    timeout.id = setTimeout(() => runStoppableTimeout(timeout), 50);
-    return;
-  }
+function createTimeoutRecord(callback, delay) {
+  return {
+    id: null,
+    callback,
+    remaining: delay,
+    startedAt: 0,
+  };
+}
 
+function scheduleTimeout(timeout) {
+  timeout.startedAt = Date.now();
+  timeout.id = setTimeout(() => executeTimeout(timeout), timeout.remaining);
+}
+
+function executeTimeout(timeout) {
   removeTimeout(timeout);
+  timeout.id = null;
   timeout.callback();
+}
+
+function pauseAllTimeouts() {
+  timeouts.forEach((timeout) => pauseTimeout(timeout));
+}
+
+function pauseTimeout(timeout) {
+  if (timeout.id === null) return;
+
+  clearTimeout(timeout.id);
+  timeout.remaining = getRemainingTime(timeout);
+  timeout.id = null;
+}
+
+function getRemainingTime(timeout) {
+  const elapsed = Date.now() - timeout.startedAt;
+
+  return Math.max(0, timeout.remaining - elapsed);
+}
+
+function resumeAllTimeouts() {
+  timeouts.forEach((timeout) => {
+    if (timeout.id === null) scheduleTimeout(timeout);
+  });
 }
 
 function clearStoppableTimeout(timeout) {
   if (!timeout) return;
 
-  clearTimeout(timeout.id);
+  if (timeout.id !== null) clearTimeout(timeout.id);
   removeTimeout(timeout);
 }
 
@@ -97,7 +133,10 @@ function clearAllIntervals() {
 }
 
 function clearAllTimeouts() {
-  timeouts.forEach((timeout) => clearTimeout(timeout.id));
+  timeouts.forEach((timeout) => {
+    if (timeout.id !== null) clearTimeout(timeout.id);
+  });
+
   timeouts = [];
 }
 
@@ -116,6 +155,7 @@ function pauseGame() {
   isGamePaused = true;
   pauseStartedAt = Date.now();
   resetKeyboard();
+  pauseAllTimeouts();
   world.stopDrawing();
   audioManager.pauseAllSounds();
   showPauseMenu();
@@ -131,6 +171,7 @@ function resumeGame() {
   preservePausedTimestamps();
   isGamePaused = false;
   pauseStartedAt = null;
+  resumeAllTimeouts();
   closePauseMenu(false);
   showGameMenuButton();
   world.draw();
