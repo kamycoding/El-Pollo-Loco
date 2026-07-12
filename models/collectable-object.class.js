@@ -31,13 +31,19 @@ class CollectableObject extends DrawableObject {
   pulseSpeed = 0.004;
   pulsePhase = 0;
 
+  /**
+   * Creates a bottle or coin collectable.
+   *
+   * @param {number} x - Horizontal position.
+   * @param {number} y - Vertical position.
+   * @param {"bottle"|"coin"} type - Collectable type.
+   */
   constructor(x, y, type) {
     super(x, y).loadImage(this.TYPE[type].img);
 
     this.type = type;
     this.setDimensions(type);
     this.setCollectableCollision(type);
-
     this.pulsePhase = x * 0.01;
     this.getCollisionArea();
   }
@@ -75,14 +81,17 @@ class CollectableObject extends DrawableObject {
     const scale = this.getPulseScale();
     const width = this.baseWidth * scale;
     const height = this.baseHeight * scale;
-
     const x = this.x + (this.baseWidth - width) / 2;
-
     const y = this.y + (this.baseHeight - height) / 2;
 
     ctx.drawImage(this.img, x, y, width, height);
   }
 
+  /**
+   * Calculates the current visual pulse scale.
+   *
+   * @returns {number} Scale applied to the coin image.
+   */
   getPulseScale() {
     const animationTime = performance.now() * this.pulseSpeed;
 

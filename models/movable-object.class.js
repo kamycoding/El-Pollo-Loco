@@ -20,6 +20,12 @@ class MovableObject extends DrawableObject {
     super(x, y);
   }
 
+  /**
+   * Checks whether this object overlaps another collision area.
+   *
+   * @param {DrawableObject} object - Object to check for a collision.
+   * @returns {boolean} Whether both collision areas overlap.
+   */
   isColliding(object) {
     const thisX = this.getCollisionX(this);
     const objectX = this.getCollisionX(object);
@@ -35,10 +41,9 @@ class MovableObject extends DrawableObject {
   }
 
   /**
-   * Returns the horizontal collision position and mirrors its offset
-   * when the object is facing the opposite direction.
+   * Returns the horizontal collision position, including mirroring.
    *
-   * @param {MovableObject} object - Object whose collision position is needed.
+   * @param {DrawableObject} object - Object whose position is required.
    * @returns {number} Horizontal position of the collision area.
    */
   getCollisionX(object) {
@@ -101,6 +106,12 @@ class MovableObject extends DrawableObject {
     this.moveInterval = calcRandomNumber(fast, slow);
   }
 
+  /**
+   * Starts moving the object and removes it after leaving the level.
+   *
+   * @param {MovableObject[]} objectArray - Array containing this object.
+   * @param {number} direction - Movement direction, usually -1 or 1.
+   */
   startMoving(objectArray, direction) {
     this.moveIntervalId = setStoppableInterval(() => {
       this.move(direction);

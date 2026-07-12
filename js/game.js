@@ -47,6 +47,13 @@ function createWorld() {
   world.createStatusBars();
 }
 
+/**
+ * Creates a pause-aware interval and registers it for cleanup.
+ *
+ * @param {Function} callback - Function executed after each delay.
+ * @param {number} delay - Interval delay in milliseconds.
+ * @returns {number} Browser interval identifier.
+ */
 function setStoppableInterval(callback, delay) {
   const intervalId = setInterval(() => {
     if (!isGamePaused) callback();
@@ -56,6 +63,11 @@ function setStoppableInterval(callback, delay) {
   return intervalId;
 }
 
+/**
+ * Clears a registered interval.
+ *
+ * @param {number|null|undefined} intervalId - Interval identifier to clear.
+ */
 function clearStoppableInterval(intervalId) {
   if (intervalId === null || intervalId === undefined) return;
 
@@ -63,6 +75,14 @@ function clearStoppableInterval(intervalId) {
   intervals = intervals.filter((id) => id !== intervalId);
 }
 
+/**
+ * Creates a pause-aware timeout and registers it for cleanup.
+ *
+ * @param {Function} callback - Function executed after the delay.
+ * @param {number} delay - Timeout delay in milliseconds.
+ * @returns {{id: number|null, callback: Function, remaining: number, startedAt: number}}
+ *   Registered timeout record.
+ */
 function setStoppableTimeout(callback, delay) {
   const timeout = createTimeoutRecord(callback, delay);
 
@@ -116,6 +136,11 @@ function resumeAllTimeouts() {
   });
 }
 
+/**
+ * Clears a registered pause-aware timeout.
+ *
+ * @param {{id: number|null}|null|undefined} timeout - Timeout record to clear.
+ */
 function clearStoppableTimeout(timeout) {
   if (!timeout) return;
 
@@ -145,6 +170,13 @@ function clearAllTimers() {
   clearAllTimeouts();
 }
 
+/**
+ * Returns a random integer within the inclusive range.
+ *
+ * @param {number} min - Lowest possible value.
+ * @param {number} max - Highest possible value.
+ * @returns {number} Random integer between min and max.
+ */
 function calcRandomNumber(min, max) {
   return Math.round(Math.random() * (max - min)) + min;
 }
@@ -207,6 +239,12 @@ function resumeGameAudio() {
   audioManager.resumeBackgroundMusic();
 }
 
+/**
+ * Schedules the end screen for the finished game session.
+ *
+ * @param {World} finishedWorld - World instance that reached an end state.
+ * @param {"win"|"lose"} result - Result displayed on the end screen.
+ */
 function endGame(finishedWorld, result) {
   if (isGameEnding) return;
 
@@ -355,6 +393,13 @@ function preventContextMenu(event) {
   event.preventDefault();
 }
 
+/**
+ * Updates a keyboard state from a mobile touch control.
+ *
+ * @param {string} keyName - Key name stored in the keyboard state.
+ * @param {boolean} status - Whether the touch control is pressed.
+ * @param {PointerEvent} [event] - Pointer event triggered by the control.
+ */
 function setTouchKey(keyName, status, event) {
   if (event) event.preventDefault();
 

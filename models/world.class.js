@@ -59,6 +59,13 @@ class World {
     background.x += layerSpeed * direction;
   }
 
+  /**
+   * Reduces an object's health and triggers its hurt or death state.
+   *
+   * @param {MovableObject} object - Object receiving damage.
+   * @param {number} amount - Amount of health to remove.
+   * @param {Statusbar} statusbar - Statusbar updated after damage.
+   */
   reduceHealth(object, amount, statusbar) {
     object.health = Math.max(0, object.health - amount);
     statusbar.setValue(object.health);
@@ -78,6 +85,11 @@ class World {
     object.die();
   }
 
+  /**
+   * Ends the current game and determines whether it was won or lost.
+   *
+   * @param {MovableObject} object - Object whose death ended the game.
+   */
   gameOver(object) {
     endGame(this, this.getGameResult(object));
   }
@@ -91,6 +103,12 @@ class World {
     this.stopObjectInterval(enemy, "walkIntervalId");
   }
 
+  /**
+   * Clears an interval stored on an object's property.
+   *
+   * @param {Object} object - Object containing the interval identifier.
+   * @param {string} propertyName - Property holding the interval identifier.
+   */
   stopObjectInterval(object, propertyName) {
     const intervalId = object[propertyName];
 

@@ -56,6 +56,15 @@ class AudioManager {
     });
   }
 
+  /**
+   * Creates and configures an audio element.
+   *
+   * @param {Object} config - Audio configuration.
+   * @param {string} config.src - Audio file path.
+   * @param {boolean} [config.loop=false] - Whether the audio should loop.
+   * @param {number} [config.volume=1] - Playback volume between 0 and 1.
+   * @returns {HTMLAudioElement} Configured audio element.
+   */
   createAudio({ src, loop = false, volume = 1 }) {
     const audio = new Audio(src);
 
@@ -204,6 +213,11 @@ class AudioManager {
     this.playEffect("enemyDefeat");
   }
 
+  /**
+   * Restarts and plays a configured sound effect.
+   *
+   * @param {string} name - Sound key defined in AUDIO_CONFIG.
+   */
   playEffect(name) {
     const sound = this.sounds[name];
 

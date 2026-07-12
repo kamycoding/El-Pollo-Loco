@@ -60,6 +60,12 @@ class CollisionManager {
     this.damageByEnemy(enemy);
   }
 
+  /**
+   * Checks whether the character landed on an enemy from above.
+   *
+   * @param {MovableObject} enemy - Enemy involved in the collision.
+   * @returns {boolean} Whether the collision is a valid stomp.
+   */
   isStompCollision(enemy) {
     const character = this.world.character;
     const characterBottom = this.getCollisionBottom(character);
@@ -83,7 +89,10 @@ class CollisionManager {
   isWithinStompRange(characterBottom, enemyTop, enemy) {
     const stompRange = this.getStompRange(enemy);
 
-    return characterBottom >= enemyTop - 5 && characterBottom <= enemyTop + stompRange;
+    return (
+      characterBottom >= enemyTop - 5 &&
+      characterBottom <= enemyTop + stompRange
+    );
   }
 
   getStompRange(enemy) {
@@ -143,11 +152,17 @@ class CollisionManager {
     );
   }
 
+  /**
+   * Applies damage to the character when the damage cooldown allows it.
+   *
+   * @param {number} amount - Amount of health removed from the character.
+   */
   damageCharacter(amount) {
     if (!amount || !this.canDamageCharacter()) return;
 
     this.lastCharacterDamageAt = Date.now();
     audioManager.playHurtSound();
+
     this.world.reduceHealth(
       this.world.character,
       amount,
@@ -225,6 +240,12 @@ class CollisionManager {
     return Boolean(bottle.landedAt && Date.now() - bottle.landedAt > 200);
   }
 
+  /**
+   * Handles a bottle collision with a regular enemy.
+   *
+   * @param {ThrowableObject} bottle - Bottle being checked.
+   * @returns {boolean} Whether an enemy was hit.
+   */
   handleBottleEnemyCollision(bottle) {
     const enemy = this.getBottleHitEnemy(bottle);
 
@@ -259,6 +280,11 @@ class CollisionManager {
     return enemy instanceof Chicken || enemy instanceof Chick;
   }
 
+  /**
+   * Applies bottle damage when the bottle hits the active endboss.
+   *
+   * @param {ThrowableObject} bottle - Bottle being checked.
+   */
   handleBottleEndbossCollision(bottle) {
     const endboss = this.world.level.endboss;
 
@@ -297,7 +323,7 @@ class CollisionManager {
   shouldRemoveGroundedBottle(bottle) {
     return Boolean(
       bottle.landedAt &&
-        Date.now() - bottle.landedAt > this.groundedBottleLifetime,
+      Date.now() - bottle.landedAt > this.groundedBottleLifetime,
     );
   }
 

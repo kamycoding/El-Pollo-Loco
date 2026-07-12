@@ -27,7 +27,6 @@ class Keyboard {
 
   addListeners() {
     document.addEventListener("keydown", this.handleKeyDown);
-
     document.addEventListener("keyup", this.handleKeyUp);
   }
 
@@ -39,6 +38,12 @@ class Keyboard {
     this.handleKeyChange(event, false);
   };
 
+  /**
+   * Updates a key state from a keyboard event.
+   *
+   * @param {KeyboardEvent} event - Triggered keyboard event.
+   * @param {boolean} status - Whether the key is pressed.
+   */
   handleKeyChange(event, status) {
     const key = this.getKeyByCode(event.code);
 
@@ -47,15 +52,19 @@ class Keyboard {
     event.preventDefault();
     key.status = status;
 
-    if (status) {
-      this.updateActivityTimer();
-    }
+    if (status) this.updateActivityTimer();
   }
 
   updateActivityTimer() {
     lastActiveTimestamp = Date.now();
   }
 
+  /**
+   * Finds a configured key by its keyboard event code.
+   *
+   * @param {string} code - Keyboard event code.
+   * @returns {{code: string, status: boolean}|undefined} Matching key state.
+   */
   getKeyByCode(code) {
     return Object.values(this.KEYS).find((key) => {
       return key.code === code;

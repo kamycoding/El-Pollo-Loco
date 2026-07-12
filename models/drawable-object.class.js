@@ -40,6 +40,11 @@ class DrawableObject {
     });
   }
 
+  /**
+   * Loads multiple image sequences into the image cache.
+   *
+   * @param {...string[]} imageArrays - Arrays containing image paths.
+   */
   loadImages(...imageArrays) {
     imageArrays.forEach((array) => {
       this.loadImageCache(array);
@@ -52,6 +57,14 @@ class DrawableObject {
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   }
 
+  /**
+   * Defines the collision area relative to the object's dimensions.
+   *
+   * @param {number} offsetX - Horizontal offset as a width ratio.
+   * @param {number} offsetY - Vertical offset as a height ratio.
+   * @param {number} widthRatio - Collision width relative to object width.
+   * @param {number} heightRatio - Collision height relative to object height.
+   */
   setCollisionBasis(offsetX, offsetY, widthRatio, heightRatio) {
     this.collisionBasis = {
       offsetX,
@@ -61,6 +74,9 @@ class DrawableObject {
     };
   }
 
+  /**
+   * Updates the absolute collision area from the configured ratios.
+   */
   getCollisionArea() {
     this.collisionArea.x = this.x + this.width * this.collisionBasis.offsetX;
 

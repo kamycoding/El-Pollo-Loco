@@ -61,15 +61,18 @@ class Statusbar extends DrawableObject {
   maxValue = 100;
   currentCount = 0;
 
+  /**
+   * Creates a configured health or collectable statusbar.
+   *
+   * @param {"characterHealth"|"endbossHealth"|"bottle"|"coin"} type
+   *   Statusbar type.
+   * @param {number} percent - Initial percentage value.
+   * @param {number} [maxValue=100] - Maximum value used by counter bars.
+   */
   constructor(type, percent, maxValue = 100) {
     super(0, 0);
-    this.validateType(type);
-    this.configureStatusbar(type, maxValue);
-    this.loadImageCache(this.TYPE[type].images);
-    this.setValue(percent);
-  }
 
-  configureStatusbar(type, maxValue) {
+    this.validateType(type);
     this.type = type;
     this.maxValue = Math.max(1, maxValue);
     this.aspectRatio = 595 / 158;
@@ -77,6 +80,9 @@ class Statusbar extends DrawableObject {
     this.height = this.width / this.aspectRatio;
     this.x = this.TYPE[type].x;
     this.y = this.TYPE[type].y;
+
+    this.loadImageCache(this.TYPE[type].images);
+    this.setValue(percent);
   }
 
   validateType(type) {
@@ -85,14 +91,17 @@ class Statusbar extends DrawableObject {
     throw new Error(`Unknown statusbar type: ${type}`);
   }
 
+  /**
+   * Updates the displayed statusbar value.
+   *
+   * @param {number} percent - Percentage value between 0 and 100.
+   */
   setValue(percent) {
     const safePercent = this.getSafePercent(percent);
-
     const imageIndex = this.getImageIndex(safePercent);
 
     this.value = safePercent;
     this.currentImage = imageIndex;
-
     this.img = this.imageCache[this.TYPE[this.type].images[imageIndex]];
 
     this.updateCurrentCount();
@@ -116,7 +125,6 @@ class Statusbar extends DrawableObject {
     if (!this.img) return;
 
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-
     this.drawStatusValue(ctx);
   }
 
@@ -126,9 +134,7 @@ class Statusbar extends DrawableObject {
       return;
     }
 
-    if (this.isCounterBar()) {
-      this.drawCounterText(ctx);
-    }
+    if (this.isCounterBar()) this.drawCounterText(ctx);
   }
 
   isHealthbar() {
@@ -148,26 +154,16 @@ class Statusbar extends DrawableObject {
     const bar = this.getHealthFillPosition();
 
     ctx.save();
-    this.drawHealthBackground(ctx, bar);
-    this.drawHealthProgress(ctx, bar);
-    this.drawHealthBorder(ctx, bar);
-    ctx.restore();
-  }
-
-  drawHealthBackground(ctx, bar) {
     ctx.fillStyle = "rgba(45, 20, 0, 0.7)";
     ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
-  }
 
-  drawHealthProgress(ctx, bar) {
     ctx.fillStyle = this.TYPE[this.type].color;
     ctx.fillRect(bar.x, bar.y, bar.width * (this.value / 100), bar.height);
-  }
 
-  drawHealthBorder(ctx, bar) {
     ctx.strokeStyle = "rgba(255, 245, 190, 0.85)";
     ctx.lineWidth = 1;
     ctx.strokeRect(bar.x, bar.y, bar.width, bar.height);
+    ctx.restore();
   }
 
   getHealthFillPosition() {
@@ -194,12 +190,10 @@ class Statusbar extends DrawableObject {
   drawOutlinedText(ctx, text, x, y, fontSize) {
     ctx.save();
     ctx.font = `bold ${fontSize}px Arial`;
-
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.lineWidth = 3;
     ctx.strokeStyle = "rgba(70, 25, 0, 0.9)";
-
     ctx.fillStyle = "#fff6c7";
     ctx.strokeText(text, x, y);
     ctx.fillText(text, x, y);

@@ -62,6 +62,14 @@ class Level {
     }
   }
 
+  /**
+   * Creates and starts a group of enemies within a level range.
+   *
+   * @param {typeof MovableObject} EnemyClass - Enemy class to instantiate.
+   * @param {number} count - Number of enemies to create.
+   * @param {number} startPosition - Minimum horizontal spawn position.
+   * @param {number} endPosition - Maximum horizontal spawn position.
+   */
   createEnemies(EnemyClass, count, startPosition, endPosition) {
     for (let index = 0; index < count; index++) {
       const enemy = new EnemyClass(0, 0);
@@ -100,20 +108,18 @@ class Level {
 
   getCollectableLayout() {
     const total = this.maxBottles + this.maxCoins;
+
     const startPosition = canvas.width * 0.6;
-    const distance = this.getCollectableDistance(total, startPosition);
+
+    const endPosition = this.getLevelEndPosition() - canvas.width * 0.7;
+
+    const distance = (endPosition - startPosition) / total;
 
     return {
       total,
       distance,
       currentPosition: startPosition - distance,
     };
-  }
-
-  getCollectableDistance(total, startPosition) {
-    const endPosition = this.getLevelEndPosition() - canvas.width * 0.7;
-
-    return (endPosition - startPosition) / Math.max(1, total);
   }
 
   addCollectables(types, remaining, layout) {
@@ -124,22 +130,18 @@ class Level {
 
   addCollectable(types, remaining, layout) {
     const typeIndex = this.getObjectType(remaining);
+
     const position = this.getCollectablePosition(
       layout.currentPosition,
       layout.distance,
     );
 
-    this.pushCollectable(position, types[typeIndex]);
-    this.updateCollectableLayout(remaining, layout, typeIndex, position.x);
-  }
+    this.collectables.push(
+      new CollectableObject(position.x, position.y, types[typeIndex]),
+    );
 
-  pushCollectable(position, type) {
-    this.collectables.push(new CollectableObject(position.x, position.y, type));
-  }
-
-  updateCollectableLayout(remaining, layout, typeIndex, positionX) {
     remaining[typeIndex]--;
-    layout.currentPosition = positionX;
+    layout.currentPosition = position.x;
   }
 
   getObjectType(remaining) {
@@ -170,6 +172,15 @@ class Level {
     }, 180000);
   }
 
+  /**
+   * Schedules recurring enemy creation.
+   *
+   * @param {typeof MovableObject} EnemyClass - Enemy class to instantiate.
+   * @param {number} count - Number of enemies created per interval.
+   * @param {number} startPosition - Minimum horizontal spawn position.
+   * @param {number} endPosition - Maximum horizontal spawn position.
+   * @param {number} intervalTime - Spawn interval in milliseconds.
+   */
   addMoreEnemies(EnemyClass, count, startPosition, endPosition, intervalTime) {
     setStoppableInterval(() => {
       this.createEnemies(EnemyClass, count, startPosition, endPosition);

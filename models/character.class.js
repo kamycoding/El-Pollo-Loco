@@ -71,6 +71,13 @@ class Character extends MovableObject {
   jumpIntervalId = null;
   hurtIntervalId = null;
 
+  /**
+   * Creates the playable character and starts its control intervals.
+   *
+   * @param {number} x - Initial horizontal position.
+   * @param {number} y - Initial vertical position.
+   * @param {Keyboard} keyboard - Shared keyboard input state.
+   */
   constructor(x, y, keyboard) {
     super(x, y).loadImage(this.IMAGES_WAIT[0]);
     this.keyboard = keyboard;
@@ -126,6 +133,11 @@ class Character extends MovableObject {
     if (this.keyboard.KEYS.LEFT.status) this.moveLeft(maxCamX);
   }
 
+  /**
+   * Calculates the character and camera movement boundaries.
+   *
+   * @returns {{maxX: number, maxCamX: number}} Movement limits.
+   */
   getMovementLimits() {
     const backgroundWidth = world.level.background.landscapeLayer[0].width;
     const levelWidth = backgroundWidth * world.level.sceneParts;
@@ -138,7 +150,8 @@ class Character extends MovableObject {
 
   moveRight(maxX, maxCamX) {
     this.isFlipped = false;
-    this.x = Math.min(maxX, this.x + this.speedX);
+
+    if (this.x <= maxX) this.move(1);
 
     if (this.x <= maxCamX) {
       world.setCameraPos(-this.x + this.startX);
@@ -151,7 +164,7 @@ class Character extends MovableObject {
 
     if (this.x <= this.startX) return;
 
-    this.x = Math.max(this.startX, this.x - this.speedX);
+    this.move(-1);
 
     if (this.x <= maxCamX) {
       world.setCameraPos(-this.x + this.startX);
@@ -290,8 +303,6 @@ class Character extends MovableObject {
     return (
       this.keyboard.KEYS.THROW.status &&
       !this.hasThrownBottle &&
-      !this.gotHit &&
-      !this.isDead &&
       this.bottleCount > 0
     );
   }

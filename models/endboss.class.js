@@ -100,6 +100,12 @@ class Endboss extends MovableObject {
     }
   }
 
+  /**
+   * Checks whether the character entered the boss activation range.
+   *
+   * @param {Character} character - Active player character.
+   * @returns {boolean} Whether the character is close enough.
+   */
   isCharacterNear(character) {
     const distance = this.x - character.x;
 
@@ -159,6 +165,12 @@ class Endboss extends MovableObject {
     }, 130);
   }
 
+  /**
+   * Updates the current fight animation sequence.
+   *
+   * @param {number} sequenceCount - Current walk sequence progress.
+   * @returns {number} Updated sequence progress.
+   */
   handleFightAnimation(sequenceCount) {
     if (this.gotHit || this.status === "alert") {
       return sequenceCount;
@@ -188,19 +200,14 @@ class Endboss extends MovableObject {
 
     const nextSequenceCount = sequenceCount + 1;
 
-    if (!this.shouldStartAttack(nextSequenceCount)) return nextSequenceCount;
+    if (nextSequenceCount >= this.IMAGES_WALK.length * 5) {
+      this.currentImage = 0;
+      this.status = "attack";
 
-    this.startAttack();
-    return 0;
-  }
+      return 0;
+    }
 
-  shouldStartAttack(sequenceCount) {
-    return sequenceCount >= this.IMAGES_WALK.length * 5;
-  }
-
-  startAttack() {
-    this.currentImage = 0;
-    this.status = "attack";
+    return nextSequenceCount;
   }
 
   hurt() {
@@ -218,6 +225,11 @@ class Endboss extends MovableObject {
     }, 150);
   }
 
+  /**
+   * Stops the hurt animation and schedules the boss fight to resume.
+   *
+   * @param {number} intervalId - Hurt animation interval identifier.
+   */
   finishHurtAnimation(intervalId) {
     clearStoppableInterval(intervalId);
 

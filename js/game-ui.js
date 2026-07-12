@@ -37,6 +37,11 @@ function showStartScreen() {
   updateInterfaceButtons();
 }
 
+/**
+ * Displays the appropriate end screen for the game result.
+ *
+ * @param {"win"|"lose"} result - Final result of the game.
+ */
 function showEndScreen(result) {
   hideGameSoundButton();
   hideGameMenuButton();
@@ -134,6 +139,11 @@ function showPauseMenu() {
   resumeButton?.focus();
 }
 
+/**
+ * Closes the pause menu.
+ *
+ * @param {boolean} [restoreFocus=true] - Whether focus returns to the menu button.
+ */
 function closePauseMenu(restoreFocus = true) {
   if (!pauseDialog) return;
 
@@ -150,6 +160,11 @@ function handlePauseDialogKeydown(event) {
   resumeGame();
 }
 
+/**
+ * Updates the overlay background for the selected screen.
+ *
+ * @param {"start"|"win"|"lose"} screen - Overlay screen identifier.
+ */
 function setOverlayBackground(screen) {
   const imagePath = OVERLAY_BACKGROUNDS[screen];
 
@@ -225,6 +240,11 @@ function openControlsDialog() {
   controlsCloseButton.focus();
 }
 
+/**
+ * Closes the controls dialog.
+ *
+ * @param {boolean} [restoreFocus=true] - Whether focus returns to the controls button.
+ */
 function closeControlsDialog(restoreFocus = true) {
   if (!controlsDialog) return;
 
