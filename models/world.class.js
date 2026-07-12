@@ -13,7 +13,6 @@ class World {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-
     this.collisionManager = new CollisionManager(this);
   }
 
@@ -25,19 +24,14 @@ class World {
     const startX = 100;
 
     this.character = new Character(startX, 0, keyboardListener);
-
     this.character.y = this.canvas.height - this.character.height - 40;
-
     this.character.groundPosition = this.character.y;
-
     this.character.applyGravity();
   }
 
   createStatusBars() {
     this.statusbars.health = new Statusbar("characterHealth", 100);
-
     this.statusbars.bottle = new Statusbar("bottle", 0, this.level.maxBottles);
-
     this.statusbars.coin = new Statusbar("coin", 0, this.level.maxCoins);
   }
 
@@ -53,18 +47,20 @@ class World {
 
   moveBackgroundLayer(layer, direction) {
     for (let part = 0; part < this.level.sceneParts; part++) {
-      const backgroundIndex = layer * 2 + part;
-
-      const layerSpeed = this.level.parallaxLayers[layer];
-
-      this.level.background.landscapeLayer[backgroundIndex].x +=
-        layerSpeed * direction;
+      this.moveBackgroundPart(layer, part, direction);
     }
+  }
+
+  moveBackgroundPart(layer, part, direction) {
+    const backgroundIndex = layer * 2 + part;
+    const layerSpeed = this.level.parallaxLayers[layer];
+    const background = this.level.background.landscapeLayer[backgroundIndex];
+
+    background.x += layerSpeed * direction;
   }
 
   reduceHealth(object, amount, statusbar) {
     object.health = Math.max(0, object.health - amount);
-
     statusbar.setValue(object.health);
 
     if (object.health <= 0) {
@@ -77,14 +73,9 @@ class World {
   }
 
   handleObjectDeath(object) {
-    this.clearAllIntervals();
-
+    clearAllIntervals();
     object.isDead = true;
     object.die();
-  }
-
-  gainHealth(object, amount) {
-    object.health = Math.min(100, object.health + amount);
   }
 
   gameOver(object) {
@@ -92,25 +83,21 @@ class World {
   }
 
   getGameResult(object) {
-    if (object instanceof Endboss) {
-      return "win";
-    }
-
-    return "lose";
-  }
-
-  clearAllIntervals() {
-    intervals.forEach((intervalId) => {
-      clearInterval(intervalId);
-    });
-
-    intervals = [];
+    return object instanceof Endboss ? "win" : "lose";
   }
 
   stopEnemy(enemy) {
-    clearInterval(enemy.moveIntervalId);
+    this.stopObjectInterval(enemy, "moveIntervalId");
+    this.stopObjectInterval(enemy, "walkIntervalId");
+  }
 
-    clearInterval(enemy.walkIntervalId);
+  stopObjectInterval(object, propertyName) {
+    const intervalId = object[propertyName];
+
+    if (intervalId === null || intervalId === undefined) return;
+
+    clearStoppableInterval(intervalId);
+    object[propertyName] = null;
   }
 
   removeEnemy(enemy) {
@@ -122,13 +109,12 @@ class World {
   }
 
   stopEnemiesAndClouds() {
-    this.level.enemies.forEach((enemy) => {
-      this.stopEnemy(enemy);
-    });
+    this.level.enemies.forEach((enemy) => this.stopEnemy(enemy));
+    this.level.background.clouds.forEach((cloud) => this.stopCloud(cloud));
+  }
 
-    this.level.background.clouds.forEach((cloud) => {
-      clearInterval(cloud.moveIntervalId);
-    });
+  stopCloud(cloud) {
+    this.stopObjectInterval(cloud, "moveIntervalId");
   }
 
   draw() {
@@ -150,30 +136,29 @@ class World {
   }
 
   drawWorld() {
+    this.ctx.save();
     this.ctx.translate(this.cameraPos, 0);
+    this.drawBackground();
+    this.drawGameObjects();
+    this.ctx.restore();
+  }
 
+  drawBackground() {
     this.drawObjects(this.level.background.sky);
-
     this.drawObjects(this.level.background.clouds);
-
     this.drawObjects(this.level.background.landscapeLayer);
+  }
 
+  drawGameObjects() {
     this.drawObjects(this.level.collectables);
-
     this.drawObject(this.character);
-
     this.drawObject(this.level.endboss);
-
     this.drawObjects(this.level.enemies);
-
     this.drawObjects(this.throwables);
-
-    this.ctx.translate(-this.cameraPos, 0);
   }
 
   drawInterface() {
     this.drawObjects(Object.values(this.statusbars));
-
     this.drawObject(this.level.endboss.statusbar);
   }
 
@@ -184,12 +169,9 @@ class World {
   }
 
   stopDrawing() {
-    if (this.animationFrameId === null) {
-      return;
-    }
+    if (this.animationFrameId === null) return;
 
     cancelAnimationFrame(this.animationFrameId);
-
     this.animationFrameId = null;
     this.isRendering = false;
   }
@@ -210,9 +192,7 @@ class World {
     if (!object.isFlipped) return;
 
     this.ctx.save();
-
     this.ctx.translate(object.width, 0);
-
     this.ctx.scale(-1, 1);
     object.x *= -1;
   }
