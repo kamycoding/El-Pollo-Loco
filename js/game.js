@@ -10,7 +10,6 @@ let isGameRunning = false;
 let isGameEnding = false;
 let isGamePaused = false;
 let pauseStartedAt = null;
-let isTouchContextMenuDisabled = false;
 
 function startGame() {
   if (isGameRunning || isGameEnding) return;
@@ -350,7 +349,7 @@ function init() {
   createKeyboardListener();
   resetKeyboard();
   addFullscreenListener();
-  disableTouchContextMenu();
+  initTouchControls();
   canvas.focus();
 }
 
@@ -371,42 +370,10 @@ function resetKeyboard() {
   if (!keyboardListener) return;
 
   keyboardListener.resetKeys();
+  if (typeof resetTouchControls === "function") resetTouchControls();
 }
 
 function addFullscreenListener() {
   document.removeEventListener("fullscreenchange", updateFullscreenButton);
   document.addEventListener("fullscreenchange", updateFullscreenButton);
-}
-
-function disableTouchContextMenu() {
-  if (isTouchContextMenuDisabled) return;
-
-  const touchControls = document.getElementById("touch-controls");
-
-  if (!touchControls) return;
-
-  touchControls.addEventListener("contextmenu", preventContextMenu);
-  isTouchContextMenuDisabled = true;
-}
-
-function preventContextMenu(event) {
-  event.preventDefault();
-}
-
-/**
- * Updates a keyboard state from a mobile touch control.
- *
- * @param {string} keyName - Key name stored in the keyboard state.
- * @param {boolean} status - Whether the touch control is pressed.
- * @param {PointerEvent} [event] - Pointer event triggered by the control.
- */
-function setTouchKey(keyName, status, event) {
-  if (event) event.preventDefault();
-
-  createKeyboardListener();
-
-  if (!keyboardListener.KEYS[keyName]) return;
-
-  keyboardListener.KEYS[keyName].status = status;
-  lastActiveTimestamp = Date.now();
 }
