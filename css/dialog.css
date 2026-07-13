@@ -146,6 +146,109 @@
   line-height: 1.35;
 }
 
+.pause-dialog {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(37, 16, 3, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.pause-card {
+  width: min(420px, 100%);
+  max-height: 100%;
+  padding: 30px;
+  overflow: hidden;
+  border: 4px solid #7e3a00;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffe6a1 0%, #efb758 100%);
+  color: #4b2100;
+  text-align: center;
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -5px 0 rgba(117, 47, 0, 0.24),
+    0 8px 0 #572200,
+    0 18px 36px rgba(0, 0, 0, 0.45);
+}
+
+.pause-card h2 {
+  margin: 0;
+  color: #9a3600;
+  font-family: GameFont, GameText, Arial, sans-serif;
+  font-size: 52px;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 #ffdb7a;
+}
+
+.pause-card p {
+  margin-top: 10px;
+  font-size: 17px;
+}
+
+.pause-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pause-action-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  padding: 0 14px;
+  border: 3px solid #7e3a00;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffe174 0%, #ffad16 55%, #dc6f00 100%);
+  color: #fff8d6;
+  font-family: GameFont, GameText, Arial, sans-serif;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 #7a2600;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.4),
+    0 4px 0 #5c2400;
+}
+
+.pause-sound-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+}
+
+.pause-sound-button img {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.pause-action-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.pause-action-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #5c2400;
+}
+
+.pause-action-button:focus-visible {
+  outline: 4px solid #ffffff;
+  outline-offset: 3px;
+}
+
 @media (orientation: landscape) and (max-width: 1024px) and (max-height: 600px) {
   .controls-dialog {
     padding: 12px;
@@ -199,154 +302,61 @@
   }
 }
 
-.pause-dialog {
-  position: absolute;
-  inset: 0;
-  z-index: 30;
-  padding: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(37, 16, 3, 0.78);
-  backdrop-filter: blur(4px);
-}
-
-.pause-card {
-  width: min(420px, 100%);
-  padding: 30px;
-  border: 4px solid #7e3a00;
-  border-radius: 24px;
-  background: linear-gradient(180deg, #ffe6a1 0%, #efb758 100%);
-  color: #4b2100;
-  text-align: center;
-  box-shadow:
-    inset 0 4px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -5px 0 rgba(117, 47, 0, 0.24),
-    0 8px 0 #572200,
-    0 18px 36px rgba(0, 0, 0, 0.45);
-}
-
-.pause-card h2 {
-  color: #9a3600;
-  font-family: GameFont, GameText, Arial, sans-serif;
-  font-size: 52px;
-  line-height: 1;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-shadow: 2px 2px 0 #ffdb7a;
-}
-
-.pause-card p {
-  margin-top: 10px;
-  font-size: 17px;
-}
-
-.pause-actions {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.pause-action-button {
-  width: 100%;
-  min-height: 54px;
-  border: 3px solid #7e3a00;
-  border-radius: 16px;
-  background: linear-gradient(180deg, #ffe174 0%, #ffad16 55%, #dc6f00 100%);
-  color: #fff8d6;
-  font-family: GameFont, GameText, Arial, sans-serif;
-  font-size: 30px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  text-shadow: 2px 2px 0 #7a2600;
-  box-shadow:
-    inset 0 4px 0 rgba(255, 255, 255, 0.4),
-    0 4px 0 #5c2400;
-}
-
-.pause-sound-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 9px;
-}
-
-.pause-sound-button img {
-  width: 26px;
-  height: 26px;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-.pause-action-button:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
-}
-
-.pause-action-button:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #5c2400;
-}
-
-.pause-action-button:focus-visible {
-  outline: 4px solid #ffffff;
-  outline-offset: 3px;
-}
-
-@media (orientation: landscape) and (max-width: 1024px) and (max-height: 600px) {
+@media (orientation: landscape) and (hover: none),
+  (orientation: landscape) and (any-pointer: coarse) {
   .pause-dialog {
     padding: max(10px, var(--safe-top)) max(12px, var(--safe-right))
       max(10px, var(--safe-bottom)) max(12px, var(--safe-left));
   }
 
   .pause-card {
-    width: min(680px, calc(100% - 12px));
-    max-height: 100%;
-    padding: clamp(12px, 3dvh, 18px) clamp(16px, 3vw, 24px);
-    overflow-y: auto;
+    width: min(520px, calc(100% - 8px));
+    padding: clamp(12px, 3dvh, 20px) clamp(14px, 3vw, 24px);
+    border-width: 3px;
+    border-radius: clamp(16px, 3vw, 22px);
   }
 
   .pause-card h2 {
-    font-size: clamp(30px, 10dvh, 40px);
+    font-size: clamp(30px, 9dvh, 42px);
+    line-height: 0.95;
   }
 
   .pause-card p {
     margin-top: 4px;
-    font-size: 13px;
+    font-size: clamp(12px, 3dvh, 14px);
   }
 
   .pause-actions {
-    margin-top: clamp(10px, 3dvh, 14px);
+    margin-top: clamp(10px, 3dvh, 16px);
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(8px, 1.5vw, 12px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(8px, 2dvh, 12px);
   }
 
   .pause-action-button {
-    min-height: clamp(42px, 12dvh, 48px);
-    padding: 0 8px;
-    font-size: clamp(18px, 3.4vw, 24px);
+    min-height: clamp(44px, 12dvh, 52px);
+    padding: 0 clamp(8px, 2vw, 14px);
+    border-radius: 14px;
+    font-size: clamp(20px, 5dvh, 27px);
   }
 
   .pause-sound-button {
-    gap: 6px;
+    gap: clamp(5px, 1vw, 8px);
   }
 
   .pause-sound-button img {
-    width: 22px;
-    height: 22px;
+    width: clamp(20px, 5dvh, 25px);
+    height: clamp(20px, 5dvh, 25px);
   }
 }
 
 @media (orientation: landscape) and (max-height: 360px) {
   .pause-dialog {
-    padding: 8px max(10px, var(--safe-right)) 8px
-      max(10px, var(--safe-left));
+    padding: 8px max(10px, var(--safe-right)) 8px max(10px, var(--safe-left));
   }
 
   .pause-card {
-    width: min(640px, 96%);
+    width: min(500px, calc(100% - 4px));
     padding: 10px 14px;
   }
 
@@ -355,7 +365,7 @@
   }
 
   .pause-card p {
-    font-size: 12px;
+    display: none;
   }
 
   .pause-actions {
@@ -364,7 +374,12 @@
   }
 
   .pause-action-button {
-    min-height: 40px;
+    min-height: 42px;
     font-size: 20px;
+  }
+
+  .pause-sound-button img {
+    width: 20px;
+    height: 20px;
   }
 }
