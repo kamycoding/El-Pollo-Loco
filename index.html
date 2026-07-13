@@ -225,6 +225,23 @@
               </button>
 
               <button
+                id="pause-sound-button"
+                class="pause-action-button pause-sound-button"
+                type="button"
+                aria-label="Turn sound off"
+                aria-pressed="false"
+                title="Turn sound off"
+                onclick="toggleSound()"
+              >
+                <img
+                  id="pause-sound-icon"
+                  src="./img/symbol/volume-on.svg"
+                  alt=""
+                />
+                <span id="pause-sound-label">Mute</span>
+              </button>
+
+              <button
                 class="pause-action-button"
                 type="button"
                 onclick="restartGame()"
@@ -255,18 +272,6 @@
         onclick="pauseGame()"
       >
         <img src="./img/symbol/pause.svg" alt="" />
-      </button>
-
-      <button
-        id="game-sound-button"
-        class="game-sound-button hidden"
-        type="button"
-        aria-label="Turn sound off"
-        aria-pressed="false"
-        title="Turn sound off"
-        onclick="toggleSound()"
-      >
-        <img id="game-sound-icon" src="./img/symbol/volume-on.svg" alt="" />
       </button>
 
       <div id="touch-controls" class="touch-controls">

@@ -248,23 +248,14 @@
     font-size: 12px;
   }
 
-  .game-menu-button,
-  .game-sound-button {
+  .game-menu-button {
     top: max(8px, var(--safe-top));
+    right: max(8px, var(--safe-right));
     width: 44px;
     height: 44px;
   }
 
-  .game-menu-button {
-    left: max(8px, var(--safe-left));
-  }
-
-  .game-sound-button {
-    right: max(8px, var(--safe-right));
-  }
-
-  .game-menu-button img,
-  .game-sound-button img {
+  .game-menu-button img {
     width: 25px;
     height: 25px;
   }
@@ -276,7 +267,10 @@
 }
 
 #game-container.fullscreen-active .touch-group {
-  bottom: max(calc(var(--safe-bottom) + 12px), clamp(18px, 4dvh, 28px));
+  bottom: max(
+    calc(var(--safe-bottom) + 12px),
+    clamp(18px, 4dvh, 28px)
+  );
   gap: clamp(12px, 1.8dvw, 18px);
 }
 
@@ -288,19 +282,11 @@
   right: max(calc(var(--safe-right) + 12px), clamp(16px, 3dvw, 30px));
 }
 
-#game-container.fullscreen-active .game-menu-button,
-#game-container.fullscreen-active .game-sound-button {
+#game-container.fullscreen-active .game-menu-button {
   top: max(8px, var(--safe-top));
+  right: max(12px, var(--safe-right));
   width: 48px;
   height: 48px;
-}
-
-#game-container.fullscreen-active .game-menu-button {
-  left: max(12px, var(--safe-left));
-}
-
-#game-container.fullscreen-active .game-sound-button {
-  right: max(12px, var(--safe-right));
 }
 
 #game-container:has(.game-overlay:not(.hidden)) .touch-controls,

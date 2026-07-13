@@ -180,53 +180,11 @@
   outline-offset: 3px;
 }
 
-.game-sound-button {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 7;
-  width: 52px;
-  height: 52px;
-  border: 3px solid #873600;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(180deg, #ffe27a 0%, #ffaf18 55%, #d96d00 100%);
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow:
-    inset 0 4px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -4px 0 rgba(117, 47, 0, 0.35),
-    0 4px 0 #5d2500,
-    0 8px 14px rgba(0, 0, 0, 0.3);
-}
-
-.game-sound-button:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
-}
-
-.game-sound-button:active {
-  transform: translateY(3px);
-  box-shadow:
-    inset 0 3px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -3px 0 rgba(117, 47, 0, 0.35),
-    0 1px 0 #5d2500;
-}
-
-.game-sound-button img {
-  width: 29px;
-  height: 29px;
-  object-fit: contain;
-  pointer-events: none;
-}
 
 .game-menu-button {
   position: absolute;
   top: 12px;
-  left: 12px;
+  right: 12px;
   z-index: 7;
   width: 52px;
   height: 52px;
@@ -267,7 +225,6 @@
     0 1px 0 #5d2500;
 }
 
-.game-sound-button:focus-visible,
 .game-menu-button:focus-visible {
   outline: 4px solid #fff3b4;
   outline-offset: 3px;
@@ -282,7 +239,7 @@
 
   .game-menu-button {
     top: 8px;
-    left: 8px;
+    right: 8px;
     width: 44px;
     height: 44px;
   }

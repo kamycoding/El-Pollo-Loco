@@ -24,7 +24,6 @@ function initializeGameSession() {
   init();
   hideGameOverlay();
   closePauseMenu(false);
-  showGameSoundButton();
   showGameMenuButton();
   blurActiveElement();
   prepareGameAudio();
@@ -262,7 +261,6 @@ function finishGame(finishedWorld, result) {
 
   stopFinishedWorld(finishedWorld);
   resetGameState(finishedWorld);
-  hideGameSoundButton();
   hideGameMenuButton();
   audioManager.stopBackgroundMusic();
   playEndSound(result);
@@ -309,7 +307,6 @@ function resetCurrentGame() {
   resetKeyboard();
   exitGameFullscreen();
   closePauseMenu(false);
-  hideGameSoundButton();
   hideGameMenuButton();
   stopCurrentWorld();
   stopCurrentAudio();

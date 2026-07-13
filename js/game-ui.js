@@ -10,10 +10,10 @@ let overlayMessage;
 let startButton;
 let restartButton;
 let homeButton;
-let gameSoundButton;
 let gameMenuButton;
 let soundButtons = [];
 let soundIcons = [];
+let pauseSoundLabel;
 let controlsButton;
 let controlsDialog;
 let controlsCloseButton;
@@ -22,7 +22,6 @@ let resumeButton;
 
 function showStartScreen() {
   init();
-  hideGameSoundButton();
   hideGameMenuButton();
   closePauseMenu(false);
   setOverlayBackground("start");
@@ -41,7 +40,6 @@ function showStartScreen() {
  * @param {"win"|"lose"} result - Final result of the game.
  */
 function showEndScreen(result) {
-  hideGameSoundButton();
   hideGameMenuButton();
   closeControlsDialog(false);
   closePauseMenu(false);
@@ -104,17 +102,6 @@ function hideGameOverlay() {
   gameOverlay.classList.add("hidden");
 }
 
-function showGameSoundButton() {
-  if (!gameSoundButton) return;
-
-  gameSoundButton.classList.remove("hidden");
-}
-
-function hideGameSoundButton() {
-  if (!gameSoundButton) return;
-
-  gameSoundButton.classList.add("hidden");
-}
 
 function showGameMenuButton() {
   if (!gameMenuButton) return;
@@ -131,6 +118,7 @@ function hideGameMenuButton() {
 function showPauseMenu() {
   if (!pauseDialog) return;
 
+  updateSoundButton();
   pauseDialog.classList.remove("hidden");
   gameMenuButton?.setAttribute("aria-expanded", "true");
   hideGameMenuButton();
@@ -211,10 +199,17 @@ function updateSoundButtonLabels() {
   soundButtons.forEach((button) => {
     updateSoundButtonAccessibility(button, label);
   });
+  updatePauseSoundLabel();
 }
 
 function getSoundButtonLabel() {
   return audioManager.isMuted ? "Turn sound on" : "Turn sound off";
+}
+
+function updatePauseSoundLabel() {
+  if (!pauseSoundLabel) return;
+
+  pauseSoundLabel.textContent = audioManager.isMuted ? "Unmute" : "Mute";
 }
 
 function updateSoundButtonAccessibility(button, label) {
@@ -300,22 +295,23 @@ function cacheActionButtons() {
 }
 
 function cacheSoundControls() {
-  gameSoundButton = document.getElementById("game-sound-button");
   gameMenuButton = document.getElementById("game-menu-button");
+  pauseSoundLabel = document.getElementById("pause-sound-label");
   soundButtons = getSoundButtons();
   soundIcons = getSoundIcons();
 }
 
 function getSoundButtons() {
-  return [document.getElementById("sound-button"), gameSoundButton].filter(
-    Boolean,
-  );
+  return [
+    document.getElementById("sound-button"),
+    document.getElementById("pause-sound-button"),
+  ].filter(Boolean);
 }
 
 function getSoundIcons() {
   return [
     document.getElementById("sound-icon"),
-    document.getElementById("game-sound-icon"),
+    document.getElementById("pause-sound-icon"),
   ].filter(Boolean);
 }
 
