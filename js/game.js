@@ -307,6 +307,7 @@ function resetCurrentGame() {
   clearPendingGameEnd();
   clearAllTimers();
   resetKeyboard();
+  exitGameFullscreen();
   closePauseMenu(false);
   hideGameSoundButton();
   hideGameMenuButton();

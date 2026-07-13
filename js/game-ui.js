@@ -19,8 +19,6 @@ let controlsDialog;
 let controlsCloseButton;
 let pauseDialog;
 let resumeButton;
-let fullscreenButton;
-let fullscreenIcon;
 
 function showStartScreen() {
   init();
@@ -267,42 +265,6 @@ function handleControlsDialogKeydown(event) {
   closeControlsDialog();
 }
 
-function toggleFullscreen() {
-  const gameContainer = document.getElementById("game-container");
-
-  if (!document.fullscreenElement) {
-    requestGameFullscreen(gameContainer);
-    return;
-  }
-
-  document.exitFullscreen();
-}
-
-function requestGameFullscreen(gameContainer) {
-  gameContainer.requestFullscreen().catch(() => {});
-}
-
-function updateFullscreenButton() {
-  if (!fullscreenIcon) return;
-
-  fullscreenIcon.src = document.fullscreenElement
-    ? "symbols/exit-fullscreen.png"
-    : "symbols/enter-fullscreen.png";
-
-  updateFullscreenButtonLabel();
-}
-
-function updateFullscreenButtonLabel() {
-  if (!fullscreenButton) return;
-
-  const label = document.fullscreenElement
-    ? "Exit fullscreen"
-    : "Enter fullscreen";
-
-  fullscreenButton.setAttribute("aria-label", label);
-  fullscreenButton.title = label;
-}
-
 function blurActiveElement() {
   if (!document.activeElement) return;
 
@@ -359,6 +321,4 @@ function getSoundIcons() {
 
 function cacheInterfaceButtons() {
   controlsButton = document.getElementById("controls-button");
-  fullscreenButton = document.getElementById("fullscreen-button");
-  fullscreenIcon = document.getElementById("fullscreen-icon");
 }

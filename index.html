@@ -40,7 +40,209 @@
 
   <body onload="showStartScreen()">
     <div id="game-container">
-      <canvas id="canvas" width="720" height="480" tabindex="0"></canvas>
+      <div id="game-stage" class="game-stage">
+        <canvas id="canvas" width="720" height="480" tabindex="0"></canvas>
+
+        <div id="game-overlay" class="game-overlay">
+          <div class="menu-layer">
+            <h1 id="overlay-title" class="game-title">El Pollo Loco</h1>
+
+            <p id="overlay-message" class="game-subtitle">
+              Collect bottles, defeat chickens and beat the final boss.
+            </p>
+
+            <div class="main-actions">
+              <button
+                id="start-button"
+                class="menu-button start-button"
+                type="button"
+                onclick="startGame()"
+              >
+                Start
+              </button>
+
+              <button
+                id="restart-button"
+                class="menu-button hidden"
+                type="button"
+                onclick="restartGame()"
+              >
+                Restart
+              </button>
+
+              <button
+                id="home-button"
+                class="menu-button hidden"
+                type="button"
+                onclick="goToHomeScreen()"
+              >
+                Home
+              </button>
+            </div>
+
+            <div class="round-actions">
+              <button
+                id="sound-button"
+                class="round-button"
+                type="button"
+                aria-label="Turn sound off"
+                aria-pressed="false"
+                title="Turn sound off"
+                onclick="toggleSound()"
+              >
+                <img id="sound-icon" src="./img/symbol/volume-on.svg" alt="" />
+
+                <span>Sound</span>
+              </button>
+
+              <button
+                id="controls-button"
+                class="round-button"
+                type="button"
+                aria-label="Show controls"
+                aria-controls="controls-dialog"
+                aria-expanded="false"
+                title="Show controls"
+                onclick="toggleControlsDialog()"
+              >
+                <img src="symbols/help_open.png" alt="" />
+
+                <span>Controls</span>
+              </button>
+
+              <button
+                id="fullscreen-button"
+                class="round-button"
+                type="button"
+                aria-label="Enter fullscreen"
+                title="Enter fullscreen"
+                onclick="toggleFullscreen()"
+              >
+                <img
+                  id="fullscreen-icon"
+                  src="symbols/enter-fullscreen.png"
+                  alt=""
+                />
+
+                <span>Fullscreen</span>
+              </button>
+            </div>
+
+            <a class="legal-link" href="./impressum.html">Impressum</a>
+          </div>
+
+          <div
+            id="controls-dialog"
+            class="controls-dialog hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="controls-dialog-title"
+            tabindex="-1"
+            onclick="handleControlsBackdropClick(event)"
+            onkeydown="handleControlsDialogKeydown(event)"
+          >
+            <div class="controls-card">
+              <button
+                id="controls-close-button"
+                class="controls-close-button"
+                type="button"
+                aria-label="Close controls"
+                title="Close controls"
+                onclick="closeControlsDialog()"
+              >
+                ×
+              </button>
+
+              <h2 id="controls-dialog-title">Controls</h2>
+
+              <p class="controls-description">
+                Use the keyboard or touch buttons to help Pepe defeat the
+                chickens.
+              </p>
+
+              <div class="controls-content">
+                <div class="control-group">
+                  <strong>Move</strong>
+
+                  <div class="key-row">
+                    <span class="key">←</span>
+                    <span class="key">→</span>
+                  </div>
+
+                  <p>Walk left or right</p>
+                </div>
+
+                <div class="control-group">
+                  <strong>Jump</strong>
+
+                  <div class="key-row">
+                    <span class="key wide-key"> Space </span>
+                  </div>
+
+                  <p>Jump on enemies</p>
+                </div>
+
+                <div class="control-group">
+                  <strong>Throw</strong>
+
+                  <div class="key-row">
+                    <span class="key">D</span>
+                  </div>
+
+                  <p>Throw a bottle</p>
+                </div>
+              </div>
+
+              <p class="controls-hint">
+                Collect bottles before fighting the endboss.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="pause-dialog"
+          class="pause-dialog hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pause-dialog-title"
+          tabindex="-1"
+          onkeydown="handlePauseDialogKeydown(event)"
+        >
+          <div class="pause-card">
+            <h2 id="pause-dialog-title">Paused</h2>
+
+            <p>The game is paused.</p>
+
+            <div class="pause-actions">
+              <button
+                id="resume-button"
+                class="pause-action-button"
+                type="button"
+                onclick="resumeGame()"
+              >
+                Resume
+              </button>
+
+              <button
+                class="pause-action-button"
+                type="button"
+                onclick="restartGame()"
+              >
+                Restart
+              </button>
+
+              <button
+                class="pause-action-button"
+                type="button"
+                onclick="goToHomeScreen()"
+              >
+                Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <button
         id="game-menu-button"
@@ -66,206 +268,6 @@
       >
         <img id="game-sound-icon" src="./img/symbol/volume-on.svg" alt="" />
       </button>
-
-      <div id="game-overlay" class="game-overlay">
-        <div class="menu-layer">
-          <h1 id="overlay-title" class="game-title">El Pollo Loco</h1>
-
-          <p id="overlay-message" class="game-subtitle">
-            Collect bottles, defeat chickens and beat the final boss.
-          </p>
-
-          <div class="main-actions">
-            <button
-              id="start-button"
-              class="menu-button start-button"
-              type="button"
-              onclick="startGame()"
-            >
-              Start
-            </button>
-
-            <button
-              id="restart-button"
-              class="menu-button hidden"
-              type="button"
-              onclick="restartGame()"
-            >
-              Restart
-            </button>
-
-            <button
-              id="home-button"
-              class="menu-button hidden"
-              type="button"
-              onclick="goToHomeScreen()"
-            >
-              Home
-            </button>
-          </div>
-
-          <div class="round-actions">
-            <button
-              id="sound-button"
-              class="round-button"
-              type="button"
-              aria-label="Turn sound off"
-              aria-pressed="false"
-              title="Turn sound off"
-              onclick="toggleSound()"
-            >
-              <img id="sound-icon" src="./img/symbol/volume-on.svg" alt="" />
-
-              <span>Sound</span>
-            </button>
-
-            <button
-              id="controls-button"
-              class="round-button"
-              type="button"
-              aria-label="Show controls"
-              aria-controls="controls-dialog"
-              aria-expanded="false"
-              title="Show controls"
-              onclick="toggleControlsDialog()"
-            >
-              <img src="symbols/help_open.png" alt="" />
-
-              <span>Controls</span>
-            </button>
-
-            <button
-              id="fullscreen-button"
-              class="round-button"
-              type="button"
-              aria-label="Enter fullscreen"
-              title="Enter fullscreen"
-              onclick="toggleFullscreen()"
-            >
-              <img
-                id="fullscreen-icon"
-                src="symbols/enter-fullscreen.png"
-                alt=""
-              />
-
-              <span>Fullscreen</span>
-            </button>
-          </div>
-
-          <a class="legal-link" href="./impressum.html">Impressum</a>
-        </div>
-
-        <div
-          id="controls-dialog"
-          class="controls-dialog hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="controls-dialog-title"
-          tabindex="-1"
-          onclick="handleControlsBackdropClick(event)"
-          onkeydown="handleControlsDialogKeydown(event)"
-        >
-          <div class="controls-card">
-            <button
-              id="controls-close-button"
-              class="controls-close-button"
-              type="button"
-              aria-label="Close controls"
-              title="Close controls"
-              onclick="closeControlsDialog()"
-            >
-              ×
-            </button>
-
-            <h2 id="controls-dialog-title">Controls</h2>
-
-            <p class="controls-description">
-              Use the keyboard or touch buttons to help Pepe defeat the
-              chickens.
-            </p>
-
-            <div class="controls-content">
-              <div class="control-group">
-                <strong>Move</strong>
-
-                <div class="key-row">
-                  <span class="key">←</span>
-                  <span class="key">→</span>
-                </div>
-
-                <p>Walk left or right</p>
-              </div>
-
-              <div class="control-group">
-                <strong>Jump</strong>
-
-                <div class="key-row">
-                  <span class="key wide-key"> Space </span>
-                </div>
-
-                <p>Jump on enemies</p>
-              </div>
-
-              <div class="control-group">
-                <strong>Throw</strong>
-
-                <div class="key-row">
-                  <span class="key">D</span>
-                </div>
-
-                <p>Throw a bottle</p>
-              </div>
-            </div>
-
-            <p class="controls-hint">
-              Collect bottles before fighting the endboss.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div
-        id="pause-dialog"
-        class="pause-dialog hidden"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="pause-dialog-title"
-        tabindex="-1"
-        onkeydown="handlePauseDialogKeydown(event)"
-      >
-        <div class="pause-card">
-          <h2 id="pause-dialog-title">Paused</h2>
-
-          <p>The game is paused.</p>
-
-          <div class="pause-actions">
-            <button
-              id="resume-button"
-              class="pause-action-button"
-              type="button"
-              onclick="resumeGame()"
-            >
-              Resume
-            </button>
-
-            <button
-              class="pause-action-button"
-              type="button"
-              onclick="restartGame()"
-            >
-              Restart
-            </button>
-
-            <button
-              class="pause-action-button"
-              type="button"
-              onclick="goToHomeScreen()"
-            >
-              Home
-            </button>
-          </div>
-        </div>
-      </div>
 
       <div id="touch-controls" class="touch-controls">
         <div class="touch-group touch-left">
@@ -347,6 +349,7 @@
     <script src="js/audio-manager.js"></script>
     <script src="js/game.js"></script>
     <script src="js/touch-controls.js"></script>
+    <script src="js/fullscreen.js"></script>
     <script src="js/game-ui.js"></script>
   </body>
 </html>

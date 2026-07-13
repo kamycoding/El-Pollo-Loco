@@ -20,6 +20,7 @@
   --edge-right: max(var(--page-gap), var(--safe-right));
   --edge-bottom: max(var(--page-gap), var(--safe-bottom));
   --edge-left: max(var(--page-gap), var(--safe-left));
+  --fullscreen-toolbar-height: 64px;
 }
 
 * {
@@ -64,6 +65,13 @@ body {
     linear-gradient(135deg, #4c2408 0%, #9a4f13 42%, #d99235 100%);
 }
 
+body.fullscreen-scroll-lock {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
 button {
   font: inherit;
 }
@@ -81,6 +89,17 @@ button,
   overflow: hidden;
   isolation: isolate;
   border-radius: 12px;
+  background: #1b0f06;
+  box-shadow:
+    0 0 0 4px rgba(255, 194, 87, 0.22),
+    0 22px 60px rgba(0, 0, 0, 0.48);
+}
+
+.game-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
   background:
     radial-gradient(
       circle at center,
@@ -88,9 +107,6 @@ button,
       transparent 45%
     ),
     linear-gradient(180deg, #6d3109, #1b0f06);
-  box-shadow:
-    0 0 0 4px rgba(255, 194, 87, 0.22),
-    0 22px 60px rgba(0, 0, 0, 0.48);
 }
 
 canvas {
@@ -99,6 +115,39 @@ canvas {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+#game-container.fullscreen-active {
+  width: 100vw;
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: calc(var(--safe-top) + var(--fullscreen-toolbar-height))
+    var(--safe-right) var(--safe-bottom) var(--safe-left);
+  display: grid;
+  place-items: center;
+  container-type: size;
+  aspect-ratio: auto;
+  border-radius: 0;
+  background: #1b0f06;
+  box-shadow: none;
+}
+
+#game-container.pseudo-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+#game-container.fullscreen-active .game-stage {
+  position: relative;
+  inset: auto;
+  width: min(100cqw, 150cqh);
+  height: min(100cqh, 66.6667cqw);
+  aspect-ratio: 3 / 2;
+  border-radius: 0;
 }
 
 .hidden {
