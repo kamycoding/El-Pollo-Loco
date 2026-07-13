@@ -1,0 +1,147 @@
+<mxfile host="65bd71144e">
+    <diagram id="el-pollo-loco-current" name="El Pollo Loco - Class Diagram">
+        <mxGraphModel dx="3508" dy="2200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1300" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="drawable" value="&lt;b&gt;DrawableObject&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;x, y&lt;br&gt;width, height&lt;br&gt;img, imageCache&lt;br&gt;collisionBasis&lt;br&gt;collisionArea&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;loadImage()&lt;br&gt;loadImages()&lt;br&gt;draw()&lt;br&gt;setCollisionBasis()&lt;br&gt;getCollisionArea()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="730" y="40" width="240" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="movable" value="&lt;b&gt;MovableObject&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;speedX, speedY&lt;br&gt;acceleration&lt;br&gt;groundPosition&lt;br&gt;health&lt;br&gt;state flags&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;isColliding()&lt;br&gt;applyGravity()&lt;br&gt;playAnimation()&lt;br&gt;move()&lt;br&gt;walk()&lt;br&gt;die()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="760" y="515" width="290" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="statusbar" value="&lt;b&gt;Statusbar&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;TYPE&lt;br&gt;type&lt;br&gt;value&lt;br&gt;maxValue&lt;br&gt;currentCount&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;setValue()&lt;br&gt;draw()&lt;br&gt;drawCounterText()&lt;br&gt;drawHealthText()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="1080" y="40" width="230" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="collectable" value="&lt;b&gt;CollectableObject&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;TYPE&lt;br&gt;type&lt;br&gt;baseWidth&lt;br&gt;baseHeight&lt;br&gt;pulse settings&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;draw()&lt;br&gt;drawPulsingCoin()&lt;br&gt;getPulseScale()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="250" y="40" width="230" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="character" value="&lt;b&gt;Character&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;keyboard&lt;br&gt;bottleCount&lt;br&gt;coinCount&lt;br&gt;sleepDelay&lt;br&gt;animation arrays&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;handleMovement()&lt;br&gt;animateJump()&lt;br&gt;animateIdle()&lt;br&gt;handleThrow()&lt;br&gt;hurt()" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="10" y="335" width="240" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="chicken" value="&lt;b&gt;Chicken&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;IMAGES_WALK&lt;br&gt;IMAGES_DIE&lt;br&gt;speedX&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;constructor()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="830" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="endboss" value="&lt;b&gt;Endboss&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;status&lt;br&gt;statusbar&lt;br&gt;activationDistance&lt;br&gt;animation arrays&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;animateAlert()&lt;br&gt;animateFight()&lt;br&gt;startFight()&lt;br&gt;hurt()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="790" y="1090" width="230" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="cloud" value="&lt;b&gt;Cloud&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;image source&lt;br&gt;speedX&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;constructor()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="1280" y="490" width="190" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="background" value="&lt;b&gt;Background&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;aspectRatio&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;constructor()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="1450" y="830" width="190" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="throwable" value="&lt;b&gt;ThrowableObject&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;IMAGES_ROTATE&lt;br&gt;IMAGES_SPLASH&lt;br&gt;landedAt&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;throw()&lt;br&gt;smash()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="1730" y="710" width="220" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="keyboard" value="&lt;b&gt;Keyboard&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;KEYS&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;handleKeyDown()&lt;br&gt;handleKeyUp()&lt;br&gt;isAnyKeyPressed()&lt;br&gt;resetKeys()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="1600" width="270" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="level" value="&lt;b&gt;Level&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;background&lt;br&gt;enemies&lt;br&gt;collectables&lt;br&gt;maxBottles&lt;br&gt;maxCoins&lt;br&gt;endboss&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;createLandscape()&lt;br&gt;createEnemies()&lt;br&gt;createEndboss()&lt;br&gt;createCollectables()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="430" y="1220" width="240" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="world" value="&lt;b&gt;World&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;canvas, ctx&lt;br&gt;level&lt;br&gt;character&lt;br&gt;collisionManager&lt;br&gt;statusbars&lt;br&gt;throwables&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;createCharacter()&lt;br&gt;createStatusBars()&lt;br&gt;reduceHealth()&lt;br&gt;draw()&lt;br&gt;gameOver()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="660" y="1800" width="250" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="collision" value="&lt;b&gt;CollisionManager&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;world&lt;br&gt;damage cooldown&lt;br&gt;lastCharacterDamageAt&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;checkAllCollisions()&lt;br&gt;checkEnemyCollisions()&lt;br&gt;checkBottleCollisions()&lt;br&gt;checkCollectables()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="850" y="1415" width="260" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="audio" value="&lt;b&gt;AudioManager&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;sounds&lt;br&gt;isMuted&lt;br&gt;isUnlocked&lt;br&gt;storageKey&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;toggleMute()&lt;br&gt;playBackgroundMusic()&lt;br&gt;stopAllSounds()&lt;br&gt;playEffect()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="1580" y="1430" width="230" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_movable_drawable" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="movable" target="drawable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_status_drawable" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="statusbar" target="drawable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_collect_drawable" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="collectable" target="drawable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_inherit_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="character" target="movable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_inherit_2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="chicken" target="movable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_inherit_3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="chick" target="movable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_inherit_4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="endboss" target="movable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_inherit_5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="cloud" target="movable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_inherit_6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="background" target="movable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_inherit_7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;endSize=14;strokeWidth=2;" parent="1" source="throwable" target="movable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_character_keyboard" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="character" target="keyboard" edge="1">
+                    <mxGeometry x="0.0264" y="-3" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="a_character_throwable" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="character" target="throwable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_endboss_statusbar" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="endboss" target="statusbar" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_world_level" value="contains" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="world" target="level" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_world_character" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="world" target="character" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_world_collision" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="world" target="collision" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_world_statusbar" value="renders" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="world" target="statusbar" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_world_throwable" value="renders" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="world" target="throwable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_level_collectable" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="level" target="collectable" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_level_chicken" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="level" target="chicken" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_level_chick" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="level" target="chick" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_level_endboss" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="level" target="endboss" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_level_cloud" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="level" target="cloud" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_level_background" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="level" target="background" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_collision_audio" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="collision" target="audio" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a_character_audio" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" parent="1" source="chick" target="audio" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="title" value="&lt;b&gt;El Pollo Loco Class Architecture&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="-150" y="-50" width="700" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;strokeWidth=1.5;" edge="1" parent="1" source="character" target="chick">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="310" y="713" as="sourcePoint"/>
+                        <mxPoint x="1455" y="1040" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="chick" value="&lt;b&gt;Chick&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Properties&lt;/b&gt;&lt;br&gt;IMAGES_WALK&lt;br&gt;IMAGES_DIE&lt;br&gt;speedX&lt;hr&gt;&lt;b&gt;Methods&lt;/b&gt;&lt;br&gt;constructor()" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;spacing=8;fontSize=12;shadow=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="570" y="950" width="200" height="170" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
