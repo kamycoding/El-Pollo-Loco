@@ -20,7 +20,20 @@
   --edge-right: max(var(--page-gap), var(--safe-right));
   --edge-bottom: max(var(--page-gap), var(--safe-bottom));
   --edge-left: max(var(--page-gap), var(--safe-left));
-  --fullscreen-toolbar-height: 64px;
+  --fullscreen-frame-gap: 10px;
+  --fullscreen-stage-max-width: 1080px;
+  --page-background:
+    radial-gradient(
+      circle at 18% 12%,
+      rgba(255, 210, 92, 0.55),
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 82% 18%,
+      rgba(255, 111, 0, 0.35),
+      transparent 24%
+    ),
+    linear-gradient(135deg, #4c2408 0%, #9a4f13 42%, #d99235 100%);
 }
 
 * {
@@ -44,25 +57,13 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   min-height: 100dvh;
-  padding: var(--edge-top) var(--edge-right) var(--edge-bottom)
-    var(--edge-left);
+  padding: var(--edge-top) var(--edge-right) var(--edge-bottom) var(--edge-left);
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: GameText, Arial, Helvetica, sans-serif;
   overscroll-behavior: none;
-  background:
-    radial-gradient(
-      circle at 18% 12%,
-      rgba(255, 210, 92, 0.55),
-      transparent 26%
-    ),
-    radial-gradient(
-      circle at 82% 18%,
-      rgba(255, 111, 0, 0.35),
-      transparent 24%
-    ),
-    linear-gradient(135deg, #4c2408 0%, #9a4f13 42%, #d99235 100%);
+  background: var(--page-background);
 }
 
 body.fullscreen-scroll-lock {
@@ -124,14 +125,17 @@ canvas {
   height: 100dvh;
   max-width: none;
   max-height: none;
-  padding: calc(var(--safe-top) + var(--fullscreen-toolbar-height))
-    var(--safe-right) var(--safe-bottom) var(--safe-left);
+  padding: max(var(--safe-top), var(--fullscreen-frame-gap))
+    max(var(--safe-right), var(--fullscreen-frame-gap))
+    max(var(--safe-bottom), var(--fullscreen-frame-gap))
+    max(var(--safe-left), var(--fullscreen-frame-gap));
   display: grid;
   place-items: center;
+  overflow: hidden;
   container-type: size;
   aspect-ratio: auto;
   border-radius: 0;
-  background: #1b0f06;
+  background: var(--page-background);
   box-shadow: none;
 }
 
@@ -144,10 +148,14 @@ canvas {
 #game-container.fullscreen-active .game-stage {
   position: relative;
   inset: auto;
-  width: min(100cqw, 150cqh);
-  height: min(100cqh, 66.6667cqw);
+  width: min(var(--fullscreen-stage-max-width), 100cqw, 150cqh);
+  height: auto;
+  max-height: 100cqh;
   aspect-ratio: 3 / 2;
-  border-radius: 0;
+  border-radius: clamp(8px, 1.2vw, 14px);
+  box-shadow:
+    0 0 0 2px rgba(255, 216, 128, 0.24),
+    0 22px 64px rgba(20, 8, 0, 0.5);
 }
 
 .hidden {

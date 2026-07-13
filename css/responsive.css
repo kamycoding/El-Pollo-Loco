@@ -312,6 +312,23 @@
   .touch-group {
     bottom: max(26px, calc(var(--safe-bottom) + 12px));
   }
+
+  #game-container.fullscreen-active .touch-group {
+    gap: 10px;
+  }
+
+  #game-container.fullscreen-active .touch-button {
+    width: 56px;
+    height: 56px;
+  }
+
+  #game-container.fullscreen-active .touch-button::before {
+    font-size: 36px;
+  }
+
+  #game-container.fullscreen-active .throw-button::before {
+    font-size: 22px;
+  }
 }
 
 @media (max-height: 360px) and (orientation: landscape) {
@@ -363,3 +380,9 @@
 #game-container.fullscreen-active .touch-right {
   right: max(16px, calc(var(--safe-right) + 8px));
 }
+
+#game-container:has(.game-overlay:not(.hidden)) .touch-controls,
+#game-container:has(.pause-dialog:not(.hidden)) .touch-controls {
+  display: none !important;
+}
+
