@@ -2,26 +2,27 @@
   display: none;
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 9;
   pointer-events: none;
   user-select: none;
+  -webkit-user-select: none;
   touch-action: none;
 }
 
 .touch-group {
   position: absolute;
-  bottom: max(18px, env(safe-area-inset-bottom));
+  bottom: max(32px, calc(var(--safe-bottom) + 16px));
   display: flex;
   gap: 18px;
   pointer-events: auto;
 }
 
 .touch-left {
-  left: max(22px, env(safe-area-inset-left));
+  left: max(22px, var(--safe-left));
 }
 
 .touch-right {
-  right: max(22px, env(safe-area-inset-right));
+  right: max(22px, var(--safe-right));
 }
 
 .touch-button {
@@ -39,9 +40,17 @@
     linear-gradient(180deg, #ffe27a 0%, #ffaf18 55%, #d96d00 100%);
   color: #4b2100;
   font-family: GameText, Arial, sans-serif;
+  cursor: pointer;
+  pointer-events: auto;
   user-select: none;
+  -webkit-user-select: none;
   touch-action: none;
+  -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
+  outline: none;
+  transform: translateZ(0);
+  transition: transform 35ms linear, filter 35ms linear;
+  will-change: transform;
   box-shadow:
     inset 0 5px 0 rgba(255, 255, 255, 0.35),
     inset 0 -6px 0 rgba(117, 47, 0, 0.38),
@@ -61,6 +70,7 @@
   font-size: 52px;
   font-weight: 900;
   line-height: 1;
+  pointer-events: none;
   text-shadow:
     2px 2px 0 rgba(255, 222, 130, 0.95),
     0 2px 0 rgba(255, 222, 130, 0.95);
@@ -72,8 +82,9 @@
   letter-spacing: 1px;
 }
 
+.touch-button.is-pressed,
 .touch-button:active {
-  transform: translateY(5px) scale(0.96);
+  transform: scale(0.94);
   filter: brightness(1.08);
   box-shadow:
     inset 0 4px 0 rgba(255, 255, 255, 0.25),
@@ -89,7 +100,12 @@
   z-index: 999;
   justify-content: center;
   align-items: center;
-  padding: 24px;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  padding: max(24px, var(--safe-top)) max(24px, var(--safe-right))
+    max(24px, var(--safe-bottom)) max(24px, var(--safe-left));
+  overflow: hidden;
   background:
     radial-gradient(circle at top, rgba(255, 183, 3, 0.2), transparent 35%),
     linear-gradient(180deg, #1b0f06, #000);
@@ -98,7 +114,7 @@
 }
 
 .rotate-card {
-  max-width: 340px;
+  width: min(340px, 100%);
   padding: 30px 26px;
   border: 4px solid #ffb703;
   border-radius: 24px;
@@ -131,7 +147,7 @@
 
 @media (max-aspect-ratio: 3 / 2) {
   #game-container {
-    width: min(720px, 100vw);
+    width: min(var(--game-max-width), 100%);
     height: auto;
   }
 }
@@ -139,18 +155,30 @@
 @media (min-aspect-ratio: 3 / 2) {
   #game-container {
     width: auto;
-    height: min(480px, 100vh);
-    height: min(480px, 100dvh);
+    height: min(
+      var(--game-max-height),
+      calc(100vh - var(--edge-top) - var(--edge-bottom))
+    );
+    height: min(
+      var(--game-max-height),
+      calc(100svh - var(--edge-top) - var(--edge-bottom))
+    );
+    height: min(
+      var(--game-max-height),
+      calc(100dvh - var(--edge-top) - var(--edge-bottom))
+    );
   }
 }
 
-@media (pointer: coarse) and (min-aspect-ratio: 1 / 1) {
+@media (orientation: landscape) and (hover: none),
+  (orientation: landscape) and (any-pointer: coarse) {
   .touch-controls {
     display: block;
   }
 }
 
-@media (pointer: coarse) and (max-aspect-ratio: 1 / 1) {
+@media (orientation: portrait) and (hover: none),
+  (orientation: portrait) and (any-pointer: coarse) {
   .rotate-message {
     display: flex;
   }
@@ -158,15 +186,22 @@
   #game-container {
     display: none;
   }
-}
 
-@media (pointer: fine) {
   .touch-controls {
     display: none;
   }
 }
 
-@media (max-width: 760px) and (min-aspect-ratio: 1 / 1) {
+@media (orientation: landscape) and (max-width: 1024px) and (max-height: 600px) {
+  :root {
+    --page-gap: 0px;
+  }
+
+  #game-container {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .game-title {
     font-size: 52px;
   }
@@ -206,29 +241,38 @@
     font-size: 12px;
   }
 
+  .game-menu-button,
   .game-sound-button {
-    top: 8px;
-    right: 8px;
+    top: max(8px, var(--safe-top));
     width: 44px;
     height: 44px;
   }
 
+  .game-menu-button {
+    left: max(8px, var(--safe-left));
+  }
+
+  .game-sound-button {
+    right: max(8px, var(--safe-right));
+  }
+
+  .game-menu-button img,
   .game-sound-button img {
     width: 25px;
     height: 25px;
   }
 
   .touch-group {
-    bottom: max(14px, env(safe-area-inset-bottom));
+    bottom: max(30px, calc(var(--safe-bottom) + 14px));
     gap: 14px;
   }
 
   .touch-left {
-    left: max(16px, env(safe-area-inset-left));
+    left: max(16px, var(--safe-left));
   }
 
   .touch-right {
-    right: max(16px, env(safe-area-inset-right));
+    right: max(16px, var(--safe-right));
   }
 
   .touch-button {
@@ -247,7 +291,7 @@
   }
 }
 
-@media (max-height: 430px) and (pointer: coarse) and (min-aspect-ratio: 1 / 1) {
+@media (max-height: 430px) and (orientation: landscape) {
   .touch-button {
     width: 62px;
     height: 62px;
@@ -264,6 +308,29 @@
   }
 
   .touch-group {
-    bottom: max(10px, env(safe-area-inset-bottom));
+    bottom: max(26px, calc(var(--safe-bottom) + 12px));
+  }
+}
+
+@media (max-height: 360px) and (orientation: landscape) {
+  .touch-group {
+    bottom: max(18px, calc(var(--safe-bottom) + 8px));
+    gap: 10px;
+  }
+
+  .touch-button {
+    width: 54px;
+    height: 54px;
+    border-width: 4px;
+  }
+
+  .touch-button::before {
+    padding-bottom: 3px;
+    font-size: 34px;
+  }
+
+  .throw-button::before {
+    padding-bottom: 0;
+    font-size: 21px;
   }
 }
