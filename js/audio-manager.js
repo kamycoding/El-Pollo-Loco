@@ -40,6 +40,9 @@ const AUDIO_CONFIG = {
 
 class AudioManager {
   sounds = {};
+  effectBuffers = {};
+  activeSources = new Set();
+  audioContext = null;
   isMuted = false;
   isUnlocked = false;
   storageKey = "elPolloLocoMuted";
@@ -47,6 +50,8 @@ class AudioManager {
   constructor() {
     this.loadMuteState();
     this.createSounds();
+    this.createAudioContext();
+    this.loadEffectBuffers();
     this.applyMuteState();
   }
 
@@ -76,6 +81,45 @@ class AudioManager {
     return audio;
   }
 
+  /**
+   * Creates the Web Audio context used for low-latency sound effects.
+   * Falls back silently if the API is unavailable.
+   */
+  createAudioContext() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) return;
+
+    this.audioContext = new AudioContextClass();
+  }
+
+  /**
+   * Fetches and decodes all sound effects into memory once.
+   * Decoded buffers play without per-call media pipeline costs,
+   * which avoids frame drops on iOS Safari.
+   */
+  loadEffectBuffers() {
+    if (!this.audioContext) return;
+
+    Object.entries(AUDIO_CONFIG).forEach(([name, config]) => {
+      if (name !== "background") this.loadEffectBuffer(name, config.src);
+    });
+  }
+
+  /**
+   * Loads a single effect into an AudioBuffer.
+   *
+   * @param {string} name - Sound key defined in AUDIO_CONFIG.
+   * @param {string} src - Audio file path.
+   */
+  loadEffectBuffer(name, src) {
+    fetch(src)
+      .then((response) => response.arrayBuffer())
+      .then((data) => this.audioContext.decodeAudioData(data))
+      .then((buffer) => (this.effectBuffers[name] = buffer))
+      .catch(() => {});
+  }
+
   loadMuteState() {
     this.isMuted = localStorage.getItem(this.storageKey) === "true";
   }
@@ -95,44 +139,22 @@ class AudioManager {
     Object.values(this.sounds).forEach((sound) => {
       sound.muted = this.isMuted;
     });
+
+    if (this.isMuted) this.stopActiveEffects();
   }
 
+  /**
+   * Resumes the audio context after the first user gesture.
+   * Browsers require a gesture before any audio may play.
+   */
   unlockAudio() {
     if (this.isUnlocked) return;
 
-    Object.entries(this.sounds).forEach(([name, sound]) => {
-      if (name !== "background") this.prepareSound(sound);
-    });
+    if (this.audioContext && this.audioContext.state === "suspended") {
+      this.audioContext.resume().catch(() => {});
+    }
 
     this.isUnlocked = true;
-  }
-
-  prepareSound(sound) {
-    const volume = sound.volume;
-
-    this.muteForPreparation(sound);
-
-    sound
-      .play()
-      .then(() => this.finishSoundPreparation(sound, volume))
-      .catch(() => this.restorePreparedSound(sound, volume));
-  }
-
-  muteForPreparation(sound) {
-    sound.muted = true;
-    sound.volume = 0;
-  }
-
-  finishSoundPreparation(sound, volume) {
-    sound.pause();
-    sound.currentTime = 0;
-
-    this.restorePreparedSound(sound, volume);
-  }
-
-  restorePreparedSound(sound, volume) {
-    sound.volume = volume;
-    sound.muted = this.isMuted;
   }
 
   playBackgroundMusic() {
@@ -172,6 +194,8 @@ class AudioManager {
     Object.values(this.sounds).forEach((sound) => {
       sound.pause();
     });
+
+    this.stopActiveEffects();
   }
 
   stopAllSounds() {
@@ -179,6 +203,16 @@ class AudioManager {
       sound.pause();
       sound.currentTime = 0;
     });
+
+    this.stopActiveEffects();
+  }
+
+  stopActiveEffects() {
+    this.activeSources.forEach((source) => {
+      source.stop();
+    });
+
+    this.activeSources.clear();
   }
 
   playGameOverSound() {
@@ -214,14 +248,64 @@ class AudioManager {
   }
 
   /**
-   * Restarts and plays a configured sound effect.
+   * Plays a sound effect with minimal latency.
+   * Uses a decoded Web Audio buffer when available and falls back
+   * to the audio element otherwise.
    *
    * @param {string} name - Sound key defined in AUDIO_CONFIG.
    */
   playEffect(name) {
+    if (this.isMuted) return;
+
+    if (this.canPlayBuffer(name)) return this.playBufferEffect(name);
+
+    this.playElementEffect(name);
+  }
+
+  canPlayBuffer(name) {
+    return (
+      this.effectBuffers[name] &&
+      this.audioContext &&
+      this.audioContext.state === "running"
+    );
+  }
+
+  /**
+   * Plays a decoded effect buffer through a one-shot source node.
+   *
+   * @param {string} name - Sound key defined in AUDIO_CONFIG.
+   */
+  playBufferEffect(name) {
+    const source = this.audioContext.createBufferSource();
+    const gain = this.audioContext.createGain();
+
+    source.buffer = this.effectBuffers[name];
+    gain.gain.value = AUDIO_CONFIG[name].volume;
+
+    source.connect(gain);
+    gain.connect(this.audioContext.destination);
+
+    this.registerSource(source);
+    source.start();
+  }
+
+  registerSource(source) {
+    this.activeSources.add(source);
+
+    source.onended = () => {
+      this.activeSources.delete(source);
+    };
+  }
+
+  /**
+   * Fallback playback through the preloaded audio element.
+   *
+   * @param {string} name - Sound key defined in AUDIO_CONFIG.
+   */
+  playElementEffect(name) {
     const sound = this.sounds[name];
 
-    if (this.isMuted || !sound) return;
+    if (!sound) return;
 
     sound.pause();
     sound.currentTime = 0;
