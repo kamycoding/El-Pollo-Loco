@@ -43,7 +43,8 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   min-height: 100dvh;
-  padding: var(--edge-top) var(--edge-right) var(--edge-bottom) var(--edge-left);
+  padding: var(--edge-top) var(--edge-right) var(--edge-bottom)
+    var(--edge-left);
   display: flex;
   justify-content: center;
   align-items: center;
