@@ -27,17 +27,53 @@ class DrawableObject {
   }
 
   loadImage(imgUrl) {
-    this.img = new Image();
-    this.img.src = imgUrl;
+    const img = new Image();
+    img.src = imgUrl;
+    this.img = img;
+
+    img.onload = () => {
+      if (this.img === img) this.img = this.downscaleImage(img);
+    };
 
     return this;
   }
 
   loadImageCache(urlList) {
     urlList.forEach((url) => {
-      this.imageCache[url] = new Image();
-      this.imageCache[url].src = url;
+      const img = new Image();
+      img.src = url;
+      this.imageCache[url] = img;
+
+      img.onload = () => {
+        if (this.imageCache[url] === img)
+          this.imageCache[url] = this.downscaleImage(img);
+      };
     });
+  }
+
+  /**
+   * Downscales oversized source images once at load time.
+   * Drawing from a pre-scaled canvas avoids per-frame scaling,
+   * which causes noticeable lag on iOS Safari.
+   *
+   * @param {HTMLImageElement} img - Fully loaded source image.
+   * @returns {HTMLImageElement|HTMLCanvasElement} Original image or pre-scaled canvas.
+   */
+  downscaleImage(img) {
+    const maxHeight = 480;
+
+    if (!img.naturalHeight || img.naturalHeight <= maxHeight) return img;
+
+    const scale = maxHeight / img.naturalHeight;
+    const offscreen = document.createElement("canvas");
+
+    offscreen.width = Math.round(img.naturalWidth * scale);
+    offscreen.height = maxHeight;
+    offscreen
+      .getContext("2d")
+      .drawImage(img, 0, 0, offscreen.width, offscreen.height);
+
+    return offscreen;
   }
 
   /**
