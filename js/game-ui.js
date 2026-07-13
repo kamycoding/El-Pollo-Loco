@@ -1,7 +1,7 @@
 const OVERLAY_BACKGROUNDS = {
-  start: "./img/ui/start-screen-bg.png",
-  lose: "./img/ui/game-over-bg.png",
-  win: "./img/ui/win-screen-bg.png",
+  start: "./img/ui/start-screen-bg.webp",
+  lose: "./img/ui/game-over-bg.webp",
+  win: "./img/ui/win-screen-bg.webp",
 };
 
 let gameOverlay;
@@ -101,7 +101,6 @@ function showGameOverlay() {
 function hideGameOverlay() {
   gameOverlay.classList.add("hidden");
 }
-
 
 function showGameMenuButton() {
   if (!gameMenuButton) return;

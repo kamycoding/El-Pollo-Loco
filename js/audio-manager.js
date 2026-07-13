@@ -21,7 +21,7 @@ const AUDIO_CONFIG = {
     volume: 0.65,
   },
   collectBottle: {
-    src: "./audio/collect-bottle.wav",
+    src: "./audio/collect-bottle.mp3",
     volume: 0.65,
   },
   collectCoin: {
@@ -33,7 +33,7 @@ const AUDIO_CONFIG = {
     volume: 0.65,
   },
   enemyDefeat: {
-    src: "./audio/chicken-single-alarm-call.wav",
+    src: "./audio/chicken-single-alarm-call.mp3",
     volume: 0.55,
   },
 };
