@@ -1,5 +1,5 @@
-let fullscreenButton;
-let fullscreenIcon;
+let fullscreenButtons = [];
+let fullscreenIcons = [];
 let fullscreenScrollY = 0;
 let isPseudoFullscreen = false;
 let isFullscreenListenerReady = false;
@@ -16,8 +16,12 @@ function addFullscreenListener() {
 }
 
 function cacheFullscreenElements() {
-  fullscreenButton = document.getElementById("fullscreen-button");
-  fullscreenIcon = document.getElementById("fullscreen-icon");
+  fullscreenButtons = Array.from(
+    document.querySelectorAll("[data-fullscreen-button]"),
+  );
+  fullscreenIcons = Array.from(
+    document.querySelectorAll("[data-fullscreen-icon]"),
+  );
 }
 
 function toggleFullscreen() {
@@ -146,12 +150,16 @@ function getGameContainer() {
 }
 
 function updateFullscreenButton() {
-  if (!fullscreenButton || !fullscreenIcon) cacheFullscreenElements();
-  if (!fullscreenButton || !fullscreenIcon) return;
+  if (!fullscreenButtons.length || !fullscreenIcons.length) {
+    cacheFullscreenElements();
+  }
 
   const isActive = isGameFullscreenActive();
-  fullscreenIcon.src = getFullscreenIconPath(isActive);
-  updateFullscreenButtonLabel(isActive);
+  const iconPath = getFullscreenIconPath(isActive);
+  fullscreenIcons.forEach((icon) => (icon.src = iconPath));
+  fullscreenButtons.forEach((button) => {
+    updateFullscreenButtonLabel(button, isActive);
+  });
 }
 
 function getFullscreenIconPath(isActive) {
@@ -160,9 +168,9 @@ function getFullscreenIconPath(isActive) {
     : "symbols/enter-fullscreen.png";
 }
 
-function updateFullscreenButtonLabel(isActive) {
+function updateFullscreenButtonLabel(button, isActive) {
   const label = isActive ? "Exit fullscreen" : "Enter fullscreen";
 
-  fullscreenButton.setAttribute("aria-label", label);
-  fullscreenButton.title = label;
+  button.setAttribute("aria-label", label);
+  button.title = label;
 }

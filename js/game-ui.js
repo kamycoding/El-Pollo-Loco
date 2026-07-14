@@ -11,6 +11,7 @@ let startButton;
 let restartButton;
 let homeButton;
 let gameMenuButton;
+let gameFullscreenButton;
 let soundButtons = [];
 let soundIcons = [];
 let pauseSoundLabel;
@@ -109,15 +110,13 @@ function hideGameOverlay() {
 }
 
 function showGameMenuButton() {
-  if (!gameMenuButton) return;
-
-  gameMenuButton.classList.remove("hidden");
+  gameMenuButton?.classList.remove("hidden");
+  gameFullscreenButton?.classList.remove("hidden");
 }
 
 function hideGameMenuButton() {
-  if (!gameMenuButton) return;
-
-  gameMenuButton.classList.add("hidden");
+  gameMenuButton?.classList.add("hidden");
+  gameFullscreenButton?.classList.add("hidden");
 }
 
 /** Displays the pause menu. */
@@ -127,7 +126,7 @@ function showPauseMenu() {
   updateSoundButton();
   pauseDialog.classList.remove("hidden");
   gameMenuButton?.setAttribute("aria-expanded", "true");
-  hideGameMenuButton();
+  gameMenuButton?.classList.add("hidden");
   resumeButton?.focus();
 }
 
@@ -346,4 +345,5 @@ function getSoundIcons() {
 
 function cacheInterfaceButtons() {
   controlsButton = document.getElementById("controls-button");
+  gameFullscreenButton = document.getElementById("game-fullscreen-button");
 }

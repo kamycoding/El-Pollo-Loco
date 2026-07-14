@@ -20,8 +20,6 @@
   --edge-right: max(var(--page-gap), var(--safe-right));
   --edge-bottom: max(var(--page-gap), var(--safe-bottom));
   --edge-left: max(var(--page-gap), var(--safe-left));
-  --fullscreen-frame-gap: 10px;
-  --fullscreen-stage-max-width: 1080px;
   --page-background:
     radial-gradient(
       circle at 18% 12%,
@@ -125,17 +123,10 @@ canvas {
   height: 100dvh;
   max-width: none;
   max-height: none;
-  padding: max(var(--safe-top), var(--fullscreen-frame-gap))
-    max(var(--safe-right), var(--fullscreen-frame-gap))
-    max(var(--safe-bottom), var(--fullscreen-frame-gap))
-    max(var(--safe-left), var(--fullscreen-frame-gap));
-  display: grid;
-  place-items: center;
+  padding: 0;
   overflow: hidden;
-  container-type: size;
   aspect-ratio: auto;
   border-radius: 0;
-  background: var(--page-background);
   box-shadow: none;
 }
 
@@ -146,16 +137,15 @@ canvas {
 }
 
 #game-container.fullscreen-active .game-stage {
-  position: relative;
-  inset: auto;
-  width: min(var(--fullscreen-stage-max-width), 100cqw, 150cqh);
-  height: auto;
-  max-height: 100cqh;
-  aspect-ratio: 3 / 2;
-  border-radius: clamp(8px, 1.2vw, 14px);
-  box-shadow:
-    0 0 0 2px rgba(255, 216, 128, 0.24),
-    0 22px 64px rgba(20, 8, 0, 0.5);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .hidden {

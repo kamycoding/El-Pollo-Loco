@@ -114,12 +114,14 @@
                 id="fullscreen-button"
                 class="round-button"
                 type="button"
+                data-fullscreen-button
                 aria-label="Enter fullscreen"
                 title="Enter fullscreen"
                 onclick="toggleFullscreen()"
               >
                 <img
                   id="fullscreen-icon"
+                  data-fullscreen-icon
                   src="symbols/enter-fullscreen.png"
                   alt=""
                 />
@@ -272,6 +274,23 @@
         onclick="pauseGame()"
       >
         <img src="./img/symbol/pause.svg" alt="" />
+      </button>
+
+      <button
+        id="game-fullscreen-button"
+        class="game-menu-button game-fullscreen-button hidden"
+        type="button"
+        data-fullscreen-button
+        aria-label="Enter fullscreen"
+        title="Enter fullscreen"
+        onclick="toggleFullscreen()"
+      >
+        <img
+          id="game-fullscreen-icon"
+          data-fullscreen-icon
+          src="symbols/enter-fullscreen.png"
+          alt=""
+        />
       </button>
 
       <div id="touch-controls" class="touch-controls">

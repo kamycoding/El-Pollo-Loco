@@ -246,6 +246,13 @@
     font-size: 12px;
   }
 
+  .game-menu-button img {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+@media (orientation: landscape) and (max-width: 1024px) {
   .game-menu-button {
     top: max(8px, var(--safe-top));
     right: max(8px, var(--safe-right));
@@ -253,9 +260,20 @@
     height: 44px;
   }
 
-  .game-menu-button img {
-    width: 25px;
-    height: 25px;
+  .game-fullscreen-button {
+    top: calc(max(8px, var(--safe-top)) + 52px);
+    right: max(8px, var(--safe-right));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 450px) {
+  .game-menu-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .game-fullscreen-button {
+    top: calc(max(6px, var(--safe-top)) + 46px);
   }
 }
 
@@ -278,13 +296,6 @@
 
 #game-container.fullscreen-active .touch-right {
   right: max(calc(var(--safe-right) + 12px), clamp(16px, 3dvw, 30px));
-}
-
-#game-container.fullscreen-active .game-menu-button {
-  top: max(8px, var(--safe-top));
-  right: max(12px, var(--safe-right));
-  width: 48px;
-  height: 48px;
 }
 
 #game-container:has(.game-overlay:not(.hidden)) .touch-controls,

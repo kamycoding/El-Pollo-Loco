@@ -3,7 +3,6 @@ class Statusbar extends DrawableObject {
     characterHealth: {
       x: 70,
       y: 10,
-      color: "#ff7a00",
       images: [
         "./img/7_statusbars/1_statusbar/2_statusbar_health/orange/0.png",
         "./img/7_statusbars/1_statusbar/2_statusbar_health/orange/20.png",
@@ -17,7 +16,6 @@ class Statusbar extends DrawableObject {
     endbossHealth: {
       x: 450,
       y: 10,
-      color: "#2d8cff",
       images: [
         "./img/7_statusbars/1_statusbar/2_statusbar_health/blue/0.png",
         "./img/7_statusbars/1_statusbar/2_statusbar_health/blue/20.png",
@@ -31,7 +29,6 @@ class Statusbar extends DrawableObject {
     bottle: {
       x: 50,
       y: 45,
-      color: "#2d8cff",
       images: [
         "./img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/0.png",
         "./img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/20.png",
@@ -45,7 +42,6 @@ class Statusbar extends DrawableObject {
     coin: {
       x: 30,
       y: 80,
-      color: "#3dbb45",
       images: [
         "./img/7_statusbars/1_statusbar/1_statusbar_coin/green/0.png",
         "./img/7_statusbars/1_statusbar/1_statusbar_coin/green/20.png",
@@ -156,30 +152,7 @@ class Statusbar extends DrawableObject {
   }
 
   drawExactHealthValue(ctx) {
-    this.drawHealthFill(ctx);
     this.drawHealthText(ctx);
-  }
-
-  drawHealthFill(ctx) {
-    const bar = this.getHealthFillPosition();
-    ctx.save();
-    ctx.fillStyle = "rgba(45, 20, 0, 0.7)";
-    ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
-    ctx.fillStyle = this.TYPE[this.type].color;
-    ctx.fillRect(bar.x, bar.y, bar.width * (this.value / 100), bar.height);
-    ctx.strokeStyle = "rgba(255, 245, 190, 0.85)";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(bar.x, bar.y, bar.width, bar.height);
-    ctx.restore();
-  }
-
-  getHealthFillPosition() {
-    return {
-      x: this.x + 32,
-      y: this.y + this.height - 9,
-      width: this.width - 64,
-      height: 6,
-    };
   }
 
   drawHealthText(ctx) {
