@@ -122,6 +122,12 @@ function pauseTimeout(timeout) {
   timeout.id = null;
 }
 
+/**
+ * Calculates the remaining delay for a timeout.
+ *
+ * @param {{remaining: number, startedAt: number}} timeout - Timeout record.
+ * @returns {number} Remaining delay in milliseconds.
+ */
 function getRemainingTime(timeout) {
   const elapsed = Date.now() - timeout.startedAt;
 
@@ -179,6 +185,16 @@ function calcRandomNumber(min, max) {
   return Math.round(Math.random() * (max - min)) + min;
 }
 
+/**
+ * Checks whether gameplay input may update the active world.
+ *
+ * @returns {boolean} Whether gameplay can accept input.
+ */
+function canProcessGameInput() {
+  return isGameRunning && !isGamePaused && !isGameEnding && Boolean(world);
+}
+
+/** Pauses the active game. */
 function pauseGame() {
   if (!canPauseGame()) return;
 
@@ -195,10 +211,12 @@ function canPauseGame() {
   return isGameRunning && !isGameEnding && !isGamePaused && Boolean(world);
 }
 
+/** Resumes the paused game. */
 function resumeGame() {
   if (!isGamePaused || !world) return;
 
   preservePausedTimestamps();
+  resetKeyboard();
   isGamePaused = false;
   pauseStartedAt = null;
   resumeAllTimeouts();
@@ -291,11 +309,13 @@ function playEndSound(result) {
   audioManager.playGameOverSound();
 }
 
+/** Restarts the active game. */
 function restartGame() {
   resetCurrentGame();
   startGame();
 }
 
+/** Returns to the start screen. */
 function goToHomeScreen() {
   resetCurrentGame();
   showStartScreen();

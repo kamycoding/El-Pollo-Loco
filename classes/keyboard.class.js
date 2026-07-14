@@ -46,12 +46,15 @@ class Keyboard {
    */
   handleKeyChange(event, status) {
     const key = this.getKeyByCode(event.code);
-
     if (!key) return;
 
     event.preventDefault();
-    key.status = status;
+    if (!canProcessGameInput()) {
+      key.status = false;
+      return;
+    }
 
+    key.status = status;
     if (status) this.updateActivityTimer();
   }
 

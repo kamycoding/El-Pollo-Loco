@@ -177,15 +177,13 @@
   }
 }
 
-@media (orientation: landscape) and (hover: none),
-  (orientation: landscape) and (any-pointer: coarse) {
+@media (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .touch-controls {
     display: block;
   }
 }
 
-@media (orientation: portrait) and (hover: none),
-  (orientation: portrait) and (any-pointer: coarse) {
+@media (orientation: portrait) and (hover: none) and (pointer: coarse) {
   .rotate-message {
     display: flex;
   }

@@ -71,7 +71,6 @@ class Statusbar extends DrawableObject {
    */
   constructor(type, percent, maxValue = 100) {
     super(0, 0);
-
     this.validateType(type);
     this.type = type;
     this.maxValue = Math.max(1, maxValue);
@@ -80,7 +79,6 @@ class Statusbar extends DrawableObject {
     this.height = this.width / this.aspectRatio;
     this.x = this.TYPE[type].x;
     this.y = this.TYPE[type].y;
-
     this.loadImageCache(this.TYPE[type].images);
     this.setValue(percent);
   }
@@ -113,10 +111,22 @@ class Statusbar extends DrawableObject {
     this.currentCount = Math.round((this.value / 100) * this.maxValue);
   }
 
+  /**
+   * Clamps a status value to its valid range.
+   *
+   * @param {number} percent - Status percentage.
+   * @returns {number} Percentage between zero and one hundred.
+   */
   getSafePercent(percent) {
     return Math.max(0, Math.min(100, percent));
   }
 
+  /**
+   * Maps a percentage to its statusbar image index.
+   *
+   * @param {number} percent - Status percentage.
+   * @returns {number} Image index.
+   */
   getImageIndex(percent) {
     return Math.round((percent * 5) / 100);
   }
@@ -152,14 +162,11 @@ class Statusbar extends DrawableObject {
 
   drawHealthFill(ctx) {
     const bar = this.getHealthFillPosition();
-
     ctx.save();
     ctx.fillStyle = "rgba(45, 20, 0, 0.7)";
     ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
-
     ctx.fillStyle = this.TYPE[this.type].color;
     ctx.fillRect(bar.x, bar.y, bar.width * (this.value / 100), bar.height);
-
     ctx.strokeStyle = "rgba(255, 245, 190, 0.85)";
     ctx.lineWidth = 1;
     ctx.strokeRect(bar.x, bar.y, bar.width, bar.height);

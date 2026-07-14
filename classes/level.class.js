@@ -106,15 +106,17 @@ class Level {
     this.addCollectables(types, remaining, layout);
   }
 
+  /**
+   * Calculates spacing for level collectables.
+   *
+   * @returns {{total: number, distance: number, currentPosition: number}}
+   *   Collectable layout values.
+   */
   getCollectableLayout() {
     const total = this.maxBottles + this.maxCoins;
-
     const startPosition = canvas.width * 0.6;
-
     const endPosition = this.getLevelEndPosition() - canvas.width * 0.7;
-
     const distance = (endPosition - startPosition) / total;
-
     return {
       total,
       distance,
@@ -130,20 +132,23 @@ class Level {
 
   addCollectable(types, remaining, layout) {
     const typeIndex = this.getObjectType(remaining);
-
     const position = this.getCollectablePosition(
       layout.currentPosition,
       layout.distance,
     );
-
     this.collectables.push(
       new CollectableObject(position.x, position.y, types[typeIndex]),
     );
-
     remaining[typeIndex]--;
     layout.currentPosition = position.x;
   }
 
+  /**
+   * Selects a collectable type that is still available.
+   *
+   * @param {number[]} remaining - Remaining counts by type.
+   * @returns {number} Selected type index.
+   */
   getObjectType(remaining) {
     if (remaining[0] === 0) {
       return 1;
@@ -156,6 +161,13 @@ class Level {
     return Math.round(Math.random());
   }
 
+  /**
+   * Calculates the next collectable position.
+   *
+   * @param {number} currentPosition - Previous horizontal position.
+   * @param {number} distance - Base spacing between items.
+   * @returns {{x: number, y: number}} Next collectable position.
+   */
   getCollectablePosition(currentPosition, distance) {
     const x = currentPosition + distance * (calcRandomNumber(80, 110) / 100);
 

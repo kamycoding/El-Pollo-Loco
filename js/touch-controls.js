@@ -16,17 +16,43 @@ function initTouchControls() {
   touchControlsInitialized = true;
 }
 
+/**
+ * Updates a touch-controlled key.
+ *
+ * @param {string} keyName - Keyboard action name.
+ * @param {boolean} status - Whether the action is pressed.
+ * @param {PointerEvent} event - Pointer event from the touch button.
+ */
 function setTouchKey(keyName, status, event) {
   event?.preventDefault();
   createKeyboardListener();
 
   const key = keyboardListener?.KEYS[keyName];
   if (!key) return;
+  if (rejectInactiveTouchInput(keyName, key, event)) return;
 
   if (status) pressTouchKey(keyName, key, event);
   else releaseTouchKey(keyName, key, event);
 
   lastActiveTimestamp = Date.now();
+}
+
+/**
+ * Clears a touch action when gameplay cannot accept input.
+ *
+ * @param {string} keyName - Keyboard action name.
+ * @param {{status: boolean}} key - Keyboard state to clear.
+ * @param {PointerEvent} event - Pointer event from the touch button.
+ * @returns {boolean} Whether the touch action was rejected.
+ */
+function rejectInactiveTouchInput(keyName, key, event) {
+  if (canProcessGameInput()) return false;
+
+  key.status = false;
+  touchStartedAt.delete(keyName);
+  clearTouchReleaseTimer(keyName);
+  setTouchButtonPressed(event, false);
+  return true;
 }
 
 function pressTouchKey(keyName, key, event) {
@@ -56,6 +82,12 @@ function scheduleTouchRelease(keyName, key, event) {
   else queueTouchRelease(keyName, key, delay);
 }
 
+/**
+ * Calculates the remaining minimum touch duration.
+ *
+ * @param {string} keyName - Keyboard action name.
+ * @returns {number} Remaining delay in milliseconds.
+ */
 function getTouchReleaseDelay(keyName) {
   if (!TOUCH_ACTION_KEYS.has(keyName)) return 0;
 
@@ -104,6 +136,12 @@ function releaseTouchPointer(event) {
   } catch {}
 }
 
+/**
+ * Checks whether a pointer should remain captured.
+ *
+ * @param {PointerEvent} event - Pointer event to inspect.
+ * @returns {boolean} Whether pointer capture should be kept.
+ */
 function shouldKeepCapturedPointer(event) {
   if (event?.type !== "pointerleave") return false;
 

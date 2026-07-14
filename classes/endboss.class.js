@@ -194,19 +194,21 @@ class Endboss extends MovableObject {
     return 0;
   }
 
+  /**
+   * Advances the boss walk sequence.
+   *
+   * @param {number} sequenceCount - Current walk sequence progress.
+   * @returns {number} Updated walk sequence progress.
+   */
   handleWalk(sequenceCount) {
     this.move(-1);
     this.playAnimation(this.IMAGES_WALK);
-
     const nextSequenceCount = sequenceCount + 1;
-
     if (nextSequenceCount >= this.IMAGES_WALK.length * 5) {
       this.currentImage = 0;
       this.status = "attack";
-
       return 0;
     }
-
     return nextSequenceCount;
   }
 

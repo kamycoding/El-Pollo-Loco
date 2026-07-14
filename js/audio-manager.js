@@ -81,10 +81,6 @@ class AudioManager {
     return audio;
   }
 
-  /**
-   * Creates the Web Audio context used for low-latency sound effects.
-   * Falls back silently if the API is unavailable.
-   */
   createAudioContext() {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
@@ -93,11 +89,6 @@ class AudioManager {
     this.audioContext = new AudioContextClass();
   }
 
-  /**
-   * Fetches and decodes all sound effects into memory once.
-   * Decoded buffers play without per-call media pipeline costs,
-   * which avoids frame drops on iOS Safari.
-   */
   loadEffectBuffers() {
     if (!this.audioContext) return;
 
@@ -262,6 +253,12 @@ class AudioManager {
     this.playElementEffect(name);
   }
 
+  /**
+   * Checks whether a buffered effect can be played.
+   *
+   * @param {string} name - Sound effect name.
+   * @returns {boolean} Whether the buffer is ready.
+   */
   canPlayBuffer(name) {
     return (
       this.effectBuffers[name] &&
@@ -289,6 +286,11 @@ class AudioManager {
     source.start();
   }
 
+  /**
+   * Tracks an active audio source until it ends.
+   *
+   * @param {AudioBufferSourceNode} source - Audio source to track.
+   */
   registerSource(source) {
     this.activeSources.add(source);
 

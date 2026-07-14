@@ -41,6 +41,12 @@ function enterGameFullscreen() {
   enterPseudoFullscreen(gameContainer);
 }
 
+/**
+ * Checks whether native fullscreen is available.
+ *
+ * @param {HTMLElement} gameContainer - Game element entering fullscreen.
+ * @returns {boolean} Whether native fullscreen can be used.
+ */
 function canUseNativeFullscreen(gameContainer) {
   return Boolean(document.fullscreenEnabled && gameContainer.requestFullscreen);
 }
@@ -92,6 +98,11 @@ function handleFullscreenChange() {
   updateFullscreenButton();
 }
 
+/**
+ * Exits pseudo fullscreen when Escape is pressed.
+ *
+ * @param {KeyboardEvent} event - Keyboard event to inspect.
+ */
 function handleFullscreenEscape(event) {
   if (event.key !== "Escape" || !isPseudoFullscreen) return;
 
@@ -121,6 +132,11 @@ function unlockPageScroll() {
   window.scrollTo(0, fullscreenScrollY);
 }
 
+/**
+ * Checks whether any game fullscreen mode is active.
+ *
+ * @returns {boolean} Whether the game is fullscreen.
+ */
 function isGameFullscreenActive() {
   return Boolean(document.fullscreenElement || isPseudoFullscreen);
 }

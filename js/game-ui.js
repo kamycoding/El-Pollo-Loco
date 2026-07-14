@@ -73,6 +73,12 @@ function updateInterfaceButtons() {
   updateFullscreenButton();
 }
 
+/**
+ * Updates the overlay title and message.
+ *
+ * @param {string} title - Overlay heading.
+ * @param {string} message - Overlay description.
+ */
 function setOverlayContent(title, message) {
   overlayTitle.textContent = title;
   overlayMessage.textContent = message;
@@ -114,6 +120,7 @@ function hideGameMenuButton() {
   gameMenuButton.classList.add("hidden");
 }
 
+/** Displays the pause menu. */
 function showPauseMenu() {
   if (!pauseDialog) return;
 
@@ -138,6 +145,11 @@ function closePauseMenu(restoreFocus = true) {
   if (restoreFocus) gameMenuButton?.focus();
 }
 
+/**
+ * Resumes the game when Escape is pressed.
+ *
+ * @param {KeyboardEvent} event - Keyboard event to inspect.
+ */
 function handlePauseDialogKeydown(event) {
   if (event.key !== "Escape") return;
 
@@ -156,6 +168,7 @@ function setOverlayBackground(screen) {
   gameOverlay.style.backgroundImage = `url("${imagePath}")`;
 }
 
+/** Toggles game audio mute state. */
 function toggleSound() {
   createAudioManager();
   audioManager.toggleMute();
@@ -211,12 +224,19 @@ function updatePauseSoundLabel() {
   pauseSoundLabel.textContent = audioManager.isMuted ? "Unmute" : "Mute";
 }
 
+/**
+ * Updates a sound button's accessible state.
+ *
+ * @param {HTMLButtonElement} button - Sound button to update.
+ * @param {string} label - Accessible button label.
+ */
 function updateSoundButtonAccessibility(button, label) {
   button.setAttribute("aria-label", label);
   button.setAttribute("aria-pressed", String(audioManager.isMuted));
   button.title = label;
 }
 
+/** Toggles the controls dialog. */
 function toggleControlsDialog() {
   if (controlsDialog.classList.contains("hidden")) {
     openControlsDialog();
@@ -246,12 +266,22 @@ function closeControlsDialog(restoreFocus = true) {
   if (restoreFocus) controlsButton?.focus();
 }
 
+/**
+ * Closes the controls dialog from a backdrop click.
+ *
+ * @param {MouseEvent} event - Backdrop click event.
+ */
 function handleControlsBackdropClick(event) {
   if (event.target !== event.currentTarget) return;
 
   closeControlsDialog();
 }
 
+/**
+ * Handles keyboard input for the controls dialog.
+ *
+ * @param {KeyboardEvent} event - Keyboard event to inspect.
+ */
 function handleControlsDialogKeydown(event) {
   if (event.key !== "Escape") return;
 

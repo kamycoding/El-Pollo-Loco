@@ -94,6 +94,12 @@ class World {
     endGame(this, this.getGameResult(object));
   }
 
+  /**
+   * Determines the result for a defeated object.
+   *
+   * @param {MovableObject} object - Object that ended the game.
+   * @returns {"win"|"lose"} Game result.
+   */
   getGameResult(object) {
     return object instanceof Endboss ? "win" : "lose";
   }
@@ -136,17 +142,31 @@ class World {
   }
 
   draw() {
-    if (this.isRendering) return;
+    if (this.isRendering || !this.canRender()) return;
 
     this.isRendering = true;
     this.renderFrame();
   }
 
   renderFrame() {
+    if (!this.canRender()) {
+      this.stopDrawing();
+      return;
+    }
+
     this.clearCanvas();
     this.drawWorld();
     this.drawInterface();
     this.scheduleNextFrame();
+  }
+
+  /**
+   * Checks whether this world may continue rendering gameplay.
+   *
+   * @returns {boolean} Whether another frame may render.
+   */
+  canRender() {
+    return isGameRunning && !isGamePaused && !isGameEnding && world === this;
   }
 
   clearCanvas() {
@@ -181,15 +201,22 @@ class World {
   }
 
   scheduleNextFrame() {
+    if (!this.canRender()) {
+      this.animationFrameId = null;
+      this.isRendering = false;
+      return;
+    }
+
     this.animationFrameId = requestAnimationFrame(() => {
       this.renderFrame();
     });
   }
 
   stopDrawing() {
-    if (this.animationFrameId === null) return;
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
 
-    cancelAnimationFrame(this.animationFrameId);
     this.animationFrameId = null;
     this.isRendering = false;
   }

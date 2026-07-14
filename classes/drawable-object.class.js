@@ -61,18 +61,14 @@ class DrawableObject {
    */
   downscaleImage(img) {
     const maxHeight = 480;
-
     if (!img.naturalHeight || img.naturalHeight <= maxHeight) return img;
-
     const scale = maxHeight / img.naturalHeight;
     const offscreen = document.createElement("canvas");
-
     offscreen.width = Math.round(img.naturalWidth * scale);
     offscreen.height = maxHeight;
     offscreen
       .getContext("2d")
       .drawImage(img, 0, 0, offscreen.width, offscreen.height);
-
     return offscreen;
   }
 
