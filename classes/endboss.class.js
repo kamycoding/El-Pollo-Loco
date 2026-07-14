@@ -53,6 +53,7 @@ class Endboss extends MovableObject {
     this.startAnimations();
   }
 
+  /** Configures the endboss state and dimensions. */
   setUpEndboss() {
     this.aspectRatio = 1045 / 1217;
     this.width = 400;
@@ -63,6 +64,7 @@ class Endboss extends MovableObject {
     this.setCollisionBasis(0.12, 0.25, 0.85, 0.6);
   }
 
+  /** Loads the endboss images. */
   loadEndbossImages() {
     this.loadImages(
       this.IMAGES_WALK,
@@ -73,11 +75,13 @@ class Endboss extends MovableObject {
     );
   }
 
+  /** Starts the animations. */
   startAnimations() {
     this.animateAlert();
     this.animateFight();
   }
 
+  /** Animates the alert. */
   animateAlert() {
     setStoppableInterval(() => {
       this.activateWhenCharacterIsNear();
@@ -88,6 +92,7 @@ class Endboss extends MovableObject {
     }, 150);
   }
 
+  /** Activates the endboss when the character approaches. */
   activateWhenCharacterIsNear() {
     const character = world?.character;
 
@@ -112,16 +117,23 @@ class Endboss extends MovableObject {
     return distance <= this.activationDistance;
   }
 
+  /** Starts the fight. */
   startFight() {
     this.status = "walk";
     this.currentImage = 0;
     this.isAnimPaused = false;
   }
 
+  /**
+   * Checks whether the alert animation can play.
+   *
+   * @returns {boolean} Whether the alert animation can play.
+   */
   canAnimateAlert() {
     return !this.isAnimPaused && this.status === "alert";
   }
 
+  /** Plays the alert animation. */
   playAlertAnimation() {
     if (this.shouldPauseAlert()) {
       this.pauseAlertAnimation();
@@ -131,6 +143,11 @@ class Endboss extends MovableObject {
     this.playAnimation(this.IMAGES_ALERT);
   }
 
+  /**
+   * Checks whether the alert animation should pause.
+   *
+   * @returns {boolean} Whether the alert animation should pause.
+   */
   shouldPauseAlert() {
     return (
       this.currentImage > 0 &&
@@ -138,6 +155,7 @@ class Endboss extends MovableObject {
     );
   }
 
+  /** Pauses the alert animation. */
   pauseAlertAnimation() {
     this.isAnimPaused = true;
 
@@ -149,6 +167,7 @@ class Endboss extends MovableObject {
     );
   }
 
+  /** Resumes the alert animation. */
   resumeAlertAnimation() {
     this.isAnimPaused = false;
 
@@ -157,6 +176,7 @@ class Endboss extends MovableObject {
     }
   }
 
+  /** Animates the fight. */
   animateFight() {
     let sequenceCount = 0;
 
@@ -183,6 +203,11 @@ class Endboss extends MovableObject {
     return this.handleWalk(sequenceCount);
   }
 
+  /**
+   * Handles the attack.
+   *
+   * @returns {number} Reset fight sequence count.
+   */
   handleAttack() {
     this.playAnimation(this.IMAGES_ATTACK);
 
@@ -212,11 +237,13 @@ class Endboss extends MovableObject {
     return nextSequenceCount;
   }
 
+  /** Starts the endboss hurt state. */
   hurt() {
     this.currentImage = 0;
     this.startHurtAnimation();
   }
 
+  /** Starts the hurt animation. */
   startHurtAnimation() {
     const intervalId = setStoppableInterval(() => {
       this.playAnimation(this.IMAGES_HURT);
@@ -240,6 +267,7 @@ class Endboss extends MovableObject {
     }, 200);
   }
 
+  /** Resumes the fight. */
   resumeFight() {
     this.gotHit = false;
 

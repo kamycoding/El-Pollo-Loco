@@ -1,5 +1,6 @@
 let level1;
 
+/** Creates level 1. */
 function createLevel1() {
   level1 = new Level(2, [0.7, 1.4], 10, 10);
   createLevel1Background();
@@ -8,6 +9,7 @@ function createLevel1() {
   level1.createCollectables();
 }
 
+/** Creates the level 1 background. */
 function createLevel1Background() {
   level1.createSky("./img/5_background/layers/air.png");
   level1.createLandscape(
@@ -18,6 +20,7 @@ function createLevel1Background() {
   level1.createClouds(0, 10);
 }
 
+/** Creates the level 1 enemies. */
 function createLevel1Enemies() {
   const endPosition = level1.getLevelEndPosition();
 
@@ -25,6 +28,7 @@ function createLevel1Enemies() {
   level1.createEnemies(Chick, 5, 350, endPosition);
 }
 
+/** Initializes the level 1 spawn intervals. */
 function initLevel1Intervals() {
   const maxPosition = level1.getLevelEndPosition();
 

@@ -48,6 +48,11 @@ class CollectableObject extends DrawableObject {
     this.getCollisionArea();
   }
 
+  /**
+   * Sets the dimensions.
+   *
+   * @param {"bottle"|"coin"} type - Collectable type.
+   */
   setDimensions(type) {
     this.width = this.TYPE[type].width;
     this.height = this.TYPE[type].height;
@@ -55,6 +60,11 @@ class CollectableObject extends DrawableObject {
     this.baseHeight = this.height;
   }
 
+  /**
+   * Sets the collectable collision.
+   *
+   * @param {"bottle"|"coin"} type - Collectable type.
+   */
   setCollectableCollision(type) {
     const collision = this.TYPE[type].collision;
 
@@ -66,6 +76,11 @@ class CollectableObject extends DrawableObject {
     );
   }
 
+  /**
+   * Draws the collectable.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   */
   draw(ctx) {
     if (!this.img) return;
 
@@ -77,6 +92,11 @@ class CollectableObject extends DrawableObject {
     this.drawPulsingCoin(ctx);
   }
 
+  /**
+   * Draws the pulsing coin.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   */
   drawPulsingCoin(ctx) {
     const scale = this.getPulseScale();
     const width = this.baseWidth * scale;

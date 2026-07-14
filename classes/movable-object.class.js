@@ -56,16 +56,27 @@ class MovableObject extends DrawableObject {
     return object.x + object.width - offsetX - object.collisionArea.width;
   }
 
+  /**
+   * Plays the animation.
+   *
+   * @param {string[]} images - Animation image paths.
+   */
   playAnimation(images) {
     this.currentImage %= images.length;
     this.img = this.imageCache[images[this.currentImage]];
     this.currentImage++;
   }
 
+  /**
+   * Checks whether the object is above ground.
+   *
+   * @returns {boolean} Whether the object is above ground.
+   */
   isAboveGround() {
     return this.y < this.groundPosition;
   }
 
+  /** Starts applying gravity to the object. */
   applyGravity() {
     if (this.gravityIntervalId !== null) return;
 
@@ -74,6 +85,7 @@ class MovableObject extends DrawableObject {
     }, 40);
   }
 
+  /** Updates the gravity. */
   updateGravity() {
     this.y -= this.speedY;
     this.speedY -= this.acceleration;
@@ -83,6 +95,7 @@ class MovableObject extends DrawableObject {
     this.finishGravity();
   }
 
+  /** Finishes the gravity. */
   finishGravity() {
     this.stopGravity();
 
@@ -90,6 +103,7 @@ class MovableObject extends DrawableObject {
     if (this instanceof Character) this.releaseJumpState();
   }
 
+  /** Stops the gravity. */
   stopGravity() {
     if (this.gravityIntervalId === null) return;
 
@@ -98,12 +112,19 @@ class MovableObject extends DrawableObject {
     this.speedY = 0;
   }
 
+  /** Releases the jump state. */
   releaseJumpState() {
     setStoppableTimeout(() => {
       this.isJumping = false;
     }, 200);
   }
 
+  /**
+   * Sets the move interval.
+   *
+   * @param {number} fast - Fast movement interval.
+   * @param {number} slow - Slow movement interval.
+   */
   setMoveInterval(fast, slow) {
     this.moveInterval = calcRandomNumber(fast, slow);
   }
@@ -121,16 +142,32 @@ class MovableObject extends DrawableObject {
     }, this.moveInterval);
   }
 
+  /**
+   * Starts the walking animation.
+   *
+   * @param {number} frequency - Animation interval in milliseconds.
+   * @param {string[]} images - Animation image paths.
+   */
   walk(frequency, images) {
     this.walkIntervalId = setStoppableInterval(() => {
       this.playAnimation(images);
     }, frequency);
   }
 
+  /**
+   * Moves the object horizontally.
+   *
+   * @param {number} direction - Movement direction.
+   */
   move(direction) {
     this.x += this.speedX * direction;
   }
 
+  /**
+   * Handles the edge.
+   *
+   * @param {MovableObject[]} objectArray - Array containing the object.
+   */
   handleEdge(objectArray) {
     if (this.x + this.width >= 0) return;
 
@@ -138,6 +175,7 @@ class MovableObject extends DrawableObject {
     this.removeFromArray(objectArray);
   }
 
+  /** Stops the movement intervals. */
   stopMovementIntervals() {
     clearStoppableInterval(this.moveIntervalId);
     clearStoppableInterval(this.walkIntervalId);
@@ -145,12 +183,18 @@ class MovableObject extends DrawableObject {
     this.walkIntervalId = null;
   }
 
+  /**
+   * Removes the object from an array.
+   *
+   * @param {MovableObject[]} objectArray - Array containing the object.
+   */
   removeFromArray(objectArray) {
     const objectIndex = objectArray.indexOf(this);
 
     if (objectIndex !== -1) objectArray.splice(objectIndex, 1);
   }
 
+  /** Starts the object death sequence. */
   die() {
     this.currentImage = 0;
     this.img = this.imageCache[this.IMAGES_DIE[0]];
@@ -164,6 +208,7 @@ class MovableObject extends DrawableObject {
     world.gameOver(this);
   }
 
+  /** Animates the death. */
   animateDeath() {
     this.playAnimation(this.IMAGES_DIE);
 

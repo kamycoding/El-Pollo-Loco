@@ -13,6 +13,7 @@ let isGameEnding = false;
 let isGamePaused = false;
 let pauseStartedAt = null;
 
+/** Starts the game. */
 function startGame() {
   if (isGameRunning || isGameEnding) return;
 
@@ -22,6 +23,7 @@ function startGame() {
   initLevel1Intervals();
 }
 
+/** Initializes the game session. */
 function initializeGameSession() {
   init();
   hideGameOverlay();
@@ -33,12 +35,14 @@ function initializeGameSession() {
   isGamePaused = false;
 }
 
+/** Prepares the game audio. */
 function prepareGameAudio() {
   audioManager.stopAllSounds();
   audioManager.unlockAudio();
   audioManager.playBackgroundMusic();
 }
 
+/** Creates the active game world. */
 function createWorld() {
   world = new World(canvas);
   createLevel1();
@@ -92,6 +96,13 @@ function setStoppableTimeout(callback, delay) {
   return timeout;
 }
 
+/**
+ * Creates a pause-aware timeout record.
+ *
+ * @param {Function} callback - Function to execute.
+ * @param {number} delay - Delay in milliseconds.
+ * @returns {{id: number|null, callback: Function, remaining: number, startedAt: number}} Registered timeout record.
+ */
 function createTimeoutRecord(callback, delay) {
   return {
     id: null,
@@ -101,21 +112,37 @@ function createTimeoutRecord(callback, delay) {
   };
 }
 
+/**
+ * Schedules the timeout.
+ *
+ * @param {{id: number|null, callback: Function, remaining: number, startedAt: number}} timeout - Timeout record.
+ */
 function scheduleTimeout(timeout) {
   timeout.startedAt = Date.now();
   timeout.id = setTimeout(() => executeTimeout(timeout), timeout.remaining);
 }
 
+/**
+ * Executes the timeout.
+ *
+ * @param {{id: number|null, callback: Function, remaining: number, startedAt: number}} timeout - Timeout record.
+ */
 function executeTimeout(timeout) {
   removeTimeout(timeout);
   timeout.id = null;
   timeout.callback();
 }
 
+/** Pauses all registered timeouts. */
 function pauseAllTimeouts() {
   timeouts.forEach((timeout) => pauseTimeout(timeout));
 }
 
+/**
+ * Pauses the timeout.
+ *
+ * @param {{id: number|null, callback: Function, remaining: number, startedAt: number}} timeout - Timeout record.
+ */
 function pauseTimeout(timeout) {
   if (timeout.id === null) return;
 
@@ -136,6 +163,7 @@ function getRemainingTime(timeout) {
   return Math.max(0, timeout.remaining - elapsed);
 }
 
+/** Resumes all paused timeouts. */
 function resumeAllTimeouts() {
   timeouts.forEach((timeout) => {
     if (timeout.id === null) scheduleTimeout(timeout);
@@ -154,15 +182,22 @@ function clearStoppableTimeout(timeout) {
   removeTimeout(timeout);
 }
 
+/**
+ * Removes the timeout.
+ *
+ * @param {{id: number|null, callback: Function, remaining: number, startedAt: number}} timeout - Timeout record.
+ */
 function removeTimeout(timeout) {
   timeouts = timeouts.filter((item) => item !== timeout);
 }
 
+/** Clears all registered intervals. */
 function clearAllIntervals() {
   intervals.forEach((intervalId) => clearInterval(intervalId));
   intervals = [];
 }
 
+/** Clears all registered timeouts. */
 function clearAllTimeouts() {
   timeouts.forEach((timeout) => {
     if (timeout.id !== null) clearTimeout(timeout.id);
@@ -171,6 +206,7 @@ function clearAllTimeouts() {
   timeouts = [];
 }
 
+/** Clears all registered timers. */
 function clearAllTimers() {
   clearAllIntervals();
   clearAllTimeouts();
@@ -197,6 +233,7 @@ function canProcessGameInput() {
 }
 
 /** Pauses the active game. */
+/** Pauses the game. */
 function pauseGame() {
   if (!canPauseGame()) return;
 
@@ -209,11 +246,17 @@ function pauseGame() {
   showPauseMenu();
 }
 
+/**
+ * Checks whether the current game can be paused.
+ *
+ * @returns {boolean} Whether the current game can be paused.
+ */
 function canPauseGame() {
   return isGameRunning && !isGameEnding && !isGamePaused && Boolean(world);
 }
 
 /** Resumes the paused game. */
+/** Resumes the game. */
 function resumeGame() {
   if (!isGamePaused || !world) return;
 
@@ -229,6 +272,7 @@ function resumeGame() {
   canvas.focus();
 }
 
+/** Preserves the paused timestamps. */
 function preservePausedTimestamps() {
   const pauseDuration = Date.now() - pauseStartedAt;
 
@@ -237,6 +281,11 @@ function preservePausedTimestamps() {
   shiftBottleTimestamps(pauseDuration);
 }
 
+/**
+ * Shifts the collision timestamp.
+ *
+ * @param {number} pauseDuration - Pause duration in milliseconds.
+ */
 function shiftCollisionTimestamp(pauseDuration) {
   const collisionManager = world?.collisionManager;
 
@@ -245,12 +294,18 @@ function shiftCollisionTimestamp(pauseDuration) {
   collisionManager.lastCharacterDamageAt += pauseDuration;
 }
 
+/**
+ * Shifts the bottle timestamps.
+ *
+ * @param {number} pauseDuration - Pause duration in milliseconds.
+ */
 function shiftBottleTimestamps(pauseDuration) {
   world.throwables.forEach((bottle) => {
     if (bottle.landedAt) bottle.landedAt += pauseDuration;
   });
 }
 
+/** Resumes the game audio. */
 function resumeGameAudio() {
   if (audioManager.isMuted) return;
 
@@ -274,6 +329,12 @@ function endGame(finishedWorld, result) {
   }, GAME_END_DELAY);
 }
 
+/**
+ * Finishes the game.
+ *
+ * @param {World} finishedWorld - Finished world instance.
+ * @param {"win"|"lose"} result - Game result.
+ */
 function finishGame(finishedWorld, result) {
   gameEndTimeoutId = null;
 
@@ -287,12 +348,22 @@ function finishGame(finishedWorld, result) {
   showEndScreen(result);
 }
 
+/**
+ * Stops the finished world.
+ *
+ * @param {World} finishedWorld - Finished world instance.
+ */
 function stopFinishedWorld(finishedWorld) {
   clearAllTimers();
   finishedWorld.stopEnemiesAndClouds();
   finishedWorld.stopDrawing();
 }
 
+/**
+ * Resets the game state.
+ *
+ * @param {World} finishedWorld - Finished world instance.
+ */
 function resetGameState(finishedWorld) {
   if (world === finishedWorld) world = null;
 
@@ -302,6 +373,11 @@ function resetGameState(finishedWorld) {
   pauseStartedAt = null;
 }
 
+/**
+ * Plays the end sound.
+ *
+ * @param {"win"|"lose"} result - Game result.
+ */
 function playEndSound(result) {
   if (result === "win") {
     audioManager.playWinSound();
@@ -312,17 +388,20 @@ function playEndSound(result) {
 }
 
 /** Restarts the active game. */
+/** Restarts the game. */
 function restartGame() {
   resetCurrentGame();
   startGame();
 }
 
 /** Returns to the start screen. */
+/** Returns to the home screen. */
 function goToHomeScreen() {
   resetCurrentGame();
   showStartScreen();
 }
 
+/** Resets the current game. */
 function resetCurrentGame() {
   clearPendingGameEnd();
   clearAllTimers();
@@ -335,6 +414,7 @@ function resetCurrentGame() {
   resetSessionFlags();
 }
 
+/** Resets the session flags. */
 function resetSessionFlags() {
   isGameRunning = false;
   isGameEnding = false;
@@ -342,6 +422,7 @@ function resetSessionFlags() {
   pauseStartedAt = null;
 }
 
+/** Clears the pending game end. */
 function clearPendingGameEnd() {
   if (gameEndTimeoutId === null) return;
 
@@ -349,6 +430,7 @@ function clearPendingGameEnd() {
   gameEndTimeoutId = null;
 }
 
+/** Stops the current world. */
 function stopCurrentWorld() {
   if (!world) return;
 
@@ -357,12 +439,14 @@ function stopCurrentWorld() {
   world = null;
 }
 
+/** Stops the current audio. */
 function stopCurrentAudio() {
   if (!audioManager) return;
 
   audioManager.stopAllSounds();
 }
 
+/** Initializes the game dependencies. */
 function init() {
   cacheDomElements();
   createAudioManager();
@@ -373,6 +457,7 @@ function init() {
   canvas.focus();
 }
 
+/** Creates the audio manager. */
 function createAudioManager() {
   if (audioManager) return;
 
@@ -380,12 +465,14 @@ function createAudioManager() {
   updateSoundButton();
 }
 
+/** Creates the keyboard listener. */
 function createKeyboardListener() {
   if (keyboardListener) return;
 
   keyboardListener = new Keyboard();
 }
 
+/** Resets the keyboard. */
 function resetKeyboard() {
   if (!keyboardListener) return;
 
@@ -393,6 +480,7 @@ function resetKeyboard() {
   if (typeof resetTouchControls === "function") resetTouchControls();
 }
 
+/** Adds the fullscreen event listeners. */
 function addFullscreenListener() {
   document.removeEventListener("fullscreenchange", updateFullscreenButton);
   document.addEventListener("fullscreenchange", updateFullscreenButton);

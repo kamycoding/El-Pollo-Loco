@@ -20,6 +20,11 @@ class Level {
     this.maxCoins = maxCoins;
   }
 
+  /**
+   * Creates the sky.
+   *
+   * @param {string} imgUrl - Image file path.
+   */
   createSky(imgUrl) {
     let x = 0;
 
@@ -30,6 +35,13 @@ class Level {
     }
   }
 
+  /**
+   * Creates the landscape.
+   *
+   * @param {string} layer1 - First landscape layer path.
+   * @param {string} layer2 - Second landscape layer path.
+   * @param {string} layer3 - Third landscape layer path.
+   */
   createLandscape(layer1, layer2, layer3) {
     const layers = [layer3, layer2, layer1];
 
@@ -38,6 +50,11 @@ class Level {
     });
   }
 
+  /**
+   * Creates the landscape layer.
+   *
+   * @param {string} imagePath - Image file path.
+   */
   createLandscapeLayer(imagePath) {
     let x = 0;
 
@@ -48,6 +65,12 @@ class Level {
     }
   }
 
+  /**
+   * Creates the clouds.
+   *
+   * @param {number} startPosition - Initial horizontal position.
+   * @param {number} count - Number of objects to create.
+   */
   createClouds(startPosition, count) {
     for (let index = 0; index < count; index++) {
       const cloud = new Cloud(0, 0);
@@ -84,6 +107,7 @@ class Level {
     }
   }
 
+  /** Creates the endboss. */
   createEndboss() {
     this.endboss = new Endboss(0, 0);
 
@@ -92,10 +116,16 @@ class Level {
     this.endboss.y = canvas.height - this.endboss.height - 40;
   }
 
+  /**
+   * Returns the level end position.
+   *
+   * @returns {number} Horizontal end position of the level.
+   */
   getLevelEndPosition() {
     return this.background.landscapeLayer[0].width * this.sceneParts;
   }
 
+  /** Creates the collectables. */
   createCollectables() {
     const types = ["bottle", "coin"];
 
@@ -124,12 +154,26 @@ class Level {
     };
   }
 
+  /**
+   * Adds the collectables.
+   *
+   * @param {string[]} types - Available collectable types.
+   * @param {number[]} remaining - Remaining collectable counts.
+   * @param {{total: number, distance: number, currentPosition: number}} layout - Collectable layout state.
+   */
   addCollectables(types, remaining, layout) {
     for (let index = 0; index < layout.total; index++) {
       this.addCollectable(types, remaining, layout);
     }
   }
 
+  /**
+   * Adds the collectable.
+   *
+   * @param {string[]} types - Available collectable types.
+   * @param {number[]} remaining - Remaining collectable counts.
+   * @param {{total: number, distance: number, currentPosition: number}} layout - Collectable layout state.
+   */
   addCollectable(types, remaining, layout) {
     const typeIndex = this.getObjectType(remaining);
     const position = this.getCollectablePosition(
@@ -178,6 +222,11 @@ class Level {
     return { x, y };
   }
 
+  /**
+   * Adds another group of clouds.
+   *
+   * @param {number} startPosition - Initial horizontal position.
+   */
   addMoreClouds(startPosition) {
     setStoppableInterval(() => {
       this.createClouds(startPosition, 5);

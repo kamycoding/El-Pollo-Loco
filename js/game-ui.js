@@ -21,6 +21,7 @@ let controlsCloseButton;
 let pauseDialog;
 let resumeButton;
 
+/** Shows the start screen. */
 function showStartScreen() {
   init();
   hideGameMenuButton();
@@ -53,6 +54,7 @@ function showEndScreen(result) {
   showLoseScreen();
 }
 
+/** Shows the win screen. */
 function showWinScreen() {
   setOverlayBackground("win");
   setOverlayContent("You won!", "The endboss is defeated. Nice job.");
@@ -61,6 +63,7 @@ function showWinScreen() {
   updateInterfaceButtons();
 }
 
+/** Shows the loss screen. */
 function showLoseScreen() {
   setOverlayBackground("lose");
   setOverlayContent("Game over", "Pepe lost all health. Try again.");
@@ -69,6 +72,7 @@ function showLoseScreen() {
   updateInterfaceButtons();
 }
 
+/** Updates the interface buttons. */
 function updateInterfaceButtons() {
   updateSoundButton();
   updateFullscreenButton();
@@ -85,6 +89,7 @@ function setOverlayContent(title, message) {
   overlayMessage.textContent = message;
 }
 
+/** Shows the start menu. */
 function showStartMenu() {
   startButton.classList.remove("hidden");
   restartButton.classList.add("hidden");
@@ -93,6 +98,7 @@ function showStartMenu() {
   closeControlsDialog(false);
 }
 
+/** Shows the end menu. */
 function showEndMenu() {
   startButton.classList.add("hidden");
   restartButton.classList.remove("hidden");
@@ -101,25 +107,30 @@ function showEndMenu() {
   closeControlsDialog(false);
 }
 
+/** Shows the game overlay. */
 function showGameOverlay() {
   gameOverlay.classList.remove("hidden");
 }
 
+/** Hides the game overlay. */
 function hideGameOverlay() {
   gameOverlay.classList.add("hidden");
 }
 
+/** Shows the game menu button. */
 function showGameMenuButton() {
   gameMenuButton?.classList.remove("hidden");
   gameFullscreenButton?.classList.remove("hidden");
 }
 
+/** Hides the game menu button. */
 function hideGameMenuButton() {
   gameMenuButton?.classList.add("hidden");
   gameFullscreenButton?.classList.add("hidden");
 }
 
 /** Displays the pause menu. */
+/** Shows the pause menu. */
 function showPauseMenu() {
   if (!pauseDialog) return;
 
@@ -168,6 +179,7 @@ function setOverlayBackground(screen) {
 }
 
 /** Toggles game audio mute state. */
+/** Toggles the sound mute state. */
 function toggleSound() {
   createAudioManager();
   audioManager.toggleMute();
@@ -175,6 +187,7 @@ function toggleSound() {
   updateBackgroundMusic();
 }
 
+/** Updates the background music. */
 function updateBackgroundMusic() {
   if (!isGameRunning || isGamePaused) return;
 
@@ -186,6 +199,7 @@ function updateBackgroundMusic() {
   audioManager.resumeBackgroundMusic();
 }
 
+/** Updates the sound button. */
 function updateSoundButton() {
   if (!audioManager) return;
 
@@ -198,12 +212,18 @@ function updateSoundButton() {
   updateSoundButtonLabels();
 }
 
+/**
+ * Returns the icon for the current sound state.
+ *
+ * @returns {string} Current sound icon path.
+ */
 function getSoundIconPath() {
   return audioManager.isMuted
     ? "./img/symbol/volume-off.svg"
     : "./img/symbol/volume-on.svg";
 }
 
+/** Updates the sound button labels. */
 function updateSoundButtonLabels() {
   const label = getSoundButtonLabel();
 
@@ -213,10 +233,16 @@ function updateSoundButtonLabels() {
   updatePauseSoundLabel();
 }
 
+/**
+ * Returns the label for the current sound state.
+ *
+ * @returns {string} Accessible sound button label.
+ */
 function getSoundButtonLabel() {
   return audioManager.isMuted ? "Turn sound on" : "Turn sound off";
 }
 
+/** Updates the pause sound label. */
 function updatePauseSoundLabel() {
   if (!pauseSoundLabel) return;
 
@@ -236,6 +262,7 @@ function updateSoundButtonAccessibility(button, label) {
 }
 
 /** Toggles the controls dialog. */
+/** Toggles the controls dialog. */
 function toggleControlsDialog() {
   if (controlsDialog.classList.contains("hidden")) {
     openControlsDialog();
@@ -245,6 +272,7 @@ function toggleControlsDialog() {
   closeControlsDialog();
 }
 
+/** Opens the controls dialog. */
 function openControlsDialog() {
   controlsDialog.classList.remove("hidden");
   controlsButton.setAttribute("aria-expanded", "true");
@@ -288,12 +316,14 @@ function handleControlsDialogKeydown(event) {
   closeControlsDialog();
 }
 
+/** Blurs the active element. */
 function blurActiveElement() {
   if (!document.activeElement) return;
 
   document.activeElement.blur();
 }
 
+/** Caches the dom elements. */
 function cacheDomElements() {
   cacheGameElements();
   cacheOverlayElements();
@@ -302,11 +332,13 @@ function cacheDomElements() {
   cacheInterfaceButtons();
 }
 
+/** Caches the game elements. */
 function cacheGameElements() {
   canvas = document.getElementById("canvas");
   gameOverlay = document.getElementById("game-overlay");
 }
 
+/** Caches the overlay elements. */
 function cacheOverlayElements() {
   overlayTitle = document.getElementById("overlay-title");
   overlayMessage = document.getElementById("overlay-message");
@@ -316,12 +348,14 @@ function cacheOverlayElements() {
   resumeButton = document.getElementById("resume-button");
 }
 
+/** Caches the action buttons. */
 function cacheActionButtons() {
   startButton = document.getElementById("start-button");
   restartButton = document.getElementById("restart-button");
   homeButton = document.getElementById("home-button");
 }
 
+/** Caches the sound controls. */
 function cacheSoundControls() {
   gameMenuButton = document.getElementById("game-menu-button");
   pauseSoundLabel = document.getElementById("pause-sound-label");
@@ -329,6 +363,11 @@ function cacheSoundControls() {
   soundIcons = getSoundIcons();
 }
 
+/**
+ * Returns all sound control buttons.
+ *
+ * @returns {HTMLButtonElement[]} Available sound buttons.
+ */
 function getSoundButtons() {
   return [
     document.getElementById("sound-button"),
@@ -336,6 +375,11 @@ function getSoundButtons() {
   ].filter(Boolean);
 }
 
+/**
+ * Returns all sound control icons.
+ *
+ * @returns {HTMLImageElement[]} Available sound icons.
+ */
 function getSoundIcons() {
   return [
     document.getElementById("sound-icon"),
@@ -343,6 +387,7 @@ function getSoundIcons() {
   ].filter(Boolean);
 }
 
+/** Caches the interface buttons. */
 function cacheInterfaceButtons() {
   controlsButton = document.getElementById("controls-button");
   gameFullscreenButton = document.getElementById("game-fullscreen-button");

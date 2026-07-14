@@ -26,6 +26,12 @@ class DrawableObject {
     this.y = y;
   }
 
+  /**
+   * Loads the image.
+   *
+   * @param {string} imgUrl - Image file path.
+   * @returns {DrawableObject} Current drawable object.
+   */
   loadImage(imgUrl) {
     const img = new Image();
     img.src = imgUrl;
@@ -38,6 +44,11 @@ class DrawableObject {
     return this;
   }
 
+  /**
+   * Loads the image cache.
+   *
+   * @param {string[]} urlList - Image file paths.
+   */
   loadImageCache(urlList) {
     urlList.forEach((url) => {
       const img = new Image();
@@ -83,6 +94,11 @@ class DrawableObject {
     });
   }
 
+  /**
+   * Draws the loaded image.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   */
   draw(ctx) {
     if (!this.img) return;
 

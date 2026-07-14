@@ -31,6 +31,11 @@ class ThrowableObject extends MovableObject {
     this.throw();
   }
 
+  /**
+   * Configures the bottle.
+   *
+   * @param {boolean} isFlipped - Whether the bottle is thrown left.
+   */
   configureBottle(isFlipped) {
     this.loadImage(this.IMAGES_ROTATE[0]);
     this.isFlipped = isFlipped;
@@ -42,22 +47,26 @@ class ThrowableObject extends MovableObject {
     this.setCollisionBasis(0.15, 0.15, 0.72, 0.72);
   }
 
+  /** Loads the bottle images. */
   loadBottleImages() {
     this.loadImages(this.IMAGES_ROTATE, this.IMAGES_SPLASH, this.IMAGES_GROUND);
   }
 
+  /** Throws the bottle. */
   throw() {
     this.currentImage = 0;
     this.startThrowAnimation();
     this.startThrowGravity();
   }
 
+  /** Starts the throw animation. */
   startThrowAnimation() {
     this.throwIntervalId = setStoppableInterval(() => {
       this.updateThrow();
     }, 40);
   }
 
+  /** Updates the throw. */
   updateThrow() {
     this.playAnimation(this.IMAGES_ROTATE);
     this.move(this.isFlipped ? -1 : 1);
@@ -65,18 +74,21 @@ class ThrowableObject extends MovableObject {
     if (!this.isAboveGround()) this.stopOnGround();
   }
 
+  /** Starts the throw gravity. */
   startThrowGravity() {
     setStoppableTimeout(() => {
       this.applyGravity();
     }, 100);
   }
 
+  /** Stops the bottle on the ground. */
   stopOnGround() {
     this.stopThrowAnimation();
     this.landedAt = Date.now();
     this.loadGroundImage();
   }
 
+  /** Stops the throw animation. */
   stopThrowAnimation() {
     if (this.throwIntervalId === null) return;
 
@@ -84,6 +96,7 @@ class ThrowableObject extends MovableObject {
     this.throwIntervalId = null;
   }
 
+  /** Loads the ground image. */
   loadGroundImage() {
     const imageIndex = Math.round(Math.random());
 
@@ -102,6 +115,7 @@ class ThrowableObject extends MovableObject {
     this.startSplashAnimation(onFinished);
   }
 
+  /** Prepares the smash. */
   prepareSmash() {
     audioManager.playBottleSmashSound();
     this.currentImage = 0;
@@ -111,12 +125,22 @@ class ThrowableObject extends MovableObject {
     this.stopGravity();
   }
 
+  /**
+   * Starts the splash animation.
+   *
+   * @param {Function} onFinished - Callback run after the animation.
+   */
   startSplashAnimation(onFinished) {
     this.splashIntervalId = setStoppableInterval(() => {
       this.animateSplash(onFinished);
     }, 70);
   }
 
+  /**
+   * Animates the splash.
+   *
+   * @param {Function} onFinished - Callback run after the animation.
+   */
   animateSplash(onFinished) {
     if (this.currentImage >= this.IMAGES_SPLASH.length) {
       this.finishSplash(onFinished);
@@ -126,12 +150,18 @@ class ThrowableObject extends MovableObject {
     this.playAnimation(this.IMAGES_SPLASH);
   }
 
+  /**
+   * Finishes the splash.
+   *
+   * @param {Function} onFinished - Callback run after the animation.
+   */
   finishSplash(onFinished) {
     this.stopSplashAnimation();
 
     if (typeof onFinished === "function") onFinished();
   }
 
+  /** Stops the splash animation. */
   stopSplashAnimation() {
     if (this.splashIntervalId === null) return;
 

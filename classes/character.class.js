@@ -87,6 +87,11 @@ class Character extends MovableObject {
     this.initIntervals();
   }
 
+  /**
+   * Configures the character.
+   *
+   * @param {number} x - Horizontal position.
+   */
   configureCharacter(x) {
     this.aspectRatio = 0.5083;
     this.width = 220;
@@ -97,6 +102,7 @@ class Character extends MovableObject {
     this.setCollisionBasis(0.15, 0.45, 0.55, 0.55);
   }
 
+  /** Loads the character images. */
   loadCharacterImages() {
     this.loadImages(
       this.IMAGES_WAIT,
@@ -108,6 +114,7 @@ class Character extends MovableObject {
     );
   }
 
+  /** Initializes the intervals. */
   initIntervals() {
     this.handleMovement();
     this.animateWalk();
@@ -116,12 +123,14 @@ class Character extends MovableObject {
     this.animateIdle();
   }
 
+  /** Handles the movement. */
   handleMovement() {
     setStoppableInterval(() => {
       this.updateMovement();
     }, 55);
   }
 
+  /** Updates the movement. */
   updateMovement() {
     const { maxX, maxCamX } = this.getMovementLimits();
 
@@ -148,6 +157,12 @@ class Character extends MovableObject {
     };
   }
 
+  /**
+   * Moves the character right and updates the camera.
+   *
+   * @param {number} maxX - Maximum horizontal position.
+   * @param {number} maxCamX - Maximum camera position.
+   */
   moveRight(maxX, maxCamX) {
     this.isFlipped = false;
 
@@ -159,6 +174,11 @@ class Character extends MovableObject {
     }
   }
 
+  /**
+   * Moves the character left and updates the camera.
+   *
+   * @param {number} maxCamX - Maximum camera position.
+   */
   moveLeft(maxCamX) {
     this.isFlipped = true;
 
@@ -172,6 +192,7 @@ class Character extends MovableObject {
     }
   }
 
+  /** Animates the walk. */
   animateWalk() {
     setStoppableInterval(() => {
       const isMoving = this.isMovementKeyPressed();
@@ -185,21 +206,29 @@ class Character extends MovableObject {
     }, 100);
   }
 
+  /**
+   * Checks whether a movement key is pressed.
+   *
+   * @returns {boolean} Whether a movement key is pressed.
+   */
   isMovementKeyPressed() {
     return this.keyboard.KEYS.RIGHT.status || this.keyboard.KEYS.LEFT.status;
   }
 
+  /** Stops the walk. */
   stopWalk() {
     this.isWalking = false;
     this.reset();
   }
 
+  /** Animates the jump. */
   animateJump() {
     setStoppableInterval(() => {
       this.tryJump();
     }, 20);
   }
 
+  /** Attempts to start a jump. */
   tryJump() {
     if (!this.canJump()) return;
 
@@ -209,24 +238,32 @@ class Character extends MovableObject {
     this.startJumpAnimation();
   }
 
+  /** Starts the jump state. */
   startJumpState() {
     this.isJumping = true;
     this.currentImage = 2;
     this.speedY = 50;
   }
 
+  /**
+   * Checks whether the character can jump.
+   *
+   * @returns {boolean} Whether the character can jump.
+   */
   canJump() {
     return (
       this.keyboard.KEYS.JUMP.status && !this.isAboveGround() && !this.isJumping
     );
   }
 
+  /** Starts the jump animation. */
   startJumpAnimation() {
     this.jumpIntervalId = setStoppableInterval(() => {
       this.updateJumpAnimation();
     }, 90);
   }
 
+  /** Updates the jump animation. */
   updateJumpAnimation() {
     if (!this.gotHit) this.playAnimation(this.IMAGES_JUMP);
     if (this.isAboveGround()) return;
@@ -234,6 +271,7 @@ class Character extends MovableObject {
     this.finishJumpAnimation();
   }
 
+  /** Finishes the jump animation. */
   finishJumpAnimation() {
     clearStoppableInterval(this.jumpIntervalId);
     this.jumpIntervalId = null;
@@ -242,12 +280,18 @@ class Character extends MovableObject {
     if (!this.gotHit) this.reset();
   }
 
+  /** Animates the idle. */
   animateIdle() {
     setStoppableInterval(() => {
       if (this.canAnimateIdle()) this.playIdleAnimation();
     }, 180);
   }
 
+  /**
+   * Checks whether the idle animation can play.
+   *
+   * @returns {boolean} Whether the idle animation can play.
+   */
   canAnimateIdle() {
     return (
       !this.keyboard.isAnyKeyPressed() &&
@@ -260,22 +304,30 @@ class Character extends MovableObject {
     );
   }
 
+  /** Plays the idle animation. */
   playIdleAnimation() {
     const images = this.shouldSleep() ? this.IMAGES_SNOOZE : this.IMAGES_WAIT;
 
     this.playAnimation(images);
   }
 
+  /**
+   * Checks whether the sleeping animation should play.
+   *
+   * @returns {boolean} Whether the sleeping animation should play.
+   */
   shouldSleep() {
     return Date.now() - lastActiveTimestamp >= this.sleepDelay;
   }
 
+  /** Handles the throw. */
   handleThrow() {
     setStoppableInterval(() => {
       this.tryThrowBottle();
     }, 50);
   }
 
+  /** Attempts to throw a bottle. */
   tryThrowBottle() {
     if (!this.canThrowBottle()) return;
 
@@ -287,18 +339,25 @@ class Character extends MovableObject {
     this.scheduleThrowReset();
   }
 
+  /** Updates the bottle status. */
   updateBottleStatus() {
     const percent = (100 / world.level.maxBottles) * this.bottleCount;
 
     world.statusbars.bottle.setValue(percent);
   }
 
+  /** Schedules the throw reset. */
   scheduleThrowReset() {
     setStoppableTimeout(() => {
       this.hasThrownBottle = false;
     }, 500);
   }
 
+  /**
+   * Checks whether the character can throw a bottle.
+   *
+   * @returns {boolean} Whether the character can throw a bottle.
+   */
   canThrowBottle() {
     return (
       this.keyboard.KEYS.THROW.status &&
@@ -307,6 +366,7 @@ class Character extends MovableObject {
     );
   }
 
+  /** Throws the bottle. */
   throwBottle() {
     const startX = this.x + this.width / 2;
     const startY = this.y + this.height / 3;
@@ -314,6 +374,7 @@ class Character extends MovableObject {
     world.throwables.push(new ThrowableObject(startX, startY, this.isFlipped));
   }
 
+  /** Starts the character hurt animation. */
   hurt() {
     this.currentImage = 0;
     this.hurtIntervalId = setStoppableInterval(() => {
@@ -321,6 +382,7 @@ class Character extends MovableObject {
     }, 120);
   }
 
+  /** Updates the hurt animation. */
   updateHurtAnimation() {
     this.playAnimation(this.IMAGES_HURT);
 
@@ -331,6 +393,7 @@ class Character extends MovableObject {
     this.finishHurtAnimation();
   }
 
+  /** Finishes the hurt animation. */
   finishHurtAnimation() {
     setStoppableTimeout(() => {
       this.gotHit = false;
@@ -339,12 +402,14 @@ class Character extends MovableObject {
     }, 250);
   }
 
+  /** Resets the character animation state. */
   reset() {
     this.currentImage = 0;
     this.loadImage(this.IMAGES_WAIT[0]);
     this.resetActivityTimer();
   }
 
+  /** Resets the activity timer. */
   resetActivityTimer() {
     lastActiveTimestamp = Date.now();
   }

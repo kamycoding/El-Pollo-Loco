@@ -55,6 +55,7 @@ class AudioManager {
     this.applyMuteState();
   }
 
+  /** Creates the configured audio elements. */
   createSounds() {
     Object.entries(AUDIO_CONFIG).forEach(([name, config]) => {
       this.sounds[name] = this.createAudio(config);
@@ -81,6 +82,7 @@ class AudioManager {
     return audio;
   }
 
+  /** Creates the Web Audio context. */
   createAudioContext() {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
@@ -89,6 +91,7 @@ class AudioManager {
     this.audioContext = new AudioContextClass();
   }
 
+  /** Loads the sound effect buffers. */
   loadEffectBuffers() {
     if (!this.audioContext) return;
 
@@ -111,14 +114,17 @@ class AudioManager {
       .catch(() => {});
   }
 
+  /** Loads the saved mute state. */
   loadMuteState() {
     this.isMuted = localStorage.getItem(this.storageKey) === "true";
   }
 
+  /** Saves the current mute state. */
   saveMuteState() {
     localStorage.setItem(this.storageKey, this.isMuted);
   }
 
+  /** Toggles the mute state. */
   toggleMute() {
     this.isMuted = !this.isMuted;
 
@@ -126,6 +132,7 @@ class AudioManager {
     this.applyMuteState();
   }
 
+  /** Applies the current mute state. */
   applyMuteState() {
     Object.values(this.sounds).forEach((sound) => {
       sound.muted = this.isMuted;
@@ -148,6 +155,7 @@ class AudioManager {
     this.isUnlocked = true;
   }
 
+  /** Plays the background music. */
   playBackgroundMusic() {
     const background = this.sounds.background;
 
@@ -158,6 +166,7 @@ class AudioManager {
     background.play().catch(() => {});
   }
 
+  /** Resumes the background music. */
   resumeBackgroundMusic() {
     const background = this.sounds.background;
 
@@ -166,12 +175,14 @@ class AudioManager {
     background.play().catch(() => {});
   }
 
+  /** Pauses the background music. */
   pauseBackgroundMusic() {
     const background = this.sounds.background;
 
     if (background) background.pause();
   }
 
+  /** Stops the background music. */
   stopBackgroundMusic() {
     const background = this.sounds.background;
 
@@ -181,6 +192,7 @@ class AudioManager {
     background.currentTime = 0;
   }
 
+  /** Pauses all active sounds. */
   pauseAllSounds() {
     Object.values(this.sounds).forEach((sound) => {
       sound.pause();
@@ -189,6 +201,7 @@ class AudioManager {
     this.stopActiveEffects();
   }
 
+  /** Stops all active sounds. */
   stopAllSounds() {
     Object.values(this.sounds).forEach((sound) => {
       sound.pause();
@@ -198,6 +211,7 @@ class AudioManager {
     this.stopActiveEffects();
   }
 
+  /** Stops the active effects. */
   stopActiveEffects() {
     this.activeSources.forEach((source) => {
       source.stop();
@@ -206,34 +220,42 @@ class AudioManager {
     this.activeSources.clear();
   }
 
+  /** Plays the game-over sound effect. */
   playGameOverSound() {
     this.playEffect("gameOver");
   }
 
+  /** Plays the win sound effect. */
   playWinSound() {
     this.playEffect("win");
   }
 
+  /** Plays the jump sound effect. */
   playJumpSound() {
     this.playEffect("jump");
   }
 
+  /** Plays the bottle-smash sound effect. */
   playBottleSmashSound() {
     this.playEffect("bottleSmash");
   }
 
+  /** Plays the bottle collection sound effect. */
   playCollectBottleSound() {
     this.playEffect("collectBottle");
   }
 
+  /** Plays the coin collection sound effect. */
   playCollectCoinSound() {
     this.playEffect("collectCoin");
   }
 
+  /** Plays the hurt sound effect. */
   playHurtSound() {
     this.playEffect("hurt");
   }
 
+  /** Plays the enemy defeat sound effect. */
   playEnemyDefeatSound() {
     this.playEffect("enemyDefeat");
   }

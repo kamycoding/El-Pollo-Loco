@@ -4,6 +4,7 @@ const touchStartedAt = new Map();
 const touchReleaseTimers = new Map();
 let touchControlsInitialized = false;
 
+/** Initializes the touch controls. */
 function initTouchControls() {
   if (touchControlsInitialized) return;
 
@@ -55,6 +56,13 @@ function rejectInactiveTouchInput(keyName, key, event) {
   return true;
 }
 
+/**
+ * Presses the touch key.
+ *
+ * @param {string} keyName - Keyboard action name.
+ * @param {{status: boolean}} key - Keyboard state to update.
+ * @param {PointerEvent} event - Triggered pointer event.
+ */
 function pressTouchKey(keyName, key, event) {
   clearTouchReleaseTimer(keyName);
   touchStartedAt.set(keyName, performance.now());
@@ -63,6 +71,13 @@ function pressTouchKey(keyName, key, event) {
   setTouchButtonPressed(event, true);
 }
 
+/**
+ * Releases the touch key.
+ *
+ * @param {string} keyName - Keyboard action name.
+ * @param {{status: boolean}} key - Keyboard state to update.
+ * @param {PointerEvent} event - Triggered pointer event.
+ */
 function releaseTouchKey(keyName, key, event) {
   if (shouldKeepCapturedPointer(event)) return;
 
@@ -71,6 +86,13 @@ function releaseTouchKey(keyName, key, event) {
   scheduleTouchRelease(keyName, key, event);
 }
 
+/**
+ * Schedules the touch release.
+ *
+ * @param {string} keyName - Keyboard action name.
+ * @param {{status: boolean}} key - Keyboard state to update.
+ * @param {PointerEvent} event - Triggered pointer event.
+ */
 function scheduleTouchRelease(keyName, key, event) {
   if (event?.type === "pointercancel") {
     finishTouchRelease(keyName, key);
@@ -96,6 +118,13 @@ function getTouchReleaseDelay(keyName) {
   return Math.max(0, TOUCH_MIN_PRESS_MS - elapsed);
 }
 
+/**
+ * Queues the touch release.
+ *
+ * @param {string} keyName - Keyboard action name.
+ * @param {{status: boolean}} key - Keyboard state to update.
+ * @param {number} delay - Delay in milliseconds.
+ */
 function queueTouchRelease(keyName, key, delay) {
   const timerId = window.setTimeout(() => {
     finishTouchRelease(keyName, key);
@@ -104,12 +133,23 @@ function queueTouchRelease(keyName, key, delay) {
   touchReleaseTimers.set(keyName, timerId);
 }
 
+/**
+ * Finishes the touch release.
+ *
+ * @param {string} keyName - Keyboard action name.
+ * @param {{status: boolean}} key - Keyboard state to update.
+ */
 function finishTouchRelease(keyName, key) {
   key.status = false;
   touchStartedAt.delete(keyName);
   clearTouchReleaseTimer(keyName);
 }
 
+/**
+ * Clears the touch release timer.
+ *
+ * @param {string} keyName - Keyboard action name.
+ */
 function clearTouchReleaseTimer(keyName) {
   const timerId = touchReleaseTimers.get(keyName);
   if (timerId === undefined) return;
@@ -118,6 +158,11 @@ function clearTouchReleaseTimer(keyName) {
   touchReleaseTimers.delete(keyName);
 }
 
+/**
+ * Captures the touch pointer.
+ *
+ * @param {PointerEvent} event - Triggered pointer event.
+ */
 function captureTouchPointer(event) {
   const button = event?.currentTarget;
   if (!button?.setPointerCapture) return;
@@ -127,6 +172,11 @@ function captureTouchPointer(event) {
   } catch {}
 }
 
+/**
+ * Releases the touch pointer.
+ *
+ * @param {PointerEvent} event - Triggered pointer event.
+ */
 function releaseTouchPointer(event) {
   const button = event?.currentTarget;
   if (!button?.hasPointerCapture?.(event.pointerId)) return;
@@ -148,6 +198,12 @@ function shouldKeepCapturedPointer(event) {
   return Boolean(event.currentTarget?.hasPointerCapture?.(event.pointerId));
 }
 
+/**
+ * Updates a touch button's pressed state.
+ *
+ * @param {PointerEvent} event - Triggered pointer event.
+ * @param {boolean} isPressed - Whether the button is pressed.
+ */
 function setTouchButtonPressed(event, isPressed) {
   const button = event?.currentTarget;
   if (!button) return;
@@ -155,10 +211,12 @@ function setTouchButtonPressed(event, isPressed) {
   button.classList.toggle("is-pressed", isPressed);
 }
 
+/** Handles the touch visibility. */
 function handleTouchVisibility() {
   if (document.hidden) resetTouchControls();
 }
 
+/** Resets the touch controls. */
 function resetTouchControls() {
   touchReleaseTimers.forEach((timerId) => clearTimeout(timerId));
   touchReleaseTimers.clear();
@@ -167,12 +225,18 @@ function resetTouchControls() {
   clearTouchButtonStates();
 }
 
+/** Clears the touch button states. */
 function clearTouchButtonStates() {
   document.querySelectorAll(".touch-button.is-pressed").forEach((button) => {
     button.classList.remove("is-pressed");
   });
 }
 
+/**
+ * Prevents default touch behavior.
+ *
+ * @param {PointerEvent} event - Triggered pointer event.
+ */
 function preventTouchDefault(event) {
   event.preventDefault();
 }

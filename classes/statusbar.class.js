@@ -79,6 +79,11 @@ class Statusbar extends DrawableObject {
     this.setValue(percent);
   }
 
+  /**
+   * Validates the type.
+   *
+   * @param {"characterHealth"|"endbossHealth"|"bottle"|"coin"} type - Statusbar type.
+   */
   validateType(type) {
     if (this.TYPE[type]) return;
 
@@ -101,6 +106,7 @@ class Statusbar extends DrawableObject {
     this.updateCurrentCount();
   }
 
+  /** Updates the current count. */
   updateCurrentCount() {
     if (!this.isCounterBar()) return;
 
@@ -127,6 +133,11 @@ class Statusbar extends DrawableObject {
     return Math.round((percent * 5) / 100);
   }
 
+  /**
+   * Draws the statusbar and its value.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   */
   draw(ctx) {
     if (!this.img) return;
 
@@ -134,6 +145,11 @@ class Statusbar extends DrawableObject {
     this.drawStatusValue(ctx);
   }
 
+  /**
+   * Draws the status value.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   */
   drawStatusValue(ctx) {
     if (this.isHealthbar()) {
       this.drawExactHealthValue(ctx);
@@ -143,30 +159,64 @@ class Statusbar extends DrawableObject {
     if (this.isCounterBar()) this.drawCounterText(ctx);
   }
 
+  /**
+   * Checks whether this statusbar displays health.
+   *
+   * @returns {boolean} Whether this statusbar displays health.
+   */
   isHealthbar() {
     return this.type === "characterHealth" || this.type === "endbossHealth";
   }
 
+  /**
+   * Checks whether this statusbar displays a counter.
+   *
+   * @returns {boolean} Whether this statusbar displays a counter.
+   */
   isCounterBar() {
     return this.type === "bottle" || this.type === "coin";
   }
 
+  /**
+   * Draws the exact health value.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   */
   drawExactHealthValue(ctx) {
     this.drawHealthText(ctx);
   }
 
+  /**
+   * Draws the health text.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   */
   drawHealthText(ctx) {
     const text = `${Math.round(this.value)}%`;
 
     this.drawOutlinedText(ctx, text, this.x + this.width - 42, this.y + 24, 13);
   }
 
+  /**
+   * Draws the counter text.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   */
   drawCounterText(ctx) {
     const text = `${this.currentCount}/${this.maxValue}`;
 
     this.drawOutlinedText(ctx, text, this.x + this.width - 40, this.y + 24, 15);
   }
 
+  /**
+   * Draws the outlined text.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+   * @param {string} text - Text to draw.
+   * @param {number} x - Horizontal position.
+   * @param {number} y - Vertical position.
+   * @param {number} fontSize - Font size in pixels.
+   */
   drawOutlinedText(ctx, text, x, y, fontSize) {
     ctx.save();
     ctx.font = `bold ${fontSize}px Arial`;
