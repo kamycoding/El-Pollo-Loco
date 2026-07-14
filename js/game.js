@@ -1,3 +1,5 @@
+const GAME_END_DELAY = 1600;
+
 let canvas;
 let world;
 let keyboardListener;
@@ -269,7 +271,7 @@ function endGame(finishedWorld, result) {
 
   gameEndTimeoutId = setStoppableTimeout(() => {
     finishGame(finishedWorld, result);
-  }, 2500);
+  }, GAME_END_DELAY);
 }
 
 function finishGame(finishedWorld, result) {

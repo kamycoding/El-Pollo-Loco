@@ -166,7 +166,7 @@ class World {
    * @returns {boolean} Whether another frame may render.
    */
   canRender() {
-    return isGameRunning && !isGamePaused && !isGameEnding && world === this;
+    return isGameRunning && !isGamePaused && world === this;
   }
 
   clearCanvas() {

@@ -1,3 +1,5 @@
+const DEATH_ANIMATION_DURATION = 1200;
+
 class MovableObject extends DrawableObject {
   isFlipped = false;
   speedX = 0;
@@ -151,10 +153,14 @@ class MovableObject extends DrawableObject {
 
   die() {
     this.currentImage = 0;
+    this.img = this.imageCache[this.IMAGES_DIE[0]];
+    this.currentImage = 1;
+    const frameDelay = Math.floor(
+      DEATH_ANIMATION_DURATION / this.IMAGES_DIE.length,
+    );
     this.deathIntervalId = setStoppableInterval(() => {
       this.animateDeath();
-    }, 160);
-
+    }, frameDelay);
     world.gameOver(this);
   }
 
