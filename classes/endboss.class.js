@@ -43,7 +43,7 @@ class Endboss extends MovableObject {
   statusbar = new Statusbar("endbossHealth", 100);
   status = "alert";
   isAnimPaused = false;
-  activationDistance = 300;
+  activationDistance = 420;
 
   constructor(x, y) {
     super(x, y).loadImage(this.IMAGES_WALK[0]);
@@ -182,7 +182,7 @@ class Endboss extends MovableObject {
 
     setStoppableInterval(() => {
       sequenceCount = this.handleFightAnimation(sequenceCount);
-    }, 130);
+    }, 110);
   }
 
   /**
